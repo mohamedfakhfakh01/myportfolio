@@ -1,0 +1,115 @@
+import 'package:flutter/foundation.dart';
+
+import '../../../shared/models/project.dart';
+import '../../../shared/models/skill.dart';
+import '../../../shared/models/student.dart';
+import '../data/portfolio_repository.dart';
+
+/// Gère l'**état** des portfolios : la liste des étudiants, chargée depuis la
+/// base de données via le [PortfolioRepository].
+///
+/// Gère trois états visibles par l'interface :
+/// - `isLoading` : chargement en cours (on affiche un indicateur) ;
+/// - `error` : un problème est survenu (on affiche un message) ;
+/// - sinon : la liste `students` est prête.
+class PortfolioProvider extends ChangeNotifier {
+  /// Le repository est injectable (pratique pour les tests) ; par défaut on
+  /// utilise le vrai, branché sur sqflite.
+  PortfolioProvider({PortfolioRepository? repository})
+      : _repository = repository ?? PortfolioRepository() {
+    load();
+  }
+
+  final PortfolioRepository _repository;
+
+  List<Student> _students = [];
+  bool _isLoading = true;
+  String? _error;
+
+  /// Liste des étudiants (lecture seule).
+  List<Student> get students => List.unmodifiable(_students);
+
+  /// Vrai tant que les données ne sont pas chargées.
+  bool get isLoading => _isLoading;
+
+  /// Message d'erreur éventuel (null si tout va bien).
+  String? get error => _error;
+
+  /// Charge les étudiants depuis la base. Au tout premier lancement, remplit
+  /// d'abord la base (seed). Gère les erreurs pour ne jamais planter l'app.
+  Future<void> load() async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+    try {
+      await _repository.seedIfEmpty();
+      _students = await _repository.getStudents();
+    } catch (e) {
+      _error = 'Impossible de charger les données.';
+      _students = [];
+      debugPrint('Erreur de chargement des portfolios : $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  /// Retrouve un étudiant par son identifiant (utile pour l'écran profil).
+  Student studentById(int id) =>
+      _students.firstWhere((student) => student.id == id);
+
+  // ---------------------------------------------------------------------------
+  // CRUD — COMPÉTENCES
+  // Chaque opération écrit en base puis recharge la liste pour rafraîchir l'UI.
+  // ---------------------------------------------------------------------------
+
+  Future<void> addSkill(int studentId, Skill skill) async {
+    await _repository.insertSkill(skill, studentId);
+    await _reloadStudents();
+  }
+
+  Future<void> updateSkill(Skill skill) async {
+    await _repository.updateSkill(skill);
+    await _reloadStudents();
+  }
+
+  Future<void> deleteSkill(int skillId) async {
+    await _repository.deleteSkill(skillId);
+    await _reloadStudents();
+  }
+
+  // ---------------------------------------------------------------------------
+  // CRUD — PROJETS
+  // ---------------------------------------------------------------------------
+
+  Future<void> addProject(int studentId, Project project) async {
+    await _repository.insertProject(project, studentId);
+    await _reloadStudents();
+  }
+
+  Future<void> updateProject(Project project) async {
+    await _repository.updateProject(project);
+    await _reloadStudents();
+  }
+
+  Future<void> deleteProject(int projectId) async {
+    await _repository.deleteProject(projectId);
+    await _reloadStudents();
+  }
+
+  // ---------------------------------------------------------------------------
+  // PROFIL ÉTUDIANT
+  // ---------------------------------------------------------------------------
+
+  /// Met à jour les champs du profil (nom, filière, bio, GitHub).
+  Future<void> updateStudent(Student student) async {
+    await _repository.updateStudent(student);
+    await _reloadStudents();
+  }
+
+  /// Recharge la liste depuis la base après une modification, puis notifie l'UI.
+  Future<void> _reloadStudents() async {
+    _students = await _repository.getStudents();
+    notifyListeners();
+  }
+}
