@@ -80,8 +80,10 @@ myportfolio/
 │   │       ├── app_theme.dart             # ThemeData (Material 3) : couleurs, Poppins, styles
 │   │       └── theme_showcase_page.dart   # Ancienne vitrine du thème (désormais inutilisée)
 │   ├── core/
-│   │   └── database/
-│   │       └── app_database.dart          # Ouvre la base SQLite + crée les 3 tables
+│   │   ├── database/
+│   │   │   └── app_database.dart          # Ouvre la base SQLite + crée les 3 tables
+│   │   └── widgets/
+│   │       └── fade_slide_route.dart      # Transition de page (fondu + glissement)
 │   ├── shared/
 │   │   └── models/
 │   │       ├── student.dart   # Modèle Étudiant (+ listes de compétences et projets)
@@ -100,6 +102,7 @@ myportfolio/
 │               │   └── profile_page.dart        # Écran profil (détail d'un étudiant)
 │               └── widgets/
 │                   ├── student_card.dart        # Carte étudiant réutilisable
+│                   ├── student_avatar.dart       # Avatar (photo ou initiales), animé (Hero)
 │                   ├── skill_chip.dart          # Puce de compétence (tappable)
 │                   ├── project_card.dart        # Carte de projet (tappable)
 │                   ├── skill_form_dialog.dart   # Formulaire ajout/modif d'une compétence
@@ -446,6 +449,14 @@ CRUD (étape 8) : autant structurer tout de suite.
 - **Fonctionnement** : `http.get(uri)` renvoie une réponse avec un `statusCode` et un `body` (texte).
 - **Alternative** : le paquet `dio` (plus de fonctionnalités) ; `http` suffit ici et reste simple.
 
+### `image_picker` et `path_provider` (photo de profil)
+- **`image_picker`** : choisir une image depuis la **galerie** ou l'**appareil photo**.
+  - **Où** : `student_edit_dialog.dart` (photo de profil).
+  - **Autorisations iOS** : `NSPhotoLibraryUsageDescription` et `NSCameraUsageDescription` (dans
+    `ios/Runner/Info.plist`).
+- **`path_provider`** : obtenir le dossier de l'application pour y **copier** l'image choisie (afin
+  qu'elle persiste). On enregistre ensuite son chemin dans la colonne `photoPath` de la base.
+
 ## F. Parcours d'exécution
 
 Du lancement de l'application jusqu'à l'affichage des dépôts GitHub.
@@ -618,6 +629,16 @@ Pour chaque question : une **réponse courte** (à dire à l'oral), un **détail
   trousseau, donc `flutter run` fonctionnera pour les prochains lancements.
 - **Limite connue** : avec un compte Apple gratuit, le profil expire après ~7 jours ; il faudra
   relancer depuis Xcode pour le renouveler.
+
+### H.4 — « Dart VM Service was not discovered » au lancement sur l'iPhone
+- **Symptôme** : `flutter run` affiche « The Dart VM Service was not discovered after 60 seconds »,
+  puis, après un long délai, « Error launching application » (code 1).
+- **Diagnostic** : le **build Xcode réussit** ; c'est seulement le **Mac** qui n'arrive pas à se
+  **connecter** à l'app en cours d'exécution (permission « Réseau local » non accordée au terminal).
+  Ce n'est donc **pas** une erreur de code.
+- **Solution** : l'app est bien **installée** sur l'iPhone → il suffit de l'**ouvrir depuis son
+  icône**. Pour que `flutter run` se connecte directement : autoriser « Réseau local » pour le
+  terminal (Réglages système ▸ Confidentialité et sécurité ▸ Réseau local).
 
 ## I. Historique des décisions
 
@@ -842,6 +863,24 @@ s'affichent. **Toutes les exigences du sujet sont désormais couvertes.**
 **Reste possible** : compléter les infos de l'étudiant 1 (directement dans l'app), d'éventuels tests
 d'intégration, et des finitions visuelles.
 
+### Finitions — design et fonctionnalités bonus (terminées, testées sur iPhone)
+**Objectif** : moderniser le design et ajouter des fonctionnalités d'enrichissement.
+
+**Réalisé :**
+- **Thème sombre élégant** : refonte de `app_colors.dart` / `app_theme.dart` (fond anthracite,
+  accent **bleu** + cyan), appliqué via `theme: AppTheme.dark`.
+- **Animations** : avatar animé entre l'accueil et le profil (`Hero` dans `student_avatar.dart`),
+  transition de page en fondu + glissement (`core/widgets/fade_slide_route.dart`), apparition en
+  fondu des cartes d'accueil.
+- **Bouton « Ajouter un CV »** : création d'un nouveau portfolio depuis l'accueil
+  (`insertStudent` / `addStudent`, formulaire `student_edit_dialog.dart` réutilisé en mode création).
+- **Photo de profil** : choix d'une image (galerie / appareil photo) via `image_picker`, copiée et
+  conservée via `path_provider` ; nouveau champ `photoPath` (**migration base v2**) ; affichée par
+  `StudentAvatar`, avec repli sur les initiales.
+
+**Vérifié** : `flutter analyze` → 0 erreur ; `flutter test` → 15 tests OK ; thème, animations, ajout
+de CV et photo (conservée après fermeture/réouverture) testés sur iPhone.
+
 ---
 
-*Dernière mise à jour : étape 10 — README + tests (15 tests réussis). Projet fonctionnellement complet et documenté.*
+*Dernière mise à jour : finitions — thème sombre bleu, animations, bouton Ajouter un CV, photo de profil. Projet complet et testé sur iPhone.*

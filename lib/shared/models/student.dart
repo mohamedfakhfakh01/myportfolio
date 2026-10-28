@@ -21,6 +21,10 @@ class Student {
   /// Nom d'utilisateur GitHub (optionnel) — servira pour l'API REST (étape 9).
   final String? githubUsername;
 
+  /// Chemin local de la photo de profil (optionnel). Null → on affiche les
+  /// initiales à la place.
+  final String? photoPath;
+
   /// Liste des compétences de l'étudiant.
   final List<Skill> skills;
 
@@ -33,6 +37,7 @@ class Student {
     required this.field,
     this.bio = '',
     this.githubUsername,
+    this.photoPath,
     this.skills = const [],
     this.projects = const [],
   });
@@ -57,6 +62,7 @@ class Student {
         'field': field,
         'bio': bio,
         'githubUsername': githubUsername,
+        'photoPath': photoPath,
       };
 
   /// Reconstruit un étudiant à partir d'une ligne `students` (sans ses listes).
@@ -67,6 +73,7 @@ class Student {
         field: map['field'] as String,
         bio: (map['bio'] as String?) ?? '',
         githubUsername: map['githubUsername'] as String?,
+        photoPath: map['photoPath'] as String?,
       );
 
   /// Renvoie une copie de l'étudiant en remplaçant seulement les champs fournis.
@@ -78,6 +85,7 @@ class Student {
     String? field,
     String? bio,
     String? githubUsername,
+    String? photoPath,
     List<Skill>? skills,
     List<Project>? projects,
   }) =>
@@ -87,6 +95,7 @@ class Student {
         field: field ?? this.field,
         bio: bio ?? this.bio,
         githubUsername: githubUsername ?? this.githubUsername,
+        photoPath: photoPath ?? this.photoPath,
         skills: skills ?? this.skills,
         projects: projects ?? this.projects,
       );

@@ -32,13 +32,15 @@ class AppDatabase {
 
     return openDatabase(
       path,
-      version: 1,
+      version: 2,
       // Active le respect des clés étrangères (désactivé par défaut en SQLite).
       onConfigure: (db) async {
         await db.execute('PRAGMA foreign_keys = ON');
       },
       // Appelé UNE fois, à la toute première création de la base.
       onCreate: _createTables,
+      // Appelé quand la version augmente : fait évoluer une base déjà installée.
+      onUpgrade: _onUpgrade,
     );
   }
 
@@ -50,7 +52,8 @@ class AppDatabase {
         fullName TEXT NOT NULL,
         field TEXT NOT NULL,
         bio TEXT,
-        githubUsername TEXT
+        githubUsername TEXT,
+        photoPath TEXT
       )
     ''');
 
@@ -74,5 +77,15 @@ class AppDatabase {
         FOREIGN KEY (studentId) REFERENCES students(id) ON DELETE CASCADE
       )
     ''');
+  }
+
+  /// Fait évoluer une base déjà installée vers une version plus récente, sans
+  /// perdre les données existantes. Appelé automatiquement si la version du
+  /// fichier sur l'appareil est inférieure à celle du code.
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      // v2 : ajout de la colonne de la photo de profil.
+      await db.execute('ALTER TABLE students ADD COLUMN photoPath TEXT');
+    }
   }
 }

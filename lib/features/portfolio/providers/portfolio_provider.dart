@@ -107,6 +107,12 @@ class PortfolioProvider extends ChangeNotifier {
     await _reloadStudents();
   }
 
+  /// Crée un nouvel étudiant (nouveau portfolio).
+  Future<void> addStudent(Student student) async {
+    await _repository.insertStudent(student);
+    await _reloadStudents();
+  }
+
   /// Recharge la liste depuis la base après une modification, puis notifie l'UI.
   Future<void> _reloadStudents() async {
     _students = await _repository.getStudents();

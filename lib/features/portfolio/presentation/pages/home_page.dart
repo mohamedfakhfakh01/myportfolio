@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/widgets/fade_slide_route.dart';
 import '../../providers/portfolio_provider.dart';
 import '../widgets/student_card.dart';
+import '../widgets/student_edit_dialog.dart';
 import 'profile_page.dart';
 
 /// Écran d'**accueil** : liste les portfolios des deux étudiants du binôme.
@@ -38,8 +40,11 @@ class HomePage extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.error_outline,
-                    size: 56, color: AppColors.textSecondary),
+                const Icon(
+                  Icons.error_outline,
+                  size: 56,
+                  color: AppColors.textSecondary,
+                ),
                 const SizedBox(height: 16),
                 Text(provider.error!, textAlign: TextAlign.center),
                 const SizedBox(height: 16),
@@ -59,39 +64,51 @@ class HomePage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text('MyPortfolio')),
-      body: students.isEmpty
-          // État vide : message clair plutôt qu'un écran blanc.
-          ? const _EmptyState()
-          : ListView(
-              padding: const EdgeInsets.all(20),
-              children: [
-                Text('Les portfolios', style: text.headlineSmall),
-                const SizedBox(height: 4),
-                Text(
-                  'Choisis un étudiant pour voir son portfolio',
-                  style:
-                      text.bodyMedium?.copyWith(color: AppColors.textSecondary),
-                ),
-                const SizedBox(height: 20),
-                // Une carte par étudiant.
-                for (final student in students) ...[
-                  StudentCard(
-                    student: student,
-                    onTap: () {
-                      // Navigue vers l'écran profil en empilant une nouvelle
-                      // page. `Navigator.push` ajoute ProfilePage au-dessus de
-                      // l'accueil ; la flèche de retour de l'AppBar la retire.
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => ProfilePage(studentId: student.id!),
-                        ),
-                      );
-                    },
+      // Apparition en fondu au chargement (de transparent à opaque).
+      body: TweenAnimationBuilder<double>(
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeOut,
+        tween: Tween<double>(begin: 0, end: 1),
+        builder: (context, value, child) =>
+            Opacity(opacity: value, child: child),
+        child: students.isEmpty
+            // État vide : message clair plutôt qu'un écran blanc.
+            ? const _EmptyState()
+            : ListView(
+                padding: const EdgeInsets.all(20),
+                children: [
+                  Text('Les portfolios', style: text.headlineSmall),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Choisis un étudiant pour voir son portfolio',
+                    style: text.bodyMedium?.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
                   ),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 20),
+                  // Une carte par étudiant.
+                  for (final student in students) ...[
+                    StudentCard(
+                      student: student,
+                      onTap: () {
+                        // Navigue vers l'écran profil en empilant une nouvelle
+                        // page. `Navigator.push` ajoute ProfilePage au-dessus de
+                        // l'accueil ; la flèche de retour de l'AppBar la retire.
+                        Navigator.of(context).push(
+                          fadeSlideRoute(ProfilePage(studentId: student.id!)),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 14),
+                  ],
                 ],
-              ],
-            ),
+              ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => showStudentEditDialog(context),
+        icon: const Icon(Icons.add),
+        label: const Text('Ajouter un CV'),
+      ),
     );
   }
 }
@@ -109,8 +126,11 @@ class _EmptyState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.inbox_outlined,
-                size: 56, color: AppColors.textSecondary),
+            const Icon(
+              Icons.inbox_outlined,
+              size: 56,
+              color: AppColors.textSecondary,
+            ),
             const SizedBox(height: 16),
             Text('Aucun portfolio', style: text.titleMedium),
             const SizedBox(height: 6),

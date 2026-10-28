@@ -33,7 +33,7 @@ class SkillChip extends StatelessWidget {
         child: Text(
           label,
           style: const TextStyle(
-            color: AppColors.primaryDark,
+            color: AppColors.primaryLight,
             fontWeight: FontWeight.w500,
           ),
         ),

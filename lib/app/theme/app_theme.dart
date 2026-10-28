@@ -3,24 +3,23 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'app_colors.dart';
 
-/// Thème global de MyPortfolio (Material 3).
+/// Thème global de MyPortfolio (Material 3, **sombre**).
 ///
 /// Un « thème » dans Flutter, c'est l'ensemble des styles par défaut appliqués
 /// automatiquement à tous les widgets : couleurs, police, forme des boutons,
 /// style des champs de saisie, etc. En le centralisant ici, on garantit la
 /// COHÉRENCE visuelle : tous les boutons se ressemblent, tous les champs aussi.
 ///
-/// Classe non instanciable (constructeur privé) : on utilise `AppTheme.light`.
+/// Classe non instanciable (constructeur privé) : on utilise `AppTheme.dark`.
 class AppTheme {
   AppTheme._();
 
   /// Rayon d'arrondi commun (coins arrondis cohérents dans toute l'app).
   static const double _radius = 14;
 
-  /// Thème clair de l'application.
-  static ThemeData get light {
-    // On part d'un thème Material 3 de base, construit à partir d'une couleur
-    // « graine » (seedColor). Flutter en déduit une palette cohérente.
+  /// Thème sombre de l'application.
+  static ThemeData get dark {
+    // Thème Material 3 de base, construit à partir d'une couleur « graine ».
     final ThemeData base = ThemeData(
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(
@@ -28,39 +27,35 @@ class AppTheme {
         primary: AppColors.primary,
         secondary: AppColors.accent,
         surface: AppColors.surface,
-        brightness: Brightness.light,
+        brightness: Brightness.dark,
       ),
       scaffoldBackgroundColor: AppColors.background,
     );
 
     // On surcharge le thème de base avec NOS choix précis.
     return base.copyWith(
-      // Typographie : on applique la police Poppins (Google Fonts) à tous les
-      // styles de texte, avec notre couleur de texte principale.
-      // On passe par `fontFamily` (nom de la police fourni par google_fonts)
-      // plutôt que par `GoogleFonts.poppinsTextTheme(...)`, car cette dernière
-      // présente une incompatibilité de type avec Flutter 3.47 (voir
-      // apprentissage.md, section H).
+      // Typographie : police Poppins appliquée à tous les styles de texte,
+      // avec notre couleur de texte claire.
       textTheme: base.textTheme.apply(
         fontFamily: GoogleFonts.poppins().fontFamily,
         bodyColor: AppColors.textPrimary,
         displayColor: AppColors.textPrimary,
       ),
 
-      // Barre supérieure : fond indigo, texte blanc, titre centré, sans ombre.
+      // Barre supérieure : fond sombre (surface), texte clair, sans ombre.
       appBarTheme: AppBarTheme(
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
+        backgroundColor: AppColors.surface,
+        foregroundColor: AppColors.textPrimary,
         elevation: 0,
         centerTitle: true,
         titleTextStyle: GoogleFonts.poppins(
           fontSize: 20,
           fontWeight: FontWeight.w600,
-          color: Colors.white,
+          color: AppColors.textPrimary,
         ),
       ),
 
-      // Boutons pleins (action principale) : fond indigo, texte blanc, arrondis.
+      // Boutons pleins : fond violet, texte blanc, arrondis.
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
@@ -78,7 +73,7 @@ class AppTheme {
         ),
       ),
 
-      // Boutons contour (action secondaire) : texte indigo, bordure indigo.
+      // Boutons contour (action secondaire) : texte et bordure violets.
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.primary,
@@ -94,10 +89,10 @@ class AppTheme {
         ),
       ),
 
-      // Champs de saisie : fond blanc, bordure grise, bordure indigo au focus.
+      // Champs de saisie : fond sombre, bordure grise, bordure violette au focus.
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.surface,
+        fillColor: AppColors.background,
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         border: OutlineInputBorder(
@@ -114,7 +109,7 @@ class AppTheme {
         ),
       ),
 
-      // Cartes : fond blanc, coins bien arrondis, ombre très discrète.
+      // Cartes : fond surface, coins arrondis, fine bordure (pas d'ombre).
       cardTheme: CardThemeData(
         color: AppColors.surface,
         elevation: 0,

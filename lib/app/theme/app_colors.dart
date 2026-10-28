@@ -1,51 +1,49 @@
 import 'package:flutter/material.dart';
 
-/// Palette de couleurs centralisée de MyPortfolio.
+/// Palette de couleurs centralisée de MyPortfolio — **thème sombre élégant**.
 ///
-/// Toutes les couleurs de l'application sont définies ICI, à un seul endroit.
-/// Avantage : si on veut changer la couleur principale, on la modifie une seule
-/// fois et toute l'application suit. (Principe « une seule source de vérité ».)
-///
-/// La classe n'est jamais instanciée : on accède aux couleurs directement par
-/// `AppColors.primary`, etc. Le constructeur privé `AppColors._()` empêche de
-/// faire `AppColors()` par erreur.
+/// Toutes les couleurs vivent ICI (principe « une seule source de vérité ») :
+/// changer l'accent se fait en un seul endroit, toute l'app suit.
 class AppColors {
   AppColors._();
 
-  // --- Couleurs de marque ---
-  /// Indigo : couleur principale (barres, boutons, accents forts).
-  static const Color primary = Color(0xFF4F46E5);
+  // --- Couleurs d'accent ---
+  /// Bleu : couleur principale (boutons, icônes, avatar, début de dégradé).
+  static const Color primary = Color(0xFF3B82F6);
 
-  /// Indigo foncé : variantes (survol, texte sur fond clair indigo).
-  static const Color primaryDark = Color(0xFF4338CA);
+  /// Bleu plus foncé : fin de dégradé, états pressés.
+  static const Color primaryDark = Color(0xFF2563EB);
 
-  /// Cyan : couleur d'accent secondaire.
-  static const Color accent = Color(0xFF06B6D4);
+  /// Bleu clair : texte lisible sur les fonds bleus sombres (puces).
+  static const Color primaryLight = Color(0xFF93C5FD);
 
-  /// Cyan foncé : texte lisible posé sur un fond cyan clair.
-  static const Color accentDark = Color(0xFF0E7490);
+  /// Cyan : accent secondaire.
+  static const Color accent = Color(0xFF22D3EE);
 
-  // --- Surfaces ---
-  /// Fond général des écrans (gris très clair).
-  static const Color background = Color(0xFFF8FAFC);
+  /// Cyan clair : texte/icône d'accent lisible sur fond sombre.
+  static const Color accentDark = Color(0xFF67E8F9);
 
-  /// Fond des cartes et surfaces surélevées (blanc).
-  static const Color surface = Color(0xFFFFFFFF);
+  // --- Surfaces (sombres) ---
+  /// Fond général des écrans (bleu anthracite).
+  static const Color background = Color(0xFF0F172A);
+
+  /// Fond des cartes et surfaces surélevées (un cran plus clair).
+  static const Color surface = Color(0xFF1E293B);
 
   // --- Textes ---
-  /// Texte principal (gris ardoise très foncé).
-  static const Color textPrimary = Color(0xFF1E293B);
+  /// Texte principal (presque blanc).
+  static const Color textPrimary = Color(0xFFF8FAFC);
 
-  /// Texte secondaire (gris moyen pour les sous-titres, légendes).
-  static const Color textSecondary = Color(0xFF64748B);
+  /// Texte secondaire (gris clair) pour sous-titres et légendes.
+  static const Color textSecondary = Color(0xFF94A3B8);
 
   // --- Divers ---
-  /// Bordures fines (contour des cartes, séparateurs).
-  static const Color border = Color(0xFFE2E8F0);
+  /// Bordures fines (gris ardoise) : contour des cartes et champs.
+  static const Color border = Color(0xFF334155);
 
-  /// Fond indigo très clair (puces/chips de compétences, icônes douces).
-  static const Color primarySoft = Color(0xFFEEF2FF);
+  /// Fond bleu sombre (puces de compétences, icônes douces).
+  static const Color primarySoft = Color(0xFF172554);
 
-  /// Fond cyan très clair (puces/chips d'accent).
-  static const Color accentSoft = Color(0xFFCFFAFE);
+  /// Fond cyan sombre (puces d'accent).
+  static const Color accentSoft = Color(0xFF164E63);
 }

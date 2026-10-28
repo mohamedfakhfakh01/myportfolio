@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../shared/models/student.dart';
+import 'student_avatar.dart';
 
 /// Carte réutilisable présentant un étudiant dans la liste d'accueil.
 ///
@@ -31,17 +32,12 @@ class StudentCard extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              // Avatar avec les initiales de l'étudiant.
-              CircleAvatar(
+              // Avatar avec les initiales (animé en Hero vers l'écran profil).
+              StudentAvatar(
+                heroTag: 'avatar-${student.id}',
+                initials: student.initials,
+                photoPath: student.photoPath,
                 radius: 26,
-                backgroundColor: AppColors.primary,
-                child: Text(
-                  student.initials,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
               ),
               const SizedBox(width: 14),
               // Nom + filière (Expanded pour occuper l'espace restant).

@@ -28,7 +28,7 @@ class MyPortfolioApp extends StatelessWidget {
       child: MaterialApp(
         title: 'MyPortfolio',
         debugShowCheckedModeBanner: false,
-        theme: AppTheme.light,
+        theme: AppTheme.dark,
         // Écran de départ : la liste des deux portfolios.
         home: const HomePage(),
       ),

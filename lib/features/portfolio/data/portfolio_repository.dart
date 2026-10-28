@@ -132,4 +132,11 @@ class PortfolioRepository {
     await db.update('students', student.toMap(),
         where: 'id = ?', whereArgs: [student.id]);
   }
+
+  /// Insère un nouvel étudiant (nouveau portfolio) et renvoie son id.
+  Future<int> insertStudent(Student student) async {
+    final db = await _db;
+    final map = student.toMap()..remove('id');
+    return db.insert('students', map);
+  }
 }
