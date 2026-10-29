@@ -107,9 +107,17 @@ class PortfolioProvider extends ChangeNotifier {
     await _reloadStudents();
   }
 
-  /// Crée un nouvel étudiant (nouveau portfolio).
-  Future<void> addStudent(Student student) async {
-    await _repository.insertStudent(student);
+  /// Crée un nouvel étudiant (nouveau portfolio), éventuellement avec des
+  /// projets saisis dès la création.
+  Future<void> addStudent(
+    Student student, {
+    List<Project> projects = const [],
+  }) async {
+    // On insère d'abord l'étudiant pour obtenir son id, puis chaque projet.
+    final int studentId = await _repository.insertStudent(student);
+    for (final project in projects) {
+      await _repository.insertProject(project, studentId);
+    }
     await _reloadStudents();
   }
 
