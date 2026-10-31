@@ -7,7 +7,6 @@ import 'package:pdf/widgets.dart' as pw;
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/models/skill.dart';
 import '../../../shared/models/student.dart';
-import '../presentation/widgets/skill_category_label.dart';
 
 // --- Palette du PDF (reprend les couleurs de l'app) ---
 final PdfColor _primary = PdfColor.fromInt(0xFF3B82F6); // bleu principal
@@ -62,17 +61,10 @@ Future<Uint8List> buildPortfolioPdf(Student student, AppLocalizations l) async {
                 pw.SizedBox(height: 18),
               ],
 
-              // --- Compétences (par catégorie, avec barres de niveau) ---
+              // --- Compétences (barres de niveau, puces sinon) ---
               if (student.skills.isNotEmpty) ...[
                 _sectionTitle(l.skills),
-                for (final category in SkillCategory.values)
-                  if (student.skills.any((s) => s.category == category))
-                    _categoryBlock(
-                      skillCategoryLabel(l, category),
-                      student.skills
-                          .where((s) => s.category == category)
-                          .toList(),
-                    ),
+                _skillsBlock(student.skills),
                 pw.SizedBox(height: 6),
               ],
 
@@ -198,26 +190,17 @@ pw.Widget _sectionTitle(String title) {
   );
 }
 
-/// Un groupe de compétences d'une même catégorie.
-pw.Widget _categoryBlock(String categoryLabel, List<Skill> skills) {
-  // On sépare celles qui ont un niveau (barre) de celles sans niveau (puces).
+/// Bloc des compétences : barres de niveau pour celles qui en ont un, puces
+/// pour les autres.
+pw.Widget _skillsBlock(List<Skill> skills) {
   final withLevel = skills.where((s) => s.level != null).toList();
   final withoutLevel = skills.where((s) => s.level == null).toList();
 
   return pw.Padding(
-    padding: const pw.EdgeInsets.only(bottom: 14),
+    padding: const pw.EdgeInsets.only(bottom: 6),
     child: pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
-        pw.Text(
-          categoryLabel,
-          style: pw.TextStyle(
-            fontSize: 11,
-            fontWeight: pw.FontWeight.bold,
-            color: _primaryDark,
-          ),
-        ),
-        pw.SizedBox(height: 6),
         for (final skill in withLevel) _skillWithBar(skill),
         if (withoutLevel.isNotEmpty)
           pw.Wrap(

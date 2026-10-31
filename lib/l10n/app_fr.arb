@@ -60,11 +60,6 @@
     "placeholders": { "date": { "type": "String" } }
   },
 
-  "catLanguages": "Langages",
-  "catFrameworks": "Frameworks",
-  "catTools": "Outils",
-  "catOther": "Autres",
-
   "appearance": "Apparence",
   "darkTheme": "Thème sombre",
   "darkThemeOn": "Activé — fond sombre, texte clair",
@@ -97,7 +92,6 @@
   "levelLabel": "Niveau 0–100 (optionnel)",
   "enterNumber": "Entrez un nombre",
   "between0and100": "Entre 0 et 100",
-  "categoryLabel": "Catégorie",
 
   "projectDeleteTitle": "Supprimer le projet ?",
   "projectDeleteBody": "« {title} » sera supprimé définitivement.",

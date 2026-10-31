@@ -45,10 +45,6 @@
   "githubMainLanguage": "Main language: {language}",
   "githubLastUpdate": "Last update: {date}",
 
-  "catLanguages": "Languages",
-  "catFrameworks": "Frameworks",
-  "catTools": "Tools",
-  "catOther": "Other",
 
   "appearance": "Appearance",
   "darkTheme": "Dark theme",
@@ -79,7 +75,6 @@
   "levelLabel": "Level 0–100 (optional)",
   "enterNumber": "Enter a number",
   "between0and100": "Between 0 and 100",
-  "categoryLabel": "Category",
 
   "projectDeleteTitle": "Delete project?",
   "projectDeleteBody": "“{title}” will be permanently deleted.",

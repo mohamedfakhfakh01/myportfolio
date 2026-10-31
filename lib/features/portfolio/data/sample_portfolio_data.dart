@@ -39,21 +39,21 @@ const List<Student> sampleStudents = [
         'développement web et de robotique.',
     githubUsername: null, // non indiqué sur le CV
     skills: [
-      Skill(name: 'C#', category: SkillCategory.language),
-      Skill(name: 'Java', category: SkillCategory.language),
-      Skill(name: 'PHP', category: SkillCategory.language),
-      Skill(name: 'Python', category: SkillCategory.language),
-      Skill(name: 'HTML / CSS', category: SkillCategory.language),
-      Skill(name: 'ASP.NET Core / MVC', category: SkillCategory.framework),
-      Skill(name: 'Laravel', category: SkillCategory.framework),
-      Skill(name: 'Entity Framework', category: SkillCategory.framework),
-      Skill(name: 'JavaFX', category: SkillCategory.framework),
-      Skill(name: 'Bootstrap', category: SkillCategory.framework),
-      Skill(name: 'SQL Server', category: SkillCategory.tool),
-      Skill(name: 'MySQL', category: SkillCategory.tool),
-      Skill(name: 'Git', category: SkillCategory.tool),
-      Skill(name: 'OutSystems', category: SkillCategory.tool),
-      Skill(name: 'Mendix', category: SkillCategory.tool),
+      Skill(name: 'C#'),
+      Skill(name: 'Java'),
+      Skill(name: 'PHP'),
+      Skill(name: 'Python'),
+      Skill(name: 'HTML / CSS'),
+      Skill(name: 'ASP.NET Core / MVC'),
+      Skill(name: 'Laravel'),
+      Skill(name: 'Entity Framework'),
+      Skill(name: 'JavaFX'),
+      Skill(name: 'Bootstrap'),
+      Skill(name: 'SQL Server'),
+      Skill(name: 'MySQL'),
+      Skill(name: 'Git'),
+      Skill(name: 'OutSystems'),
+      Skill(name: 'Mendix'),
     ],
     projects: [
       Project(
@@ -92,17 +92,17 @@ const List<Student> sampleStudents = [
     githubUsername: null,
     skills: [
       // Langages
-      Skill(name: 'Dart', level: 85, category: SkillCategory.language),
-      Skill(name: 'Python', level: 70, category: SkillCategory.language),
-      Skill(name: 'JavaScript', level: 60, category: SkillCategory.language),
+      Skill(name: 'Dart', level: 85),
+      Skill(name: 'Python', level: 70),
+      Skill(name: 'JavaScript', level: 60),
       // Frameworks
-      Skill(name: 'Flutter', level: 80, category: SkillCategory.framework),
-      Skill(name: 'React', level: 55, category: SkillCategory.framework),
+      Skill(name: 'Flutter', level: 80),
+      Skill(name: 'React', level: 55),
       // Outils
-      Skill(name: 'Git', level: 75, category: SkillCategory.tool),
-      Skill(name: 'Docker', level: 40, category: SkillCategory.tool),
+      Skill(name: 'Git', level: 75),
+      Skill(name: 'Docker', level: 40),
       // Autres
-      Skill(name: 'UI/UX Design', level: 50, category: SkillCategory.other),
+      Skill(name: 'UI/UX Design', level: 50),
     ],
     projects: [
       Project(

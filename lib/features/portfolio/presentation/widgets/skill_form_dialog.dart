@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/skill.dart';
 import '../../providers/portfolio_provider.dart';
-import 'skill_category_label.dart';
 
 /// Ouvre la boîte de dialogue d'ajout (si [skill] est null) ou de modification
 /// (si [skill] est fourni) d'une compétence.
@@ -37,7 +36,6 @@ class _SkillFormDialogState extends State<_SkillFormDialog> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _nameController;
   late final TextEditingController _levelController;
-  late SkillCategory _category;
 
   bool get _isEditing => widget.skill != null;
 
@@ -48,7 +46,6 @@ class _SkillFormDialogState extends State<_SkillFormDialog> {
     _nameController = TextEditingController(text: widget.skill?.name ?? '');
     _levelController =
         TextEditingController(text: widget.skill?.level?.toString() ?? '');
-    _category = widget.skill?.category ?? SkillCategory.other;
   }
 
   @override
@@ -68,7 +65,6 @@ class _SkillFormDialogState extends State<_SkillFormDialog> {
       id: widget.skill?.id,
       name: _nameController.text.trim(),
       level: levelText.isEmpty ? null : int.parse(levelText),
-      category: _category,
     );
 
     final provider = context.read<PortfolioProvider>();
@@ -145,21 +141,6 @@ class _SkillFormDialogState extends State<_SkillFormDialog> {
                 if (n == null) return l.enterNumber;
                 if (n < 0 || n > 100) return l.between0and100;
                 return null;
-              },
-            ),
-            const SizedBox(height: 12),
-            DropdownButtonFormField<SkillCategory>(
-              initialValue: _category,
-              decoration: InputDecoration(labelText: l.categoryLabel),
-              items: [
-                for (final c in SkillCategory.values)
-                  DropdownMenuItem(
-                    value: c,
-                    child: Text(skillCategoryLabel(l, c)),
-                  ),
-              ],
-              onChanged: (value) {
-                if (value != null) setState(() => _category = value);
               },
             ),
           ],

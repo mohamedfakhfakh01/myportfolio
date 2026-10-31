@@ -332,30 +332,6 @@ abstract class AppLocalizations {
   /// **'Dernière mise à jour : {date}'**
   String githubLastUpdate(String date);
 
-  /// No description provided for @catLanguages.
-  ///
-  /// In fr, this message translates to:
-  /// **'Langages'**
-  String get catLanguages;
-
-  /// No description provided for @catFrameworks.
-  ///
-  /// In fr, this message translates to:
-  /// **'Frameworks'**
-  String get catFrameworks;
-
-  /// No description provided for @catTools.
-  ///
-  /// In fr, this message translates to:
-  /// **'Outils'**
-  String get catTools;
-
-  /// No description provided for @catOther.
-  ///
-  /// In fr, this message translates to:
-  /// **'Autres'**
-  String get catOther;
-
   /// No description provided for @appearance.
   ///
   /// In fr, this message translates to:
@@ -517,12 +493,6 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Entre 0 et 100'**
   String get between0and100;
-
-  /// No description provided for @categoryLabel.
-  ///
-  /// In fr, this message translates to:
-  /// **'Catégorie'**
-  String get categoryLabel;
 
   /// No description provided for @projectDeleteTitle.
   ///
