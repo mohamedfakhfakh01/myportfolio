@@ -326,4 +326,10 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get createPortfolio => 'Créer le portfolio';
+
+  @override
+  String get exportPdf => 'Exporter en PDF';
+
+  @override
+  String get pdfError => 'Impossible de générer le PDF.';
 }

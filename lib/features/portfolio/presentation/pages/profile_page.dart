@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:printing/printing.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../services/portfolio_pdf.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/skill.dart';
 import '../../../github/presentation/widgets/github_repos_section.dart';
@@ -75,6 +77,25 @@ class _ProfilePageState extends State<ProfilePage> {
       appBar: AppBar(
         title: Text(student.fullName),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.picture_as_pdf_outlined),
+            tooltip: l.exportPdf,
+            onPressed: () async {
+              // On capture le messenger AVANT l'await (bonne pratique : ne pas
+              // réutiliser `context` après une opération asynchrone).
+              final messenger = ScaffoldMessenger.of(context);
+              try {
+                final bytes = await buildPortfolioPdf(student, l);
+                await Printing.sharePdf(
+                  bytes: bytes,
+                  filename:
+                      'portfolio_${student.fullName.replaceAll(' ', '_')}.pdf',
+                );
+              } catch (_) {
+                messenger.showSnackBar(SnackBar(content: Text(l.pdfError)));
+              }
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.edit_outlined),
             tooltip: l.editProfile,

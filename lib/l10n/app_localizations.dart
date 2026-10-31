@@ -703,6 +703,18 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Créer le portfolio'**
   String get createPortfolio;
+
+  /// No description provided for @exportPdf.
+  ///
+  /// In fr, this message translates to:
+  /// **'Exporter en PDF'**
+  String get exportPdf;
+
+  /// No description provided for @pdfError.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible de générer le PDF.'**
+  String get pdfError;
 }
 
 class _AppLocalizationsDelegate

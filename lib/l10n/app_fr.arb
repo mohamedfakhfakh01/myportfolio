@@ -132,5 +132,8 @@
   "githubUsernameHelp": "Pour afficher tes dépôts GitHub sur le profil",
   "projectsOptional": "Projets (optionnel)",
   "noProjectAdded": "Aucun projet ajouté. Utilise « Ajouter un projet » ci-dessous.",
-  "createPortfolio": "Créer le portfolio"
+  "createPortfolio": "Créer le portfolio",
+
+  "exportPdf": "Exporter en PDF",
+  "pdfError": "Impossible de générer le PDF."
 }
