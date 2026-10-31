@@ -9,6 +9,7 @@ import '../../providers/portfolio_provider.dart';
 import '../widgets/project_card.dart';
 import '../widgets/project_form_dialog.dart';
 import '../widgets/skill_level_tile.dart';
+import '../widgets/skills_category_chart.dart';
 import '../widgets/stat_tile.dart';
 import '../widgets/skill_category_label.dart';
 import '../widgets/skill_form_dialog.dart';
@@ -208,7 +209,10 @@ class _ProfilePageState extends State<ProfilePage> {
                         color: AppColors.textSecondary,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 12),
+                    // Vue d'ensemble : répartition des compétences par catégorie.
+                    SkillsCategoryChart(skills: skills),
+                    const SizedBox(height: 8),
                     // Regroupées par catégorie (Langages, Frameworks…), triées
                     // à l'intérieur de chaque groupe selon le critère choisi.
                     for (final category in SkillCategory.values)
