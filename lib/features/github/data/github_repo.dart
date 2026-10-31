@@ -17,12 +17,16 @@ class GithubRepo {
   /// Lien vers le dépôt sur github.com.
   final String htmlUrl;
 
+  /// Date de dernière mise à jour (peut être absente → `null`).
+  final DateTime? updatedAt;
+
   const GithubRepo({
     required this.name,
     this.description,
     this.language,
     this.stars = 0,
     required this.htmlUrl,
+    this.updatedAt,
   });
 
   /// Construit un `GithubRepo` à partir d'un objet JSON renvoyé par l'API.
@@ -35,5 +39,6 @@ class GithubRepo {
         language: json['language'] as String?,
         stars: (json['stargazers_count'] as int?) ?? 0,
         htmlUrl: json['html_url'] as String,
+        updatedAt: DateTime.tryParse((json['updated_at'] as String?) ?? ''),
       );
 }

@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/widgets/fade_slide_route.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/project.dart';
 import '../../../../shared/models/student.dart';
 import '../../providers/portfolio_provider.dart';
@@ -72,6 +73,7 @@ class _StudentFormPageState extends State<StudentFormPage> {
 
   /// Demande la source de l'image (galerie ou appareil photo).
   Future<ImageSource?> _askSource() {
+    final AppLocalizations l = AppLocalizations.of(context);
     return showModalBottomSheet<ImageSource>(
       context: context,
       builder: (_) => SafeArea(
@@ -80,12 +82,12 @@ class _StudentFormPageState extends State<StudentFormPage> {
           children: [
             ListTile(
               leading: const Icon(Icons.photo_library_outlined),
-              title: const Text('Galerie'),
+              title: Text(l.pickGallery),
               onTap: () => Navigator.pop(context, ImageSource.gallery),
             ),
             ListTile(
               leading: const Icon(Icons.photo_camera_outlined),
-              title: const Text('Appareil photo'),
+              title: Text(l.pickCamera),
               onTap: () => Navigator.pop(context, ImageSource.camera),
             ),
           ],
@@ -158,10 +160,11 @@ class _StudentFormPageState extends State<StudentFormPage> {
   @override
   Widget build(BuildContext context) {
     final TextTheme text = Theme.of(context).textTheme;
+    final AppLocalizations l = AppLocalizations.of(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_isCreating ? 'Nouveau portfolio' : 'Modifier le profil'),
+        title: Text(_isCreating ? l.newPortfolioTitle : l.editProfile),
       ),
       body: SafeArea(
         child: Form(
@@ -187,9 +190,7 @@ class _StudentFormPageState extends State<StudentFormPage> {
                     TextButton.icon(
                       onPressed: _chooseSource,
                       icon: const Icon(Icons.add_a_photo_outlined),
-                      label: Text(
-                        _hasPhoto ? 'Changer la photo' : 'Ajouter une photo',
-                      ),
+                      label: Text(_hasPhoto ? l.changePhoto : l.addPhoto),
                     ),
                   ],
                 ),
@@ -197,31 +198,31 @@ class _StudentFormPageState extends State<StudentFormPage> {
               const SizedBox(height: 16),
 
               // --- Informations ---
-              Text('Informations', style: text.titleMedium),
+              Text(l.information, style: text.titleMedium),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _nameController,
                 textCapitalization: TextCapitalization.words,
-                decoration: const InputDecoration(
-                  labelText: 'Nom complet *',
-                  hintText: 'Ex : Mohamed Fakhfakh',
-                  prefixIcon: Icon(Icons.person_outline),
+                decoration: InputDecoration(
+                  labelText: l.fullNameLabel,
+                  hintText: l.fullNameHint,
+                  prefixIcon: const Icon(Icons.person_outline),
                 ),
                 validator: (value) => (value == null || value.trim().isEmpty)
-                    ? 'Le nom est obligatoire'
+                    ? l.nameRequired
                     : null,
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _fieldController,
                 textCapitalization: TextCapitalization.sentences,
-                decoration: const InputDecoration(
-                  labelText: 'Filière / niveau *',
-                  hintText: 'Ex : 2e année informatique',
-                  prefixIcon: Icon(Icons.school_outlined),
+                decoration: InputDecoration(
+                  labelText: l.fieldLabel,
+                  hintText: l.fieldHint,
+                  prefixIcon: const Icon(Icons.school_outlined),
                 ),
                 validator: (value) => (value == null || value.trim().isEmpty)
-                    ? 'La filière est obligatoire'
+                    ? l.fieldRequired
                     : null,
               ),
               const SizedBox(height: 16),
@@ -229,32 +230,32 @@ class _StudentFormPageState extends State<StudentFormPage> {
                 controller: _bioController,
                 textCapitalization: TextCapitalization.sentences,
                 maxLines: 3,
-                decoration: const InputDecoration(
-                  labelText: 'Bio (optionnel)',
-                  hintText: 'Quelques mots sur toi…',
+                decoration: InputDecoration(
+                  labelText: l.bioLabel,
+                  hintText: l.bioHint,
                   alignLabelWithHint: true,
-                  prefixIcon: Icon(Icons.info_outline),
+                  prefixIcon: const Icon(Icons.info_outline),
                 ),
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _githubController,
-                decoration: const InputDecoration(
-                  labelText: 'Pseudo GitHub (optionnel)',
-                  hintText: 'Ex : mohamedfakhfakh01',
-                  helperText: 'Pour afficher tes dépôts GitHub sur le profil',
-                  prefixIcon: Icon(Icons.code),
+                decoration: InputDecoration(
+                  labelText: l.githubUsernameLabel,
+                  hintText: l.githubUsernameHint,
+                  helperText: l.githubUsernameHelp,
+                  prefixIcon: const Icon(Icons.code),
                 ),
               ),
               const SizedBox(height: 8),
 
               // --- Projets (saisis dès la création d'un portfolio) ---
               if (_isCreating) ...[
-                Text('Projets (optionnel)', style: text.titleMedium),
+                Text(l.projectsOptional, style: text.titleMedium),
                 const SizedBox(height: 8),
                 if (_projects.isEmpty)
                   Text(
-                    'Aucun projet ajouté. Utilise « Ajouter un projet » ci-dessous.',
+                    l.noProjectAdded,
                     style: text.bodyMedium
                         ?.copyWith(color: AppColors.textSecondary),
                   )
@@ -272,7 +273,7 @@ class _StudentFormPageState extends State<StudentFormPage> {
                           ),
                           trailing: IconButton(
                             icon: const Icon(Icons.delete_outline),
-                            tooltip: 'Retirer',
+                            tooltip: l.remove,
                             onPressed: () =>
                                 setState(() => _projects.removeAt(i)),
                           ),
@@ -283,7 +284,7 @@ class _StudentFormPageState extends State<StudentFormPage> {
                 OutlinedButton.icon(
                   onPressed: _addProject,
                   icon: const Icon(Icons.add),
-                  label: const Text('Ajouter un projet'),
+                  label: Text(l.addProject),
                 ),
               ],
               const SizedBox(height: 28),
@@ -292,12 +293,12 @@ class _StudentFormPageState extends State<StudentFormPage> {
               ElevatedButton.icon(
                 onPressed: _save,
                 icon: const Icon(Icons.check),
-                label: Text(_isCreating ? 'Créer le portfolio' : 'Enregistrer'),
+                label: Text(_isCreating ? l.createPortfolio : l.save),
               ),
               const SizedBox(height: 8),
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Annuler'),
+                child: Text(l.cancel),
               ),
             ],
           ),
@@ -344,8 +345,9 @@ class _ProjectInputDialogState extends State<_ProjectInputDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l = AppLocalizations.of(context);
     return AlertDialog(
-      title: const Text('Ajouter un projet'),
+      title: Text(l.projectAddTitle),
       content: Form(
         key: _formKey,
         child: SingleChildScrollView(
@@ -355,9 +357,9 @@ class _ProjectInputDialogState extends State<_ProjectInputDialog> {
               TextFormField(
                 controller: _titleController,
                 textCapitalization: TextCapitalization.sentences,
-                decoration: const InputDecoration(labelText: 'Titre *'),
+                decoration: InputDecoration(labelText: l.titleLabel),
                 validator: (v) => (v == null || v.trim().isEmpty)
-                    ? 'Le titre est obligatoire'
+                    ? l.titleRequired
                     : null,
               ),
               const SizedBox(height: 12),
@@ -365,16 +367,16 @@ class _ProjectInputDialogState extends State<_ProjectInputDialog> {
                 controller: _descriptionController,
                 textCapitalization: TextCapitalization.sentences,
                 maxLines: 3,
-                decoration: const InputDecoration(labelText: 'Description *'),
+                decoration: InputDecoration(labelText: l.descriptionLabel),
                 validator: (v) => (v == null || v.trim().isEmpty)
-                    ? 'La description est obligatoire'
+                    ? l.descriptionRequired
                     : null,
               ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _linkController,
                 keyboardType: TextInputType.url,
-                decoration: const InputDecoration(labelText: 'Lien (optionnel)'),
+                decoration: InputDecoration(labelText: l.linkLabel),
               ),
             ],
           ),
@@ -383,11 +385,11 @@ class _ProjectInputDialogState extends State<_ProjectInputDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Annuler'),
+          child: Text(l.cancel),
         ),
         TextButton(
           onPressed: _submit,
-          child: const Text('Ajouter'),
+          child: Text(l.add),
         ),
       ],
     );

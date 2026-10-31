@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../app/theme/theme_controller.dart';
 import '../../../../core/widgets/fade_slide_route.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../providers/portfolio_provider.dart';
 import '../widgets/student_card.dart';
 import '../widgets/student_edit_dialog.dart';
@@ -12,8 +14,35 @@ import 'profile_page.dart';
 ///
 /// C'est le point de départ de l'application. L'utilisateur y choisit un
 /// portfolio à consulter.
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  final TextEditingController _searchController = TextEditingController();
+  String _query = '';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  /// Bouton de bascule clair/sombre, affiché dans l'AppBar.
+  List<Widget> _appBarActions(BuildContext context) {
+    final bool isDark = context.watch<ThemeController>().isDark;
+    final AppLocalizations l = AppLocalizations.of(context);
+    return [
+      IconButton(
+        icon: Icon(isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined),
+        tooltip: isDark ? l.switchToLight : l.switchToDark,
+        onPressed: () => context.read<ThemeController>().toggle(),
+      ),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,11 +50,15 @@ class HomePage extends StatelessWidget {
     // (chargement, erreur, liste), cet écran se reconstruit automatiquement.
     final provider = context.watch<PortfolioProvider>();
     final TextTheme text = Theme.of(context).textTheme;
+    final AppLocalizations l = AppLocalizations.of(context);
 
     // 1) Chargement en cours : indicateur tournant.
     if (provider.isLoading) {
       return Scaffold(
-        appBar: AppBar(title: const Text('MyPortfolio')),
+        appBar: AppBar(
+          title: const Text('MyPortfolio'),
+          actions: _appBarActions(context),
+        ),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
@@ -33,14 +66,17 @@ class HomePage extends StatelessWidget {
     // 2) Erreur : message clair + bouton réessayer.
     if (provider.error != null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('MyPortfolio')),
+        appBar: AppBar(
+          title: const Text('MyPortfolio'),
+          actions: _appBarActions(context),
+        ),
         body: Center(
           child: Padding(
             padding: const EdgeInsets.all(32),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(
+                Icon(
                   Icons.error_outline,
                   size: 56,
                   color: AppColors.textSecondary,
@@ -50,7 +86,7 @@ class HomePage extends StatelessWidget {
                 const SizedBox(height: 16),
                 OutlinedButton(
                   onPressed: provider.load,
-                  child: const Text('Réessayer'),
+                  child: Text(l.retry),
                 ),
               ],
             ),
@@ -62,8 +98,21 @@ class HomePage extends StatelessWidget {
     // 3) Données prêtes.
     final students = provider.students;
 
+    // Filtrage par nom ou par filière (insensible à la casse).
+    final String q = _query.trim().toLowerCase();
+    final filtered = q.isEmpty
+        ? students
+        : students
+            .where((s) =>
+                s.fullName.toLowerCase().contains(q) ||
+                s.field.toLowerCase().contains(q))
+            .toList();
+
     return Scaffold(
-      appBar: AppBar(title: const Text('MyPortfolio')),
+      appBar: AppBar(
+          title: const Text('MyPortfolio'),
+          actions: _appBarActions(context),
+        ),
       // Apparition en fondu au chargement (de transparent à opaque).
       body: TweenAnimationBuilder<double>(
         duration: const Duration(milliseconds: 400),
@@ -77,37 +126,70 @@ class HomePage extends StatelessWidget {
             : ListView(
                 padding: const EdgeInsets.all(20),
                 children: [
-                  Text('Les portfolios', style: text.headlineSmall),
+                  Text(l.homeHeadline, style: text.headlineSmall),
                   const SizedBox(height: 4),
                   Text(
-                    'Choisis un étudiant pour voir son portfolio',
+                    l.homeSubtitle,
                     style: text.bodyMedium?.copyWith(
                       color: AppColors.textSecondary,
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  // Une carte par étudiant.
-                  for (final student in students) ...[
-                    StudentCard(
-                      student: student,
-                      onTap: () {
-                        // Navigue vers l'écran profil en empilant une nouvelle
-                        // page. `Navigator.push` ajoute ProfilePage au-dessus de
-                        // l'accueil ; la flèche de retour de l'AppBar la retire.
-                        Navigator.of(context).push(
-                          fadeSlideRoute(ProfilePage(studentId: student.id!)),
-                        );
-                      },
+                  const SizedBox(height: 16),
+                  // Barre de recherche : filtre par nom ou filière.
+                  TextField(
+                    controller: _searchController,
+                    onChanged: (v) => setState(() => _query = v),
+                    decoration: InputDecoration(
+                      hintText: l.searchHint,
+                      prefixIcon: const Icon(Icons.search),
+                      suffixIcon: _query.isEmpty
+                          ? null
+                          : IconButton(
+                              icon: const Icon(Icons.clear),
+                              tooltip: l.clear,
+                              onPressed: () => setState(() {
+                                _searchController.clear();
+                                _query = '';
+                              }),
+                            ),
                     ),
-                    const SizedBox(height: 14),
-                  ],
+                  ),
+                  const SizedBox(height: 20),
+                  // Aucun résultat pour la recherche en cours.
+                  if (filtered.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 24),
+                      child: Text(
+                        l.noResults(_query.trim()),
+                        textAlign: TextAlign.center,
+                        style: text.bodyMedium?.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    )
+                  else
+                    // Une carte par étudiant (filtré).
+                    for (final student in filtered) ...[
+                      StudentCard(
+                        student: student,
+                        onTap: () {
+                          // Navigue vers l'écran profil en empilant une nouvelle
+                          // page. `Navigator.push` ajoute ProfilePage au-dessus
+                          // de l'accueil ; la flèche de retour la retire.
+                          Navigator.of(context).push(
+                            fadeSlideRoute(ProfilePage(studentId: student.id!)),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 14),
+                    ],
                 ],
               ),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => showStudentEditDialog(context),
         icon: const Icon(Icons.add),
-        label: const Text('Ajouter un CV'),
+        label: Text(l.addCv),
       ),
     );
   }
@@ -120,22 +202,23 @@ class _EmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final TextTheme text = Theme.of(context).textTheme;
+    final AppLocalizations l = AppLocalizations.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
+            Icon(
               Icons.inbox_outlined,
               size: 56,
               color: AppColors.textSecondary,
             ),
             const SizedBox(height: 16),
-            Text('Aucun portfolio', style: text.titleMedium),
+            Text(l.emptyTitle, style: text.titleMedium),
             const SizedBox(height: 6),
             Text(
-              'Les portfolios des deux étudiants apparaîtront ici.',
+              l.emptyBody,
               textAlign: TextAlign.center,
               style: text.bodyMedium?.copyWith(color: AppColors.textSecondary),
             ),

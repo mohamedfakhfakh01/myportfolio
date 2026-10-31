@@ -1,0 +1,136 @@
+{
+  "@@locale": "fr",
+
+  "cancel": "Annuler",
+  "save": "Enregistrer",
+  "delete": "Supprimer",
+  "add": "Ajouter",
+  "retry": "Réessayer",
+  "remove": "Retirer",
+
+  "navHome": "Accueil",
+  "navAbout": "À propos",
+  "navSettings": "Réglages",
+
+  "homeHeadline": "Les portfolios",
+  "homeSubtitle": "Choisis un étudiant pour voir son portfolio",
+  "searchHint": "Rechercher un nom ou une filière…",
+  "clear": "Effacer",
+  "noResults": "Aucun résultat pour « {query} ».",
+  "@noResults": {
+    "placeholders": { "query": { "type": "String" } }
+  },
+  "addCv": "Ajouter un CV",
+  "emptyTitle": "Aucun portfolio",
+  "emptyBody": "Les portfolios des deux étudiants apparaîtront ici.",
+  "switchToLight": "Passer en thème clair",
+  "switchToDark": "Passer en thème sombre",
+
+  "editProfile": "Modifier le profil",
+  "skills": "Compétences",
+  "projects": "Projets",
+  "sortSkills": "Trier les compétences",
+  "sortProjects": "Trier les projets",
+  "sortByNameAsc": "Nom (A → Z)",
+  "sortByLevelDesc": "Niveau (élevé → bas)",
+  "sortByTitleAsc": "Titre (A → Z)",
+  "sortByTitleDesc": "Titre (Z → A)",
+  "addSkill": "Ajouter une compétence",
+  "addProject": "Ajouter un projet",
+  "skillsEmpty": "Aucune compétence. Appuie sur + pour en ajouter une.",
+  "skillsHint": "Touche une compétence pour la modifier.",
+  "projectsEmpty": "Aucun projet. Appuie sur + pour en ajouter un.",
+  "projectsHint": "Touche un projet pour le modifier.",
+
+  "githubRepos": "Dépôts GitHub",
+  "githubNoRepos": "Aucun dépôt public trouvé.",
+  "githubSummary": "{count} dépôts · {stars} étoiles",
+  "@githubSummary": {
+    "placeholders": {
+      "count": { "type": "int" },
+      "stars": { "type": "int" }
+    }
+  },
+  "githubMainLanguage": "Langage principal : {language}",
+  "@githubMainLanguage": {
+    "placeholders": { "language": { "type": "String" } }
+  },
+  "githubLastUpdate": "Dernière mise à jour : {date}",
+  "@githubLastUpdate": {
+    "placeholders": { "date": { "type": "String" } }
+  },
+
+  "catLanguages": "Langages",
+  "catFrameworks": "Frameworks",
+  "catTools": "Outils",
+  "catOther": "Autres",
+
+  "appearance": "Apparence",
+  "darkTheme": "Thème sombre",
+  "darkThemeOn": "Activé — fond sombre, texte clair",
+  "darkThemeOff": "Désactivé — fond clair, texte sombre",
+  "language": "Langue",
+
+  "aboutSubtitle": "Portfolios étudiants",
+  "aboutWhatTitle": "Ce que fait l'application",
+  "aboutFeature1": "Photo, filière et biographie de chaque étudiant",
+  "aboutFeature2": "Compétences par catégorie, avec niveau",
+  "aboutFeature3": "Projets réalisés",
+  "aboutFeature4": "Dépôts GitHub publics (via l'API GitHub)",
+  "aboutFeature5": "Recherche, tri et thème clair/sombre",
+  "aboutTechTitle": "Technologies",
+  "aboutTech1": "Flutter & Material 3",
+  "aboutTech2": "Base de données locale SQLite (sqflite)",
+  "aboutTech3": "API publique GitHub",
+  "aboutFooter": "Projet réalisé en 2ᵉ année d'informatique.",
+
+  "skillDeleteTitle": "Supprimer la compétence ?",
+  "skillDeleteBody": "« {name} » sera supprimée définitivement.",
+  "@skillDeleteBody": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "skillEditTitle": "Modifier la compétence",
+  "skillAddTitle": "Ajouter une compétence",
+  "nameLabel": "Nom *",
+  "skillNameHint": "Ex : Flutter",
+  "nameRequired": "Le nom est obligatoire",
+  "levelLabel": "Niveau 0–100 (optionnel)",
+  "enterNumber": "Entrez un nombre",
+  "between0and100": "Entre 0 et 100",
+  "categoryLabel": "Catégorie",
+
+  "projectDeleteTitle": "Supprimer le projet ?",
+  "projectDeleteBody": "« {title} » sera supprimé définitivement.",
+  "@projectDeleteBody": {
+    "placeholders": { "title": { "type": "String" } }
+  },
+  "projectEditTitle": "Modifier le projet",
+  "projectAddTitle": "Ajouter un projet",
+  "titleLabel": "Titre *",
+  "projectTitleHint": "Ex : MyPortfolio",
+  "titleRequired": "Le titre est obligatoire",
+  "descriptionLabel": "Description *",
+  "projectDescHint": "Que fait ce projet ?",
+  "descriptionRequired": "La description est obligatoire",
+  "linkLabel": "Lien (optionnel)",
+
+  "pickGallery": "Galerie",
+  "pickCamera": "Appareil photo",
+  "newPortfolioTitle": "Nouveau portfolio",
+  "changePhoto": "Changer la photo",
+  "addPhoto": "Ajouter une photo",
+  "information": "Informations",
+  "fullNameLabel": "Nom complet *",
+  "fullNameHint": "Ex : Mohamed Fakhfakh",
+  "fieldLabel": "Filière / niveau *",
+  "fieldHint": "Ex : 2e année informatique",
+  "fieldRequired": "La filière est obligatoire",
+  "bioLabel": "Bio (optionnel)",
+  "bioHint": "Quelques mots sur toi…",
+  "githubUsernameLabel": "Pseudo GitHub (optionnel)",
+  "githubUsernameHint": "Ex : mohamedfakhfakh01",
+  "githubUsernameHelp": "Pour afficher tes dépôts GitHub sur le profil",
+  "projectsOptional": "Projets (optionnel)",
+  "noProjectAdded": "Aucun projet ajouté. Utilise « Ajouter un projet » ci-dessous.",
+  "createPortfolio": "Créer le portfolio"
+}

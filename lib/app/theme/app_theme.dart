@@ -17,8 +17,11 @@ class AppTheme {
   /// Rayon d'arrondi commun (coins arrondis cohérents dans toute l'app).
   static const double _radius = 14;
 
-  /// Thème sombre de l'application.
-  static ThemeData get dark {
+  /// Construit le thème de l'application pour la luminosité demandée
+  /// (clair ou sombre). Les couleurs de surface/texte sont lues depuis
+  /// [AppColors], qui doit déjà avoir été basculé via
+  /// `AppColors.applyBrightness(brightness)`.
+  static ThemeData themeFor(Brightness brightness) {
     // Thème Material 3 de base, construit à partir d'une couleur « graine ».
     final ThemeData base = ThemeData(
       useMaterial3: true,
@@ -27,7 +30,7 @@ class AppTheme {
         primary: AppColors.primary,
         secondary: AppColors.accent,
         surface: AppColors.surface,
-        brightness: Brightness.dark,
+        brightness: brightness,
       ),
       scaffoldBackgroundColor: AppColors.background,
     );
@@ -97,11 +100,11 @@ class AppTheme {
             const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(_radius),
-          borderSide: const BorderSide(color: AppColors.border),
+          borderSide: BorderSide(color: AppColors.border),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(_radius),
-          borderSide: const BorderSide(color: AppColors.border),
+          borderSide: BorderSide(color: AppColors.border),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(_radius),
@@ -115,7 +118,7 @@ class AppTheme {
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(_radius + 2),
-          side: const BorderSide(color: AppColors.border),
+          side: BorderSide(color: AppColors.border),
         ),
         margin: EdgeInsets.zero,
       ),

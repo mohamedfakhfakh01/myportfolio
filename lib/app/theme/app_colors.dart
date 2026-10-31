@@ -23,27 +23,62 @@ class AppColors {
   /// Cyan clair : texte/icône d'accent lisible sur fond sombre.
   static const Color accentDark = Color(0xFF67E8F9);
 
-  // --- Surfaces (sombres) ---
-  /// Fond général des écrans (bleu anthracite).
-  static const Color background = Color(0xFF0F172A);
+  // --- Surfaces & textes : VARIENT selon le thème (clair/sombre) ---
+  //
+  // Ces couleurs ne sont PAS `const` : elles sont remplacées par
+  // [applyBrightness] quand l'utilisateur bascule le thème. Les ~25 endroits
+  // qui écrivent `AppColors.surface`, `AppColors.textSecondary`, etc. n'ont
+  // ainsi rien à changer : ils lisent toujours la bonne valeur du moment.
+  // (Choix volontairement simple : une seule palette globale commutable.)
 
-  /// Fond des cartes et surfaces surélevées (un cran plus clair).
-  static const Color surface = Color(0xFF1E293B);
+  /// Fond général des écrans.
+  static Color background = _backgroundDark;
 
-  // --- Textes ---
-  /// Texte principal (presque blanc).
-  static const Color textPrimary = Color(0xFFF8FAFC);
+  /// Fond des cartes et surfaces surélevées.
+  static Color surface = _surfaceDark;
 
-  /// Texte secondaire (gris clair) pour sous-titres et légendes.
-  static const Color textSecondary = Color(0xFF94A3B8);
+  /// Texte principal.
+  static Color textPrimary = _textPrimaryDark;
 
-  // --- Divers ---
-  /// Bordures fines (gris ardoise) : contour des cartes et champs.
-  static const Color border = Color(0xFF334155);
+  /// Texte secondaire (sous-titres, légendes).
+  static Color textSecondary = _textSecondaryDark;
 
-  /// Fond bleu sombre (puces de compétences, icônes douces).
-  static const Color primarySoft = Color(0xFF172554);
+  /// Bordures fines (contour des cartes et champs).
+  static Color border = _borderDark;
 
-  /// Fond cyan sombre (puces d'accent).
-  static const Color accentSoft = Color(0xFF164E63);
+  /// Fond bleu doux (puces de compétences, icônes douces).
+  static Color primarySoft = _primarySoftDark;
+
+  /// Fond cyan doux (puces d'accent).
+  static Color accentSoft = _accentSoftDark;
+
+  // Valeurs du thème SOMBRE.
+  static const Color _backgroundDark = Color(0xFF0F172A);
+  static const Color _surfaceDark = Color(0xFF1E293B);
+  static const Color _textPrimaryDark = Color(0xFFF8FAFC);
+  static const Color _textSecondaryDark = Color(0xFF94A3B8);
+  static const Color _borderDark = Color(0xFF334155);
+  static const Color _primarySoftDark = Color(0xFF172554);
+  static const Color _accentSoftDark = Color(0xFF164E63);
+
+  // Valeurs du thème CLAIR.
+  static const Color _backgroundLight = Color(0xFFF1F5F9);
+  static const Color _surfaceLight = Color(0xFFFFFFFF);
+  static const Color _textPrimaryLight = Color(0xFF0F172A);
+  static const Color _textSecondaryLight = Color(0xFF64748B);
+  static const Color _borderLight = Color(0xFFE2E8F0);
+  static const Color _primarySoftLight = Color(0xFFDBEAFE);
+  static const Color _accentSoftLight = Color(0xFFCFFAFE);
+
+  /// Bascule toute la palette des surfaces/textes vers le thème choisi.
+  static void applyBrightness(Brightness brightness) {
+    final bool dark = brightness == Brightness.dark;
+    background = dark ? _backgroundDark : _backgroundLight;
+    surface = dark ? _surfaceDark : _surfaceLight;
+    textPrimary = dark ? _textPrimaryDark : _textPrimaryLight;
+    textSecondary = dark ? _textSecondaryDark : _textSecondaryLight;
+    border = dark ? _borderDark : _borderLight;
+    primarySoft = dark ? _primarySoftDark : _primarySoftLight;
+    accentSoft = dark ? _accentSoftDark : _accentSoftLight;
+  }
 }

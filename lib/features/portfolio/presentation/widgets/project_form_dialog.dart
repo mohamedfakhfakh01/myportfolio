@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/project.dart';
 import '../../providers/portfolio_provider.dart';
 
@@ -75,20 +76,20 @@ class _ProjectFormDialogState extends State<_ProjectFormDialog> {
   }
 
   Future<void> _delete() async {
+    final AppLocalizations l = AppLocalizations.of(context);
     final bool? confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Supprimer le projet ?'),
-        content:
-            Text('« ${widget.project!.title} » sera supprimé définitivement.'),
+        title: Text(l.projectDeleteTitle),
+        content: Text(l.projectDeleteBody(widget.project!.title)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Annuler'),
+            child: Text(l.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Supprimer', style: TextStyle(color: Colors.red)),
+            child: Text(l.delete, style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -103,8 +104,9 @@ class _ProjectFormDialogState extends State<_ProjectFormDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l = AppLocalizations.of(context);
     return AlertDialog(
-      title: Text(_isEditing ? 'Modifier le projet' : 'Ajouter un projet'),
+      title: Text(_isEditing ? l.projectEditTitle : l.projectAddTitle),
       content: Form(
         key: _formKey,
         child: Column(
@@ -113,12 +115,12 @@ class _ProjectFormDialogState extends State<_ProjectFormDialog> {
             TextFormField(
               controller: _titleController,
               textCapitalization: TextCapitalization.sentences,
-              decoration: const InputDecoration(
-                labelText: 'Titre *',
-                hintText: 'Ex : MyPortfolio',
+              decoration: InputDecoration(
+                labelText: l.titleLabel,
+                hintText: l.projectTitleHint,
               ),
               validator: (value) => (value == null || value.trim().isEmpty)
-                  ? 'Le titre est obligatoire'
+                  ? l.titleRequired
                   : null,
             ),
             const SizedBox(height: 12),
@@ -126,20 +128,20 @@ class _ProjectFormDialogState extends State<_ProjectFormDialog> {
               controller: _descriptionController,
               textCapitalization: TextCapitalization.sentences,
               maxLines: 3,
-              decoration: const InputDecoration(
-                labelText: 'Description *',
-                hintText: 'Que fait ce projet ?',
+              decoration: InputDecoration(
+                labelText: l.descriptionLabel,
+                hintText: l.projectDescHint,
               ),
               validator: (value) => (value == null || value.trim().isEmpty)
-                  ? 'La description est obligatoire'
+                  ? l.descriptionRequired
                   : null,
             ),
             const SizedBox(height: 12),
             TextFormField(
               controller: _linkController,
               keyboardType: TextInputType.url,
-              decoration: const InputDecoration(
-                labelText: 'Lien (optionnel)',
+              decoration: InputDecoration(
+                labelText: l.linkLabel,
                 hintText: 'https://github.com/...',
               ),
             ),
@@ -150,15 +152,15 @@ class _ProjectFormDialogState extends State<_ProjectFormDialog> {
         if (_isEditing)
           TextButton(
             onPressed: _delete,
-            child: const Text('Supprimer', style: TextStyle(color: Colors.red)),
+            child: Text(l.delete, style: const TextStyle(color: Colors.red)),
           ),
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Annuler'),
+          child: Text(l.cancel),
         ),
         TextButton(
           onPressed: _save,
-          child: const Text('Enregistrer'),
+          child: Text(l.save),
         ),
       ],
     );

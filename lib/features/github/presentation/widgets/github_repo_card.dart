@@ -43,7 +43,7 @@ class GithubRepoCard extends StatelessWidget {
                   Text(repo.language!, style: text.bodySmall),
                   const SizedBox(width: 16),
                 ],
-                const Icon(Icons.star_border,
+                Icon(Icons.star_border,
                     size: 16, color: AppColors.textSecondary),
                 const SizedBox(width: 4),
                 Text('${repo.stars}', style: text.bodySmall),

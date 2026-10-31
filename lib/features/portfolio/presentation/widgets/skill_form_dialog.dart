@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/skill.dart';
 import '../../providers/portfolio_provider.dart';
+import 'skill_category_label.dart';
 
 /// Ouvre la boîte de dialogue d'ajout (si [skill] est null) ou de modification
 /// (si [skill] est fourni) d'une compétence.
@@ -35,6 +37,7 @@ class _SkillFormDialogState extends State<_SkillFormDialog> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _nameController;
   late final TextEditingController _levelController;
+  late SkillCategory _category;
 
   bool get _isEditing => widget.skill != null;
 
@@ -45,6 +48,7 @@ class _SkillFormDialogState extends State<_SkillFormDialog> {
     _nameController = TextEditingController(text: widget.skill?.name ?? '');
     _levelController =
         TextEditingController(text: widget.skill?.level?.toString() ?? '');
+    _category = widget.skill?.category ?? SkillCategory.other;
   }
 
   @override
@@ -64,6 +68,7 @@ class _SkillFormDialogState extends State<_SkillFormDialog> {
       id: widget.skill?.id,
       name: _nameController.text.trim(),
       level: levelText.isEmpty ? null : int.parse(levelText),
+      category: _category,
     );
 
     final provider = context.read<PortfolioProvider>();
@@ -79,20 +84,21 @@ class _SkillFormDialogState extends State<_SkillFormDialog> {
   }
 
   Future<void> _delete() async {
+    final AppLocalizations l = AppLocalizations.of(context);
     // Confirmation avant une action destructive (bonne pratique).
     final bool? confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Supprimer la compétence ?'),
-        content: Text('« ${widget.skill!.name} » sera supprimée définitivement.'),
+        title: Text(l.skillDeleteTitle),
+        content: Text(l.skillDeleteBody(widget.skill!.name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Annuler'),
+            child: Text(l.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Supprimer', style: TextStyle(color: Colors.red)),
+            child: Text(l.delete, style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -107,10 +113,9 @@ class _SkillFormDialogState extends State<_SkillFormDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l = AppLocalizations.of(context);
     return AlertDialog(
-      title: Text(
-        _isEditing ? 'Modifier la compétence' : 'Ajouter une compétence',
-      ),
+      title: Text(_isEditing ? l.skillEditTitle : l.skillAddTitle),
       content: Form(
         key: _formKey,
         child: Column(
@@ -119,12 +124,12 @@ class _SkillFormDialogState extends State<_SkillFormDialog> {
             TextFormField(
               controller: _nameController,
               textCapitalization: TextCapitalization.words,
-              decoration: const InputDecoration(
-                labelText: 'Nom *',
-                hintText: 'Ex : Flutter',
+              decoration: InputDecoration(
+                labelText: l.nameLabel,
+                hintText: l.skillNameHint,
               ),
               validator: (value) => (value == null || value.trim().isEmpty)
-                  ? 'Le nom est obligatoire'
+                  ? l.nameRequired
                   : null,
             ),
             const SizedBox(height: 12),
@@ -133,15 +138,28 @@ class _SkillFormDialogState extends State<_SkillFormDialog> {
               keyboardType: TextInputType.number,
               // N'autorise que des chiffres au clavier.
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              decoration: const InputDecoration(
-                labelText: 'Niveau 0–100 (optionnel)',
-              ),
+              decoration: InputDecoration(labelText: l.levelLabel),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) return null;
                 final int? n = int.tryParse(value.trim());
-                if (n == null) return 'Entrez un nombre';
-                if (n < 0 || n > 100) return 'Entre 0 et 100';
+                if (n == null) return l.enterNumber;
+                if (n < 0 || n > 100) return l.between0and100;
                 return null;
+              },
+            ),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<SkillCategory>(
+              initialValue: _category,
+              decoration: InputDecoration(labelText: l.categoryLabel),
+              items: [
+                for (final c in SkillCategory.values)
+                  DropdownMenuItem(
+                    value: c,
+                    child: Text(skillCategoryLabel(l, c)),
+                  ),
+              ],
+              onChanged: (value) {
+                if (value != null) setState(() => _category = value);
               },
             ),
           ],
@@ -151,15 +169,15 @@ class _SkillFormDialogState extends State<_SkillFormDialog> {
         if (_isEditing)
           TextButton(
             onPressed: _delete,
-            child: const Text('Supprimer', style: TextStyle(color: Colors.red)),
+            child: Text(l.delete, style: const TextStyle(color: Colors.red)),
           ),
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Annuler'),
+          child: Text(l.cancel),
         ),
         TextButton(
           onPressed: _save,
-          child: const Text('Enregistrer'),
+          child: Text(l.save),
         ),
       ],
     );
