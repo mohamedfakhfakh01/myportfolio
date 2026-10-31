@@ -78,6 +78,38 @@ class PortfolioRepository {
     }
   }
 
+  /// Insère l'étudiant de **démonstration** s'il n'est pas déjà présent.
+  ///
+  /// Contrairement à [seedIfEmpty] (qui ne s'exécute qu'une fois, sur base
+  /// vide), cette méthode est **idempotente** : elle peut ajouter le profil
+  /// démo à une base déjà remplie, mais seulement s'il manque — donc pas de
+  /// doublon à chaque lancement. Les données viennent de [sampleStudents]
+  /// (une seule source de vérité : on ne les réécrit pas ici).
+  Future<void> ensureDemoStudent() async {
+    final db = await _db;
+    // Le profil démo est l'entrée de sampleStudents reconnue par son nom.
+    final Student demo = sampleStudents.firstWhere(
+      (s) => s.fullName == 'Portfolio Démo',
+    );
+    // Déjà présent ? (recherche par nom) → on ne refait rien.
+    final existing = await db.query(
+      'students',
+      where: 'fullName = ?',
+      whereArgs: [demo.fullName],
+      limit: 1,
+    );
+    if (existing.isNotEmpty) return;
+    // Sinon on l'insère avec ses compétences et projets (comme le seed).
+    final studentMap = demo.toMap()..remove('id');
+    final int studentId = await db.insert('students', studentMap);
+    for (final skill in demo.skills) {
+      await insertSkill(skill, studentId);
+    }
+    for (final project in demo.projects) {
+      await insertProject(project, studentId);
+    }
+  }
+
   // ---------------------------------------------------------------------------
   // CRUD — COMPÉTENCES
   // ---------------------------------------------------------------------------

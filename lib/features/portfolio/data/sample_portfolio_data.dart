@@ -76,4 +76,45 @@ const List<Student> sampleStudents = [
       ),
     ],
   ),
+
+  // ---------------------------------------------------------------------------
+  // Étudiant 3 — PORTFOLIO DÉMO (données 100 % fictives, uniquement pour
+  // tester l'affichage : graphe de répartition, barres de niveau, tri, thème).
+  // Rien de réel ici — valeurs inventées de façon assumée pour la démo.
+  // ---------------------------------------------------------------------------
+  Student(
+    id: 3,
+    fullName: 'Portfolio Démo',
+    field: 'Jeu de données de démonstration',
+    bio: 'Profil fictif servant à tester l\'affichage : graphe des compétences, '
+        'barres de niveau, tri et thème clair/sombre. Toutes les valeurs sont '
+        'inventées pour la démo.',
+    githubUsername: null,
+    skills: [
+      // Langages
+      Skill(name: 'Dart', level: 85, category: SkillCategory.language),
+      Skill(name: 'Python', level: 70, category: SkillCategory.language),
+      Skill(name: 'JavaScript', level: 60, category: SkillCategory.language),
+      // Frameworks
+      Skill(name: 'Flutter', level: 80, category: SkillCategory.framework),
+      Skill(name: 'React', level: 55, category: SkillCategory.framework),
+      // Outils
+      Skill(name: 'Git', level: 75, category: SkillCategory.tool),
+      Skill(name: 'Docker', level: 40, category: SkillCategory.tool),
+      // Autres
+      Skill(name: 'UI/UX Design', level: 50, category: SkillCategory.other),
+    ],
+    projects: [
+      Project(
+        title: 'App Démo',
+        description:
+            'Projet fictif de démonstration pour tester les cartes de projet.',
+      ),
+      Project(
+        title: 'Site Vitrine',
+        description:
+            'Autre projet de démo pour vérifier l\'affichage et le tri.',
+      ),
+    ],
+  ),
 ];
