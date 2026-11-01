@@ -74,7 +74,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(student.fullName),
         actions: [
           IconButton(
             icon: const Icon(Icons.picture_as_pdf_outlined),

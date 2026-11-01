@@ -318,11 +318,17 @@ class AppLocalizationsFr extends AppLocalizations {
       'Pour afficher tes dépôts GitHub sur le profil';
 
   @override
+  String get skillsOptional => 'Compétences (optionnel)';
+
+  @override
+  String get noSkillAdded =>
+      'Aucune compétence ajoutée. Utilise « + » ci-dessus.';
+
+  @override
   String get projectsOptional => 'Projets (optionnel)';
 
   @override
-  String get noProjectAdded =>
-      'Aucun projet ajouté. Utilise « Ajouter un projet » ci-dessous.';
+  String get noProjectAdded => 'Aucun projet ajouté. Utilise « + » ci-dessus.';
 
   @override
   String get createPortfolio => 'Créer le portfolio';
@@ -340,4 +346,28 @@ class AppLocalizationsFr extends AppLocalizations {
   String deletePortfolioBody(String name) {
     return 'Le portfolio de « $name » et toutes ses données seront supprimés définitivement.';
   }
+
+  @override
+  String get viewProject => 'Voir le projet';
+
+  @override
+  String get linkError => 'Impossible d\'ouvrir le lien.';
+
+  @override
+  String get skillSaved => 'Compétence enregistrée';
+
+  @override
+  String get skillDeleted => 'Compétence supprimée';
+
+  @override
+  String get projectSaved => 'Projet enregistré';
+
+  @override
+  String get projectDeleted => 'Projet supprimé';
+
+  @override
+  String get portfolioSaved => 'Portfolio enregistré';
+
+  @override
+  String get portfolioDeleted => 'Portfolio supprimé';
 }

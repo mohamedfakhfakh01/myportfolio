@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
@@ -10,8 +11,10 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../core/widgets/fade_slide_route.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/project.dart';
+import '../../../../shared/models/skill.dart';
 import '../../../../shared/models/student.dart';
 import '../../providers/portfolio_provider.dart';
+import 'skill_category_label.dart';
 
 /// Ouvre l'**écran plein** d'édition (si [student] est fourni) ou de **création**
 /// d'un portfolio (si [student] est null).
@@ -42,6 +45,9 @@ class _StudentFormPageState extends State<StudentFormPage> {
   late final TextEditingController _bioController;
   late final TextEditingController _githubController;
   String? _photoPath;
+
+  /// Compétences saisies pendant la création (avant que l'étudiant existe).
+  final List<Skill> _skills = [];
 
   /// Projets saisis pendant la création (avant que l'étudiant existe en base).
   final List<Project> _projects = [];
@@ -132,8 +138,37 @@ class _StudentFormPageState extends State<StudentFormPage> {
     if (project != null) setState(() => _projects.add(project));
   }
 
+  /// Ouvre un petit formulaire pour saisir une compétence et l'ajoute à la
+  /// liste locale (enregistrée en base au moment de créer le portfolio).
+  Future<void> _addSkill() async {
+    final Skill? skill = await showDialog<Skill>(
+      context: context,
+      builder: (_) => const _SkillInputDialog(),
+    );
+    if (skill != null) setState(() => _skills.add(skill));
+  }
+
+  /// En-tête de section : titre à gauche, bouton « + » à droite.
+  Widget _sectionHeader(String title, String addTooltip, VoidCallback onAdd) {
+    final TextTheme text = Theme.of(context).textTheme;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(title, style: text.titleMedium),
+        IconButton(
+          icon: const Icon(Icons.add_circle, color: AppColors.primary),
+          tooltip: addTooltip,
+          onPressed: onAdd,
+        ),
+      ],
+    );
+  }
+
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
+
+    final AppLocalizations l = AppLocalizations.of(context);
+    final ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
 
     final String github = _githubController.text.trim();
     final Student student = Student(
@@ -143,7 +178,7 @@ class _StudentFormPageState extends State<StudentFormPage> {
       bio: _bioController.text.trim(),
       githubUsername: github.isEmpty ? null : github,
       photoPath: _photoPath,
-      skills: widget.student?.skills ?? const [],
+      skills: _isCreating ? _skills : (widget.student?.skills ?? const []),
       projects: widget.student?.projects ?? const [],
     );
 
@@ -154,6 +189,7 @@ class _StudentFormPageState extends State<StudentFormPage> {
       await provider.updateStudent(student);
     }
     if (!mounted) return;
+    messenger.showSnackBar(SnackBar(content: Text(l.portfolioSaved)));
     Navigator.of(context).pop();
   }
 
@@ -249,10 +285,38 @@ class _StudentFormPageState extends State<StudentFormPage> {
               ),
               const SizedBox(height: 8),
 
-              // --- Projets (saisis dès la création d'un portfolio) ---
+              // --- Compétences & projets (ajoutés dès la création) ---
               if (_isCreating) ...[
-                Text(l.projectsOptional, style: text.titleMedium),
-                const SizedBox(height: 8),
+                _sectionHeader(l.skillsOptional, l.addSkill, _addSkill),
+                if (_skills.isEmpty)
+                  Text(
+                    l.noSkillAdded,
+                    style: text.bodyMedium
+                        ?.copyWith(color: AppColors.textSecondary),
+                  )
+                else
+                  for (int i = 0; i < _skills.length; i++)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: Card(
+                        child: ListTile(
+                          title: Text(_skills[i].name),
+                          subtitle: Text(
+                            _skills[i].level != null
+                                ? '${skillCategoryLabel(l, _skills[i].category)} · ${_skills[i].level}%'
+                                : skillCategoryLabel(l, _skills[i].category),
+                          ),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.delete_outline),
+                            tooltip: l.remove,
+                            onPressed: () =>
+                                setState(() => _skills.removeAt(i)),
+                          ),
+                        ),
+                      ),
+                    ),
+                const SizedBox(height: 16),
+                _sectionHeader(l.projectsOptional, l.addProject, _addProject),
                 if (_projects.isEmpty)
                   Text(
                     l.noProjectAdded,
@@ -280,12 +344,6 @@ class _StudentFormPageState extends State<StudentFormPage> {
                         ),
                       ),
                     ),
-                const SizedBox(height: 8),
-                OutlinedButton.icon(
-                  onPressed: _addProject,
-                  icon: const Icon(Icons.add),
-                  label: Text(l.addProject),
-                ),
               ],
               const SizedBox(height: 28),
 
@@ -377,6 +435,108 @@ class _ProjectInputDialogState extends State<_ProjectInputDialog> {
                 controller: _linkController,
                 keyboardType: TextInputType.url,
                 decoration: InputDecoration(labelText: l.linkLabel),
+              ),
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(l.cancel),
+        ),
+        TextButton(
+          onPressed: _submit,
+          child: Text(l.add),
+        ),
+      ],
+    );
+  }
+}
+
+/// Petit formulaire pour saisir une compétence (nom, niveau, catégorie) et la
+/// **renvoyer** via `Navigator.pop`, sans toucher à la base de données.
+class _SkillInputDialog extends StatefulWidget {
+  const _SkillInputDialog();
+
+  @override
+  State<_SkillInputDialog> createState() => _SkillInputDialogState();
+}
+
+class _SkillInputDialogState extends State<_SkillInputDialog> {
+  final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
+  final _levelController = TextEditingController();
+  SkillCategory _category = SkillCategory.other;
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _levelController.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    if (!_formKey.currentState!.validate()) return;
+    final String levelText = _levelController.text.trim();
+    Navigator.of(context).pop(
+      Skill(
+        name: _nameController.text.trim(),
+        level: levelText.isEmpty ? null : int.parse(levelText),
+        category: _category,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final AppLocalizations l = AppLocalizations.of(context);
+    return AlertDialog(
+      title: Text(l.skillAddTitle),
+      content: Form(
+        key: _formKey,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                controller: _nameController,
+                textCapitalization: TextCapitalization.words,
+                decoration: InputDecoration(
+                  labelText: l.nameLabel,
+                  hintText: l.skillNameHint,
+                ),
+                validator: (v) =>
+                    (v == null || v.trim().isEmpty) ? l.nameRequired : null,
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: _levelController,
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                decoration: InputDecoration(labelText: l.levelLabel),
+                validator: (v) {
+                  if (v == null || v.trim().isEmpty) return null;
+                  final int? n = int.tryParse(v.trim());
+                  if (n == null) return l.enterNumber;
+                  if (n < 0 || n > 100) return l.between0and100;
+                  return null;
+                },
+              ),
+              const SizedBox(height: 12),
+              DropdownButtonFormField<SkillCategory>(
+                initialValue: _category,
+                decoration: InputDecoration(labelText: l.categoryLabel),
+                items: [
+                  for (final c in SkillCategory.values)
+                    DropdownMenuItem(
+                      value: c,
+                      child: Text(skillCategoryLabel(l, c)),
+                    ),
+                ],
+                onChanged: (value) {
+                  if (value != null) setState(() => _category = value);
+                },
               ),
             ],
           ),

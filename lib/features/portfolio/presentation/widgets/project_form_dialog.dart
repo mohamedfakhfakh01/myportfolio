@@ -56,6 +56,9 @@ class _ProjectFormDialogState extends State<_ProjectFormDialog> {
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
 
+    final AppLocalizations l = AppLocalizations.of(context);
+    final ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
+
     final String link = _linkController.text.trim();
     final Project project = Project(
       id: widget.project?.id,
@@ -72,6 +75,7 @@ class _ProjectFormDialogState extends State<_ProjectFormDialog> {
     }
 
     if (!mounted) return;
+    messenger.showSnackBar(SnackBar(content: Text(l.projectSaved)));
     Navigator.of(context).pop();
   }
 
@@ -97,8 +101,10 @@ class _ProjectFormDialogState extends State<_ProjectFormDialog> {
 
     if (confirmed != true) return;
     if (!mounted) return;
+    final ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
     await context.read<PortfolioProvider>().deleteProject(widget.project!.id!);
     if (!mounted) return;
+    messenger.showSnackBar(SnackBar(content: Text(l.projectDeleted)));
     Navigator.of(context).pop();
   }
 

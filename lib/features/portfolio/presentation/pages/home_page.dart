@@ -35,6 +35,7 @@ class _HomePageState extends State<HomePage> {
   /// Demande confirmation puis supprime le portfolio de [student].
   Future<void> _confirmDeletePortfolio(Student student) async {
     final AppLocalizations l = AppLocalizations.of(context);
+    final ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
     final provider = context.read<PortfolioProvider>();
     final bool? confirmed = await showDialog<bool>(
       context: context,
@@ -53,7 +54,10 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
     );
-    if (confirmed == true) await provider.deleteStudent(student.id!);
+    if (confirmed == true) {
+      await provider.deleteStudent(student.id!);
+      messenger.showSnackBar(SnackBar(content: Text(l.portfolioDeleted)));
+    }
   }
 
   /// Bouton de bascule clair/sombre, affiché dans l'AppBar.

@@ -109,11 +109,13 @@ const List<Student> sampleStudents = [
         title: 'App Démo',
         description:
             'Projet fictif de démonstration pour tester les cartes de projet.',
+        link: 'https://github.com/mohamedfakhfakh01/myportfolio',
       ),
       Project(
         title: 'Site Vitrine',
         description:
             'Autre projet de démo pour vérifier l\'affichage et le tri.',
+        link: 'https://flutter.dev',
       ),
     ],
   ),

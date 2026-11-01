@@ -63,6 +63,11 @@ class _SkillFormDialogState extends State<_SkillFormDialog> {
     // validate() déclenche les `validator` de chaque champ.
     if (!_formKey.currentState!.validate()) return;
 
+    // On capture l et le messenger AVANT l'await (ne pas réutiliser `context`
+    // à travers une opération asynchrone).
+    final AppLocalizations l = AppLocalizations.of(context);
+    final ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
+
     final String levelText = _levelController.text.trim();
     final Skill skill = Skill(
       id: widget.skill?.id,
@@ -80,6 +85,7 @@ class _SkillFormDialogState extends State<_SkillFormDialog> {
 
     // `mounted` : l'écran est-il toujours affiché ? (on vient de faire un await)
     if (!mounted) return;
+    messenger.showSnackBar(SnackBar(content: Text(l.skillSaved)));
     Navigator.of(context).pop();
   }
 
@@ -106,8 +112,10 @@ class _SkillFormDialogState extends State<_SkillFormDialog> {
 
     if (confirmed != true) return;
     if (!mounted) return; // l'écran existe-t-il encore après la confirmation ?
+    final ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
     await context.read<PortfolioProvider>().deleteSkill(widget.skill!.id!);
     if (!mounted) return;
+    messenger.showSnackBar(SnackBar(content: Text(l.skillDeleted)));
     Navigator.of(context).pop();
   }
 

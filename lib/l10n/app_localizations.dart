@@ -686,6 +686,18 @@ abstract class AppLocalizations {
   /// **'Pour afficher tes dépôts GitHub sur le profil'**
   String get githubUsernameHelp;
 
+  /// No description provided for @skillsOptional.
+  ///
+  /// In fr, this message translates to:
+  /// **'Compétences (optionnel)'**
+  String get skillsOptional;
+
+  /// No description provided for @noSkillAdded.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune compétence ajoutée. Utilise « + » ci-dessus.'**
+  String get noSkillAdded;
+
   /// No description provided for @projectsOptional.
   ///
   /// In fr, this message translates to:
@@ -695,7 +707,7 @@ abstract class AppLocalizations {
   /// No description provided for @noProjectAdded.
   ///
   /// In fr, this message translates to:
-  /// **'Aucun projet ajouté. Utilise « Ajouter un projet » ci-dessous.'**
+  /// **'Aucun projet ajouté. Utilise « + » ci-dessus.'**
   String get noProjectAdded;
 
   /// No description provided for @createPortfolio.
@@ -727,6 +739,54 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Le portfolio de « {name} » et toutes ses données seront supprimés définitivement.'**
   String deletePortfolioBody(String name);
+
+  /// No description provided for @viewProject.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voir le projet'**
+  String get viewProject;
+
+  /// No description provided for @linkError.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible d\'ouvrir le lien.'**
+  String get linkError;
+
+  /// No description provided for @skillSaved.
+  ///
+  /// In fr, this message translates to:
+  /// **'Compétence enregistrée'**
+  String get skillSaved;
+
+  /// No description provided for @skillDeleted.
+  ///
+  /// In fr, this message translates to:
+  /// **'Compétence supprimée'**
+  String get skillDeleted;
+
+  /// No description provided for @projectSaved.
+  ///
+  /// In fr, this message translates to:
+  /// **'Projet enregistré'**
+  String get projectSaved;
+
+  /// No description provided for @projectDeleted.
+  ///
+  /// In fr, this message translates to:
+  /// **'Projet supprimé'**
+  String get projectDeleted;
+
+  /// No description provided for @portfolioSaved.
+  ///
+  /// In fr, this message translates to:
+  /// **'Portfolio enregistré'**
+  String get portfolioSaved;
+
+  /// No description provided for @portfolioDeleted.
+  ///
+  /// In fr, this message translates to:
+  /// **'Portfolio supprimé'**
+  String get portfolioDeleted;
 }
 
 class _AppLocalizationsDelegate

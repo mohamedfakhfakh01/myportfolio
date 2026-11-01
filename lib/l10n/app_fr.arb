@@ -130,8 +130,10 @@
   "githubUsernameLabel": "Pseudo GitHub (optionnel)",
   "githubUsernameHint": "Ex : mohamedfakhfakh01",
   "githubUsernameHelp": "Pour afficher tes dépôts GitHub sur le profil",
+  "skillsOptional": "Compétences (optionnel)",
+  "noSkillAdded": "Aucune compétence ajoutée. Utilise « + » ci-dessus.",
   "projectsOptional": "Projets (optionnel)",
-  "noProjectAdded": "Aucun projet ajouté. Utilise « Ajouter un projet » ci-dessous.",
+  "noProjectAdded": "Aucun projet ajouté. Utilise « + » ci-dessus.",
   "createPortfolio": "Créer le portfolio",
 
   "exportPdf": "Exporter en PDF",
@@ -141,5 +143,14 @@
   "deletePortfolioBody": "Le portfolio de « {name} » et toutes ses données seront supprimés définitivement.",
   "@deletePortfolioBody": {
     "placeholders": { "name": { "type": "String" } }
-  }
+  },
+
+  "viewProject": "Voir le projet",
+  "linkError": "Impossible d'ouvrir le lien.",
+  "skillSaved": "Compétence enregistrée",
+  "skillDeleted": "Compétence supprimée",
+  "projectSaved": "Projet enregistré",
+  "projectDeleted": "Projet supprimé",
+  "portfolioSaved": "Portfolio enregistré",
+  "portfolioDeleted": "Portfolio supprimé"
 }
