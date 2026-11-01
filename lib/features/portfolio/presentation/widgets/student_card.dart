@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/student.dart';
 import 'student_avatar.dart';
 
@@ -14,14 +15,19 @@ class StudentCard extends StatelessWidget {
     super.key,
     required this.student,
     required this.onTap,
+    this.onDelete,
   });
 
   final Student student;
   final VoidCallback onTap;
 
+  /// Action de suppression (optionnelle). Si null, aucun bouton supprimer.
+  final VoidCallback? onDelete;
+
   @override
   Widget build(BuildContext context) {
     final TextTheme text = Theme.of(context).textTheme;
+    final AppLocalizations l = AppLocalizations.of(context);
 
     return Card(
       // InkWell ajoute l'effet visuel de « ondulation » au toucher.
@@ -55,6 +61,13 @@ class StudentCard extends StatelessWidget {
                   ],
                 ),
               ),
+              if (onDelete != null)
+                IconButton(
+                  icon: const Icon(Icons.delete_outline),
+                  color: AppColors.textSecondary,
+                  tooltip: l.delete,
+                  onPressed: onDelete,
+                ),
               Icon(Icons.chevron_right, color: AppColors.textSecondary),
             ],
           ),

@@ -135,6 +135,18 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get catLanguages => 'Languages';
+
+  @override
+  String get catFrameworks => 'Frameworks';
+
+  @override
+  String get catTools => 'Tools';
+
+  @override
+  String get catOther => 'Other';
+
+  @override
   String get appearance => 'Appearance';
 
   @override
@@ -216,6 +228,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get between0and100 => 'Between 0 and 100';
+
+  @override
+  String get categoryLabel => 'Category';
 
   @override
   String get projectDeleteTitle => 'Delete project?';
@@ -315,4 +330,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pdfError => 'Could not generate the PDF.';
+
+  @override
+  String get deletePortfolioTitle => 'Delete portfolio?';
+
+  @override
+  String deletePortfolioBody(String name) {
+    return 'The portfolio of “$name” and all its data will be permanently deleted.';
+  }
 }

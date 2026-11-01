@@ -46,6 +46,11 @@
   "githubLastUpdate": "Last update: {date}",
 
 
+  "catLanguages": "Languages",
+  "catFrameworks": "Frameworks",
+  "catTools": "Tools",
+  "catOther": "Other",
+
   "appearance": "Appearance",
   "darkTheme": "Dark theme",
   "darkThemeOn": "On — dark background, light text",
@@ -75,6 +80,7 @@
   "levelLabel": "Level 0–100 (optional)",
   "enterNumber": "Enter a number",
   "between0and100": "Between 0 and 100",
+  "categoryLabel": "Category",
 
   "projectDeleteTitle": "Delete project?",
   "projectDeleteBody": "“{title}” will be permanently deleted.",
@@ -109,5 +115,11 @@
   "createPortfolio": "Create portfolio",
 
   "exportPdf": "Export as PDF",
-  "pdfError": "Could not generate the PDF."
+  "pdfError": "Could not generate the PDF.",
+
+  "deletePortfolioTitle": "Delete portfolio?",
+  "deletePortfolioBody": "The portfolio of “{name}” and all its data will be permanently deleted.",
+  "@deletePortfolioBody": {
+    "placeholders": { "name": { "type": "String" } }
+  }
 }

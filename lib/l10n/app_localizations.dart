@@ -332,6 +332,30 @@ abstract class AppLocalizations {
   /// **'Dernière mise à jour : {date}'**
   String githubLastUpdate(String date);
 
+  /// No description provided for @catLanguages.
+  ///
+  /// In fr, this message translates to:
+  /// **'Langages'**
+  String get catLanguages;
+
+  /// No description provided for @catFrameworks.
+  ///
+  /// In fr, this message translates to:
+  /// **'Frameworks'**
+  String get catFrameworks;
+
+  /// No description provided for @catTools.
+  ///
+  /// In fr, this message translates to:
+  /// **'Outils'**
+  String get catTools;
+
+  /// No description provided for @catOther.
+  ///
+  /// In fr, this message translates to:
+  /// **'Autres'**
+  String get catOther;
+
   /// No description provided for @appearance.
   ///
   /// In fr, this message translates to:
@@ -493,6 +517,12 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Entre 0 et 100'**
   String get between0and100;
+
+  /// No description provided for @categoryLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Catégorie'**
+  String get categoryLabel;
 
   /// No description provided for @projectDeleteTitle.
   ///
@@ -685,6 +715,18 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Impossible de générer le PDF.'**
   String get pdfError;
+
+  /// No description provided for @deletePortfolioTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer le portfolio ?'**
+  String get deletePortfolioTitle;
+
+  /// No description provided for @deletePortfolioBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le portfolio de « {name} » et toutes ses données seront supprimés définitivement.'**
+  String deletePortfolioBody(String name);
 }
 
 class _AppLocalizationsDelegate

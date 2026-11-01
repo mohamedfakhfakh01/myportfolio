@@ -5,10 +5,12 @@ import 'package:provider/provider.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../services/portfolio_pdf.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../../shared/models/skill.dart';
 import '../../../github/presentation/widgets/github_repos_section.dart';
 import '../../providers/portfolio_provider.dart';
 import '../widgets/project_card.dart';
 import '../widgets/project_form_dialog.dart';
+import '../widgets/skill_category_label.dart';
 import '../widgets/skill_level_tile.dart';
 import '../widgets/stat_tile.dart';
 import '../widgets/skill_form_dialog.dart';
@@ -228,15 +230,31 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    for (final skill in skills)
-                      SkillLevelTile(
-                        skill: skill,
-                        onTap: () => showSkillFormDialog(
-                          context,
-                          studentId: studentId,
-                          skill: skill,
+                    // Regroupées par catégorie (Langages, Frameworks…), triées
+                    // à l'intérieur de chaque groupe selon le critère choisi.
+                    for (final category in SkillCategory.values)
+                      if (skills.any((s) => s.category == category)) ...[
+                        Padding(
+                          padding: const EdgeInsets.only(top: 10, bottom: 2),
+                          child: Text(
+                            skillCategoryLabel(l, category),
+                            style: text.labelLarge?.copyWith(
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         ),
-                      ),
+                        for (final skill
+                            in skills.where((s) => s.category == category))
+                          SkillLevelTile(
+                            skill: skill,
+                            onTap: () => showSkillFormDialog(
+                              context,
+                              studentId: studentId,
+                              skill: skill,
+                            ),
+                          ),
+                      ],
                   ],
                   const SizedBox(height: 24),
 

@@ -5,6 +5,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/theme_controller.dart';
 import '../../../../core/widgets/fade_slide_route.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../../shared/models/student.dart';
 import '../../providers/portfolio_provider.dart';
 import '../widgets/student_card.dart';
 import '../widgets/student_edit_dialog.dart';
@@ -29,6 +30,30 @@ class _HomePageState extends State<HomePage> {
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+  /// Demande confirmation puis supprime le portfolio de [student].
+  Future<void> _confirmDeletePortfolio(Student student) async {
+    final AppLocalizations l = AppLocalizations.of(context);
+    final provider = context.read<PortfolioProvider>();
+    final bool? confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l.deletePortfolioTitle),
+        content: Text(l.deletePortfolioBody(student.fullName)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text(l.cancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: Text(l.delete, style: const TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) await provider.deleteStudent(student.id!);
   }
 
   /// Bouton de bascule clair/sombre, affiché dans l'AppBar.
@@ -180,6 +205,7 @@ class _HomePageState extends State<HomePage> {
                             fadeSlideRoute(ProfilePage(studentId: student.id!)),
                           );
                         },
+                        onDelete: () => _confirmDeletePortfolio(student),
                       ),
                       const SizedBox(height: 14),
                     ],

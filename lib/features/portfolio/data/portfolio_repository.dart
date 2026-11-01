@@ -171,4 +171,11 @@ class PortfolioRepository {
     final map = student.toMap()..remove('id');
     return db.insert('students', map);
   }
+
+  /// Supprime un étudiant. Grâce aux clés étrangères `ON DELETE CASCADE`,
+  /// ses compétences et projets sont supprimés automatiquement.
+  Future<void> deleteStudent(int id) async {
+    final db = await _db;
+    await db.delete('students', where: 'id = ?', whereArgs: [id]);
+  }
 }

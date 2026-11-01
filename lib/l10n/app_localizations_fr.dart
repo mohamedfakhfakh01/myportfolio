@@ -136,6 +136,18 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get catLanguages => 'Langages';
+
+  @override
+  String get catFrameworks => 'Frameworks';
+
+  @override
+  String get catTools => 'Outils';
+
+  @override
+  String get catOther => 'Autres';
+
+  @override
   String get appearance => 'Apparence';
 
   @override
@@ -217,6 +229,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get between0and100 => 'Entre 0 et 100';
+
+  @override
+  String get categoryLabel => 'Catégorie';
 
   @override
   String get projectDeleteTitle => 'Supprimer le projet ?';
@@ -317,4 +332,12 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get pdfError => 'Impossible de générer le PDF.';
+
+  @override
+  String get deletePortfolioTitle => 'Supprimer le portfolio ?';
+
+  @override
+  String deletePortfolioBody(String name) {
+    return 'Le portfolio de « $name » et toutes ses données seront supprimés définitivement.';
+  }
 }

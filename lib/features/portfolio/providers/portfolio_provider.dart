@@ -123,6 +123,12 @@ class PortfolioProvider extends ChangeNotifier {
     await _reloadStudents();
   }
 
+  /// Supprime un portfolio (étudiant) et rafraîchit la liste.
+  Future<void> deleteStudent(int id) async {
+    await _repository.deleteStudent(id);
+    await _reloadStudents();
+  }
+
   /// Recharge la liste depuis la base après une modification, puis notifie l'UI.
   Future<void> _reloadStudents() async {
     _students = await _repository.getStudents();
