@@ -2,27 +2,100 @@ import '../../../shared/models/student.dart';
 import '../../../shared/models/skill.dart';
 import '../../../shared/models/project.dart';
 
-/// Données des portfolios.
+/// Données des portfolios (chargées dans la base sqflite au premier lancement).
 ///
-/// - Étudiant 2 (Houssain Aloulou) : **vraies données** issues de son CV.
-/// - Étudiant 1 (Mohamed Fakhfakh) : **à compléter** (`TODO`) — l'étudiant
-///   fournira ses infos plus tard.
-///
-/// Les niveaux de compétence (`level`) ne sont renseignés que lorsqu'ils sont
-/// réellement connus ; sinon ils restent `null` (aucune valeur inventée).
-/// À l'étape 8, ces données seront chargées depuis la base sqflite.
+/// - Étudiant 1 (Mohamed Fakhfakh) et Étudiant 2 (Houssain Aloulou) : infos
+///   réelles issues de leurs CV. Les **niveaux** de compétence sont toutefois
+///   indicatifs (valeurs fictives, à ajuster librement).
+/// - Étudiant 3 (Portfolio Démo) : données 100 % fictives pour tester
+///   l'affichage.
 const List<Student> sampleStudents = [
   // ---------------------------------------------------------------------------
-  // Étudiant 1 — À COMPLÉTER avec tes vraies infos.
+  // Étudiant 1 — Mohamed Fakhfakh (données réelles issues de son CV).
+  // Les niveaux de compétence sont fictifs (ajoutés à la demande).
   // ---------------------------------------------------------------------------
   Student(
     id: 1,
     fullName: 'Mohamed Fakhfakh',
-    field: '2e année informatique',
-    bio: 'TODO : à compléter (ta présentation).',
-    githubUsername: null, // TODO : ton pseudo GitHub
-    skills: [], // TODO : tes compétences
-    projects: [], // TODO : tes projets
+    field: '3e année Licence Informatique — IIT Sfax',
+    bio: 'Étudiant en 3e année de Licence en Informatique, passionné par le '
+        'développement web full-stack. Expérience pratique acquise en entreprise '
+        'et à travers plusieurs projets concrets (e-commerce, applications de '
+        'gestion, mobile). Je recherche un stage de fin d\'études (PFE) pour '
+        'mettre mes compétences au service d\'une équipe et relever de nouveaux '
+        'défis techniques.',
+    githubUsername: 'mohamedfakhfakh01',
+    skills: [
+      // Langages
+      Skill(name: 'Java', level: 75, category: SkillCategory.language),
+      Skill(name: 'C', level: 65, category: SkillCategory.language),
+      Skill(name: 'Python', level: 70, category: SkillCategory.language),
+      Skill(name: 'PHP', level: 72, category: SkillCategory.language),
+      Skill(name: 'C#', level: 74, category: SkillCategory.language),
+      Skill(name: 'TypeScript', level: 72, category: SkillCategory.language),
+      Skill(name: 'HTML5', level: 90, category: SkillCategory.language),
+      Skill(name: 'CSS3', level: 88, category: SkillCategory.language),
+      // Frameworks
+      Skill(name: 'ASP.NET MVC', level: 72, category: SkillCategory.framework),
+      Skill(
+          name: 'Entity Framework', level: 68, category: SkillCategory.framework),
+      Skill(name: 'JavaFX', level: 65, category: SkillCategory.framework),
+      Skill(name: 'Bootstrap', level: 85, category: SkillCategory.framework),
+      Skill(name: 'Flutter', level: 74, category: SkillCategory.framework),
+      Skill(name: 'Next.js', level: 76, category: SkillCategory.framework),
+      Skill(name: 'Tailwind CSS', level: 80, category: SkillCategory.framework),
+      // Outils & bases de données
+      Skill(name: 'MySQL', level: 78, category: SkillCategory.tool),
+      Skill(name: 'SQL Server', level: 70, category: SkillCategory.tool),
+      Skill(name: 'Prisma', level: 62, category: SkillCategory.tool),
+      Skill(name: 'Git', level: 85, category: SkillCategory.tool),
+      Skill(name: 'GitHub', level: 85, category: SkillCategory.tool),
+    ],
+    projects: [
+      Project(
+        title: 'Al Seniour — Restaurant',
+        description:
+            'Application web d\'un restaurant libanais haut de gamme (stage PFA '
+            'chez Tekru Technologies) : interfaces responsives et animées, '
+            'versions desktop et mobile. Next.js · TypeScript · Tailwind CSS · Prisma.',
+      ),
+      Project(
+        title: 'SIBIONICS — E-commerce',
+        description:
+            'Site de vente en ligne avec catalogue produits, panier et gestion '
+            'des commandes.',
+      ),
+      Project(
+        title: 'Carré d\'Or — Pâtisserie',
+        description:
+            'Site e-commerce élégant pour une pâtisserie de luxe, design soigné '
+            'et responsive.',
+      ),
+      Project(
+        title: 'E-FastOrder',
+        description:
+            'Application web de gestion de commandes développée en .NET '
+            '(ASP.NET MVC · C# · Entity Framework · SQL Server).',
+      ),
+      Project(
+        title: 'Gestion de Club',
+        description:
+            'Plateforme de gestion d\'un club universitaire : membres, '
+            'événements et activités (PHP · MySQL · Bootstrap).',
+      ),
+      Project(
+        title: 'My Portfolio — Mobile',
+        description:
+            'Application mobile de portfolio personnel présentant mes projets '
+            'et compétences (Flutter · Dart).',
+      ),
+      Project(
+        title: 'Applications JavaFX',
+        description:
+            'Applications desktop de gestion réalisées dans le cadre de projets '
+            'académiques (Java · JavaFX · MySQL).',
+      ),
+    ],
   ),
 
   // ---------------------------------------------------------------------------
@@ -39,21 +112,23 @@ const List<Student> sampleStudents = [
         'développement web et de robotique.',
     githubUsername: null, // non indiqué sur le CV
     skills: [
-      Skill(name: 'C#', category: SkillCategory.language),
-      Skill(name: 'Java', category: SkillCategory.language),
-      Skill(name: 'PHP', category: SkillCategory.language),
-      Skill(name: 'Python', category: SkillCategory.language),
-      Skill(name: 'HTML / CSS', category: SkillCategory.language),
-      Skill(name: 'ASP.NET Core / MVC', category: SkillCategory.framework),
-      Skill(name: 'Laravel', category: SkillCategory.framework),
-      Skill(name: 'Entity Framework', category: SkillCategory.framework),
-      Skill(name: 'JavaFX', category: SkillCategory.framework),
-      Skill(name: 'Bootstrap', category: SkillCategory.framework),
-      Skill(name: 'SQL Server', category: SkillCategory.tool),
-      Skill(name: 'MySQL', category: SkillCategory.tool),
-      Skill(name: 'Git', category: SkillCategory.tool),
-      Skill(name: 'OutSystems', category: SkillCategory.tool),
-      Skill(name: 'Mendix', category: SkillCategory.tool),
+      Skill(name: 'C#', level: 80, category: SkillCategory.language),
+      Skill(name: 'Java', level: 75, category: SkillCategory.language),
+      Skill(name: 'PHP', level: 78, category: SkillCategory.language),
+      Skill(name: 'Python', level: 65, category: SkillCategory.language),
+      Skill(name: 'HTML / CSS', level: 85, category: SkillCategory.language),
+      Skill(
+          name: 'ASP.NET Core / MVC', level: 75, category: SkillCategory.framework),
+      Skill(name: 'Laravel', level: 78, category: SkillCategory.framework),
+      Skill(
+          name: 'Entity Framework', level: 70, category: SkillCategory.framework),
+      Skill(name: 'JavaFX', level: 68, category: SkillCategory.framework),
+      Skill(name: 'Bootstrap', level: 82, category: SkillCategory.framework),
+      Skill(name: 'SQL Server', level: 75, category: SkillCategory.tool),
+      Skill(name: 'MySQL', level: 80, category: SkillCategory.tool),
+      Skill(name: 'Git', level: 80, category: SkillCategory.tool),
+      Skill(name: 'OutSystems', level: 60, category: SkillCategory.tool),
+      Skill(name: 'Mendix', level: 55, category: SkillCategory.tool),
     ],
     projects: [
       Project(
