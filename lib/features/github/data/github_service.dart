@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
@@ -18,10 +19,16 @@ class GithubException implements Exception {
 /// Analogie : c'est le « fournisseur extérieur » de la cuisine. Il va chercher
 /// des données hors de l'application, via le réseau (HTTP).
 class GithubService {
-  GithubService({http.Client? client}) : _client = client ?? http.Client();
+  GithubService({
+    http.Client? client,
+    this.timeout = const Duration(seconds: 10),
+  }) : _client = client ?? http.Client();
 
   // Le `client` est injectable → on pourra le remplacer par un faux en test.
   final http.Client _client;
+
+  /// Délai max d'attente réseau (injectable pour les tests).
+  final Duration timeout;
 
   static const String _baseUrl = 'https://api.github.com';
 
@@ -34,10 +41,18 @@ class GithubService {
       '$_baseUrl/users/$username/repos?sort=updated&per_page=30',
     );
 
-    final http.Response response = await _client.get(
-      uri,
-      headers: {'Accept': 'application/vnd.github+json'},
-    );
+    // On borne l'attente par un timeout et on traduit les erreurs réseau
+    // (hors-ligne, délai dépassé) en messages lisibles.
+    final http.Response response;
+    try {
+      response = await _client
+          .get(uri, headers: {'Accept': 'application/vnd.github+json'})
+          .timeout(timeout);
+    } on TimeoutException {
+      throw GithubException('Délai dépassé. Vérifie ta connexion et réessaie.');
+    } catch (_) {
+      throw GithubException('Impossible de contacter GitHub (connexion ?).');
+    }
 
     switch (response.statusCode) {
       case 200:
