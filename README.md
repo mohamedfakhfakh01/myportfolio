@@ -1,5 +1,7 @@
 # MyPortfolio
 
+[![CI](https://github.com/mohamedfakhfakh01/myportfolio/actions/workflows/ci.yml/badge.svg)](https://github.com/mohamedfakhfakh01/myportfolio/actions/workflows/ci.yml)
+
 Application mobile **Flutter** de portfolio étudiant, réalisée dans le cadre du module
 *Développement Mobile*. Elle présente les portfolios de **deux étudiants** (binôme) — informations,
 compétences et projets — avec **persistance locale** et intégration de l'**API GitHub**.
