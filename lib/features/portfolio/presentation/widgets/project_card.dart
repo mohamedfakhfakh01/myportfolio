@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -40,80 +42,95 @@ class ProjectCard extends StatelessWidget {
     final TextTheme text = Theme.of(context).textTheme;
     final AppLocalizations l = AppLocalizations.of(context);
 
+    final bool hasImage =
+        project.imagePath != null && File(project.imagePath!).existsSync();
+
     return Card(
+      clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Icône dans un carré indigo clair.
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: AppColors.primarySoft,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Icon(
-                  Icons.folder_outlined,
-                  color: AppColors.primary,
-                  size: 22,
-                ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            if (hasImage)
+              Image.file(
+                File(project.imagePath!),
+                height: 140,
+                width: double.infinity,
+                fit: BoxFit.cover,
               ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(project.title, style: text.titleMedium),
-                    const SizedBox(height: 4),
-                    Text(
-                      project.description,
-                      style: text.bodyMedium?.copyWith(
-                        color: AppColors.textSecondary,
-                      ),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Icône dans un carré indigo clair.
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: AppColors.primarySoft,
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    // Lien cliquable, affiché seulement s'il existe : un tap
-                    // ouvre le projet dans le navigateur (sans déclencher le
-                    // tap de la carte qui, lui, ouvre la modification).
-                    if (project.link != null) ...[
-                      const SizedBox(height: 8),
-                      InkWell(
-                        onTap: () => _openLink(context, project.link!),
-                        borderRadius: BorderRadius.circular(6),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 2),
-                          child: Row(
-                            children: [
-                              const Icon(
-                                Icons.open_in_new,
-                                size: 16,
-                                color: AppColors.accentDark,
-                              ),
-                              const SizedBox(width: 4),
-                              Flexible(
-                                child: Text(
-                                  l.viewProject,
-                                  style: text.bodySmall?.copyWith(
-                                    color: AppColors.accentDark,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ],
+                    child: const Icon(
+                      Icons.folder_outlined,
+                      color: AppColors.primary,
+                      size: 22,
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(project.title, style: text.titleMedium),
+                        const SizedBox(height: 4),
+                        Text(
+                          project.description,
+                          style: text.bodyMedium?.copyWith(
+                            color: AppColors.textSecondary,
                           ),
                         ),
-                      ),
-                    ],
-                  ],
-                ),
+                        // Lien cliquable, affiché seulement s'il existe : un tap
+                        // ouvre le projet dans le navigateur (sans déclencher le
+                        // tap de la carte qui, lui, ouvre la modification).
+                        if (project.link != null) ...[
+                          const SizedBox(height: 8),
+                          InkWell(
+                            onTap: () => _openLink(context, project.link!),
+                            borderRadius: BorderRadius.circular(6),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 2),
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.open_in_new,
+                                    size: 16,
+                                    color: AppColors.accentDark,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Flexible(
+                                    child: Text(
+                                      l.viewProject,
+                                      style: text.bodySmall?.copyWith(
+                                        color: AppColors.accentDark,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

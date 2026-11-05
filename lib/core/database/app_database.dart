@@ -32,7 +32,7 @@ class AppDatabase {
 
     return openDatabase(
       path,
-      version: 5,
+      version: 6,
       // Active le respect des clés étrangères (désactivé par défaut en SQLite).
       onConfigure: (db) async {
         await db.execute('PRAGMA foreign_keys = ON');
@@ -79,6 +79,7 @@ class AppDatabase {
         title TEXT NOT NULL,
         description TEXT NOT NULL,
         link TEXT,
+        imagePath TEXT,
         FOREIGN KEY (studentId) REFERENCES students(id) ON DELETE CASCADE
       )
     ''');
@@ -130,6 +131,10 @@ class AppDatabase {
       await db.execute('ALTER TABLE students ADD COLUMN phone TEXT');
       await db.execute('ALTER TABLE students ADD COLUMN linkedin TEXT');
       await db.execute('ALTER TABLE students ADD COLUMN location TEXT');
+    }
+    if (oldVersion < 6) {
+      // v6 : image (capture d'écran) d'un projet.
+      await db.execute('ALTER TABLE projects ADD COLUMN imagePath TEXT');
     }
   }
 }

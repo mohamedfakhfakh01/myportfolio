@@ -1,4 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../l10n/app_localizations.dart';
@@ -33,6 +38,9 @@ class _ProjectFormDialogState extends State<_ProjectFormDialog> {
   late final TextEditingController _titleController;
   late final TextEditingController _descriptionController;
   late final TextEditingController _linkController;
+  String? _imagePath;
+
+  bool get _hasImage => _imagePath != null && File(_imagePath!).existsSync();
 
   bool get _isEditing => widget.project != null;
 
@@ -40,9 +48,51 @@ class _ProjectFormDialogState extends State<_ProjectFormDialog> {
   void initState() {
     super.initState();
     _titleController = TextEditingController(text: widget.project?.title ?? '');
-    _descriptionController =
-        TextEditingController(text: widget.project?.description ?? '');
+    _descriptionController = TextEditingController(
+      text: widget.project?.description ?? '',
+    );
     _linkController = TextEditingController(text: widget.project?.link ?? '');
+    _imagePath = widget.project?.imagePath;
+  }
+
+  /// Choisit une capture d'écran (galerie ou appareil photo), la copie dans le
+  /// dossier de l'app (persistance) et retient son chemin.
+  Future<void> _pickImage() async {
+    final AppLocalizations l = AppLocalizations.of(context);
+    final ImageSource? source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      builder: (_) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_library_outlined),
+              title: Text(l.pickGallery),
+              onTap: () => Navigator.pop(context, ImageSource.gallery),
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_camera_outlined),
+              title: Text(l.pickCamera),
+              onTap: () => Navigator.pop(context, ImageSource.camera),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (source == null) return;
+    final XFile? picked = await ImagePicker().pickImage(
+      source: source,
+      maxWidth: 1200,
+      imageQuality: 85,
+    );
+    if (picked == null) return;
+    final Directory dir = await getApplicationDocumentsDirectory();
+    final String fileName =
+        'project_${DateTime.now().millisecondsSinceEpoch}${p.extension(picked.path)}';
+    final String savedPath = p.join(dir.path, fileName);
+    await File(picked.path).copy(savedPath);
+    if (!mounted) return;
+    setState(() => _imagePath = savedPath);
   }
 
   @override
@@ -65,6 +115,7 @@ class _ProjectFormDialogState extends State<_ProjectFormDialog> {
       title: _titleController.text.trim(),
       description: _descriptionController.text.trim(),
       link: link.isEmpty ? null : link,
+      imagePath: _imagePath,
     );
 
     final provider = context.read<PortfolioProvider>();
@@ -118,6 +169,24 @@ class _ProjectFormDialogState extends State<_ProjectFormDialog> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            if (_hasImage) ...[
+              ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.file(
+                  File(_imagePath!),
+                  height: 120,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              const SizedBox(height: 8),
+            ],
+            OutlinedButton.icon(
+              onPressed: _pickImage,
+              icon: const Icon(Icons.image_outlined),
+              label: Text(_hasImage ? l.changePhoto : l.addPhoto),
+            ),
+            const SizedBox(height: 12),
             TextFormField(
               controller: _titleController,
               textCapitalization: TextCapitalization.sentences,
@@ -164,10 +233,7 @@ class _ProjectFormDialogState extends State<_ProjectFormDialog> {
           onPressed: () => Navigator.of(context).pop(),
           child: Text(l.cancel),
         ),
-        TextButton(
-          onPressed: _save,
-          child: Text(l.save),
-        ),
+        TextButton(onPressed: _save, child: Text(l.save)),
       ],
     );
   }

@@ -12,11 +12,15 @@ class Project {
   /// Lien optionnel (ex : dépôt GitHub). `null` s'il n'y en a pas.
   final String? link;
 
+  /// Chemin local d'une capture d'écran du projet (optionnel).
+  final String? imagePath;
+
   const Project({
     this.id,
     required this.title,
     required this.description,
     this.link,
+    this.imagePath,
   });
 
   /// Convertit le projet en `Map` pour l'enregistrer dans la base.
@@ -26,6 +30,7 @@ class Project {
         'title': title,
         'description': description,
         'link': link,
+        'imagePath': imagePath,
       };
 
   /// Reconstruit un projet à partir d'une ligne de la base.
@@ -34,5 +39,6 @@ class Project {
         title: map['title'] as String,
         description: map['description'] as String,
         link: map['link'] as String?,
+        imagePath: map['imagePath'] as String?,
       );
 }
