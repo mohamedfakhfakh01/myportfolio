@@ -48,6 +48,9 @@ class _ProfilePageState extends State<ProfilePage> {
   _SkillSort _skillSort = _SkillSort.name;
   _ProjectSort _projectSort = _ProjectSort.titleAsc;
 
+  /// Techno sélectionnée pour filtrer les projets (null = toutes).
+  String? _techFilter;
+
   @override
   Widget build(BuildContext context) {
     final int studentId = widget.studentId;
@@ -78,6 +81,16 @@ class _ProfilePageState extends State<ProfilePage> {
           (a, b) => b.title.toLowerCase().compareTo(a.title.toLowerCase()),
         );
     }
+
+    // Technos disponibles (union des étiquettes de tous les projets) pour le
+    // filtre, et liste filtrée selon la techno sélectionnée.
+    final List<String> allTechs = <String>{
+      for (final p in student.projects) ...p.tags,
+    }.toList()
+      ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+    final visibleProjects = _techFilter == null
+        ? projects
+        : projects.where((p) => p.tags.contains(_techFilter)).toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -319,8 +332,31 @@ class _ProfilePageState extends State<ProfilePage> {
                         color: AppColors.textSecondary,
                       ),
                     ),
+                    // Filtre par techno (puces), si des technos existent.
+                    if (allTechs.isNotEmpty) ...[
+                      const SizedBox(height: 10),
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: [
+                            _TechFilterChip(
+                              label: l.filterAll,
+                              selected: _techFilter == null,
+                              onTap: () => setState(() => _techFilter = null),
+                            ),
+                            for (final tech in allTechs)
+                              _TechFilterChip(
+                                label: tech,
+                                selected: _techFilter == tech,
+                                onTap: () =>
+                                    setState(() => _techFilter = tech),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ],
                     const SizedBox(height: 12),
-                    for (final project in projects) ...[
+                    for (final project in visibleProjects) ...[
                       ProjectCard(
                         project: project,
                         onTap: () => Navigator.of(context).push(
@@ -425,6 +461,51 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Puce de filtre des projets par technologie (style onglet du design).
+class _TechFilterChip extends StatelessWidget {
+  const _TechFilterChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final TextTheme text = Theme.of(context).textTheme;
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: Material(
+        color: selected ? AppColors.primary : AppColors.surface,
+        borderRadius: BorderRadius.circular(999),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(999),
+          onTap: onTap,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(
+                color: selected ? AppColors.primary : AppColors.border,
+              ),
+            ),
+            child: Text(
+              label,
+              style: text.labelLarge?.copyWith(
+                color: selected ? Colors.white : AppColors.textSecondary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
         ),
       ),
     );

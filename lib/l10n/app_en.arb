@@ -16,6 +16,7 @@
   "homeSubtitle": "Choose a student to view their portfolio",
   "searchHint": "Search by name or field…",
   "clear": "Clear",
+  "filterAll": "All",
   "noResults": "No results for “{query}”.",
   "addCv": "Add a CV",
   "emptyTitle": "No portfolio",

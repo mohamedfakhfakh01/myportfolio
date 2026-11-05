@@ -16,6 +16,7 @@
   "homeSubtitle": "Choisis un étudiant pour voir son portfolio",
   "searchHint": "Rechercher un nom ou une filière…",
   "clear": "Effacer",
+  "filterAll": "Tous",
   "noResults": "Aucun résultat pour « {query} ».",
   "@noResults": {
     "placeholders": { "query": { "type": "String" } }

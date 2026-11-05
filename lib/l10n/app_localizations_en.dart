@@ -49,6 +49,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get clear => 'Clear';
 
   @override
+  String get filterAll => 'All';
+
+  @override
   String noResults(String query) {
     return 'No results for “$query”.';
   }

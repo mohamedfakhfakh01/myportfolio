@@ -176,6 +176,12 @@ abstract class AppLocalizations {
   /// **'Effacer'**
   String get clear;
 
+  /// No description provided for @filterAll.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tous'**
+  String get filterAll;
+
   /// No description provided for @noResults.
   ///
   /// In fr, this message translates to:
