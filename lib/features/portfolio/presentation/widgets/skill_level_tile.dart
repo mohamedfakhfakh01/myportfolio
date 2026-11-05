@@ -32,27 +32,64 @@ class SkillLevelTile extends StatelessWidget {
                 if (level != null)
                   Text(
                     '$level%',
-                    style: text.bodyMedium
-                        ?.copyWith(color: AppColors.textSecondary),
+                    style: text.labelLarge?.copyWith(
+                      color: AppColors.textPrimary,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
               ],
             ),
             if (level != null) ...[
-              const SizedBox(height: 6),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(6),
-                child: LinearProgressIndicator(
-                  value: level.clamp(0, 100) / 100,
-                  minHeight: 8,
-                  backgroundColor: AppColors.primarySoft,
-                  valueColor:
-                      const AlwaysStoppedAnimation<Color>(AppColors.primary),
-                ),
-              ),
+              const SizedBox(height: 8),
+              _GradientLevelBar(value: level.clamp(0, 100) / 100),
             ],
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Barre de niveau en **pilule** avec remplissage en dégradé bleu → violet
+/// (fidèle au design). La largeur du remplissage s'anime à l'apparition.
+class _GradientLevelBar extends StatelessWidget {
+  const _GradientLevelBar({required this.value});
+
+  /// Valeur entre 0 et 1.
+  final double value;
+
+  @override
+  Widget build(BuildContext context) {
+    const double height = 7;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final double maxWidth = constraints.maxWidth;
+        return Container(
+          height: height,
+          decoration: BoxDecoration(
+            color: AppColors.border, // piste neutre
+            borderRadius: BorderRadius.circular(999),
+          ),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: TweenAnimationBuilder<double>(
+              tween: Tween<double>(begin: 0, end: value),
+              duration: const Duration(milliseconds: 600),
+              curve: Curves.easeOutCubic,
+              builder: (context, animatedValue, _) => Container(
+                width: maxWidth * animatedValue,
+                height: height,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [AppColors.primaryDark, AppColors.violet],
+                  ),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

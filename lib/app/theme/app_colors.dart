@@ -17,6 +17,9 @@ class AppColors {
   /// Bleu clair : texte lisible sur les fonds bleus sombres (puces).
   static const Color primaryLight = Color(0xFF93C5FD);
 
+  /// Violet : accent secondaire du design (fin du dégradé des barres de niveau).
+  static const Color violet = Color(0xFF7C3AED);
+
   /// Cyan : accent secondaire.
   static const Color accent = Color(0xFF22D3EE);
 
