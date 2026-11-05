@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../../../shared/models/experience.dart';
 import '../../../shared/models/project.dart';
 import '../../../shared/models/skill.dart';
 import '../../../shared/models/student.dart';
@@ -96,6 +97,25 @@ class PortfolioProvider extends ChangeNotifier {
 
   Future<void> deleteProject(int projectId) async {
     await _repository.deleteProject(projectId);
+    await _reloadStudents();
+  }
+
+  // ---------------------------------------------------------------------------
+  // CRUD — PARCOURS (expériences & formations)
+  // ---------------------------------------------------------------------------
+
+  Future<void> addExperience(int studentId, ExperienceEntry entry) async {
+    await _repository.insertExperience(entry, studentId);
+    await _reloadStudents();
+  }
+
+  Future<void> updateExperience(ExperienceEntry entry) async {
+    await _repository.updateExperience(entry);
+    await _reloadStudents();
+  }
+
+  Future<void> deleteExperience(int experienceId) async {
+    await _repository.deleteExperience(experienceId);
     await _reloadStudents();
   }
 

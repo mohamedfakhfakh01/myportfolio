@@ -32,7 +32,7 @@ class AppDatabase {
 
     return openDatabase(
       path,
-      version: 3,
+      version: 4,
       // Active le respect des clés étrangères (désactivé par défaut en SQLite).
       onConfigure: (db) async {
         await db.execute('PRAGMA foreign_keys = ON');
@@ -78,6 +78,19 @@ class AppDatabase {
         FOREIGN KEY (studentId) REFERENCES students(id) ON DELETE CASCADE
       )
     ''');
+
+    await db.execute('''
+      CREATE TABLE experiences (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        studentId INTEGER NOT NULL,
+        title TEXT NOT NULL,
+        organization TEXT,
+        period TEXT,
+        description TEXT,
+        kind TEXT,
+        FOREIGN KEY (studentId) REFERENCES students(id) ON DELETE CASCADE
+      )
+    ''');
   }
 
   /// Fait évoluer une base déjà installée vers une version plus récente, sans
@@ -91,6 +104,21 @@ class AppDatabase {
     if (oldVersion < 3) {
       // v3 : ajout de la catégorie des compétences (langage, framework…).
       await db.execute('ALTER TABLE skills ADD COLUMN category TEXT');
+    }
+    if (oldVersion < 4) {
+      // v4 : ajout de la table du parcours (expériences et formations).
+      await db.execute('''
+        CREATE TABLE experiences (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          studentId INTEGER NOT NULL,
+          title TEXT NOT NULL,
+          organization TEXT,
+          period TEXT,
+          description TEXT,
+          kind TEXT,
+          FOREIGN KEY (studentId) REFERENCES students(id) ON DELETE CASCADE
+        )
+      ''');
     }
   }
 }

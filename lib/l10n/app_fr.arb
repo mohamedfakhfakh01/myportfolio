@@ -114,6 +114,27 @@
   "descriptionRequired": "La description est obligatoire",
   "linkLabel": "Lien (optionnel)",
 
+  "experienceTitle": "Expérience",
+  "educationTitle": "Formation",
+  "addExperience": "Ajouter une expérience",
+  "addEducation": "Ajouter une formation",
+  "experienceEmpty": "Aucune expérience. Appuie sur + pour en ajouter.",
+  "educationEmpty": "Aucune formation. Appuie sur + pour en ajouter.",
+  "entryAddTitle": "Ajouter au parcours",
+  "entryEditTitle": "Modifier l'entrée",
+  "entryKindLabel": "Type",
+  "organizationLabel": "Organisation / établissement",
+  "periodLabel": "Période (optionnel)",
+  "periodHint": "Ex : 2024 – 2027",
+  "entryDescLabel": "Description (optionnel)",
+  "entryDeleteTitle": "Supprimer cette entrée ?",
+  "entryDeleteBody": "« {title} » sera supprimé définitivement.",
+  "@entryDeleteBody": {
+    "placeholders": { "title": { "type": "String" } }
+  },
+  "entrySaved": "Parcours enregistré",
+  "entryDeleted": "Entrée supprimée",
+
   "pickGallery": "Galerie",
   "pickCamera": "Appareil photo",
   "newPortfolioTitle": "Nouveau portfolio",

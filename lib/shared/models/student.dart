@@ -1,5 +1,6 @@
 import 'skill.dart';
 import 'project.dart';
+import 'experience.dart';
 
 /// Modèle représentant un **étudiant** et son portfolio complet.
 ///
@@ -31,6 +32,9 @@ class Student {
   /// Liste des projets de l'étudiant.
   final List<Project> projects;
 
+  /// Parcours : expériences et formations.
+  final List<ExperienceEntry> experiences;
+
   const Student({
     this.id,
     required this.fullName,
@@ -40,6 +44,7 @@ class Student {
     this.photoPath,
     this.skills = const [],
     this.projects = const [],
+    this.experiences = const [],
   });
 
   /// Initiales à afficher dans l'avatar (ex : « Mohamed Fakhfakh » → « MF »).
@@ -88,6 +93,7 @@ class Student {
     String? photoPath,
     List<Skill>? skills,
     List<Project>? projects,
+    List<ExperienceEntry>? experiences,
   }) =>
       Student(
         id: id ?? this.id,
@@ -98,5 +104,6 @@ class Student {
         photoPath: photoPath ?? this.photoPath,
         skills: skills ?? this.skills,
         projects: projects ?? this.projects,
+        experiences: experiences ?? this.experiences,
       );
 }

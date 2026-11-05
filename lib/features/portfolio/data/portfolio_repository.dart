@@ -1,6 +1,7 @@
 import 'package:sqflite/sqflite.dart';
 
 import '../../../core/database/app_database.dart';
+import '../../../shared/models/experience.dart';
 import '../../../shared/models/project.dart';
 import '../../../shared/models/skill.dart';
 import '../../../shared/models/student.dart';
@@ -39,11 +40,15 @@ class PortfolioRepository {
           .query('skills', where: 'studentId = ?', whereArgs: [studentId]);
       final projectRows = await db
           .query('projects', where: 'studentId = ?', whereArgs: [studentId]);
+      final experienceRows = await db.query('experiences',
+          where: 'studentId = ?', whereArgs: [studentId]);
 
       students.add(
         base.copyWith(
           skills: skillRows.map(Skill.fromMap).toList(),
           projects: projectRows.map(Project.fromMap).toList(),
+          experiences:
+              experienceRows.map(ExperienceEntry.fromMap).toList(),
         ),
       );
     }
@@ -74,6 +79,9 @@ class PortfolioRepository {
       }
       for (final project in student.projects) {
         await insertProject(project, studentId);
+      }
+      for (final exp in student.experiences) {
+        await insertExperience(exp, studentId);
       }
     }
   }
@@ -107,6 +115,9 @@ class PortfolioRepository {
     }
     for (final project in demo.projects) {
       await insertProject(project, studentId);
+    }
+    for (final exp in demo.experiences) {
+      await insertExperience(exp, studentId);
     }
   }
 
@@ -152,6 +163,28 @@ class PortfolioRepository {
   Future<void> deleteProject(int id) async {
     final db = await _db;
     await db.delete('projects', where: 'id = ?', whereArgs: [id]);
+  }
+
+  // ---------------------------------------------------------------------------
+  // CRUD — PARCOURS (expériences & formations)
+  // ---------------------------------------------------------------------------
+
+  Future<int> insertExperience(ExperienceEntry entry, int studentId) async {
+    final db = await _db;
+    final map = entry.toMap()..remove('id');
+    map['studentId'] = studentId;
+    return db.insert('experiences', map);
+  }
+
+  Future<void> updateExperience(ExperienceEntry entry) async {
+    final db = await _db;
+    await db.update('experiences', entry.toMap(),
+        where: 'id = ?', whereArgs: [entry.id]);
+  }
+
+  Future<void> deleteExperience(int id) async {
+    final db = await _db;
+    await db.delete('experiences', where: 'id = ?', whereArgs: [id]);
   }
 
   // ---------------------------------------------------------------------------

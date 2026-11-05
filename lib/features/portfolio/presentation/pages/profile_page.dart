@@ -6,8 +6,11 @@ import '../../../../app/theme/app_colors.dart';
 import '../../services/portfolio_pdf.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/skill.dart';
+import '../../../../shared/models/experience.dart';
 import '../../../github/presentation/widgets/github_repos_section.dart';
 import '../../providers/portfolio_provider.dart';
+import '../widgets/experience_card.dart';
+import '../widgets/experience_form_dialog.dart';
 import '../widgets/project_card.dart';
 import '../widgets/project_form_dialog.dart';
 import '../widgets/skill_category_label.dart';
@@ -322,6 +325,84 @@ class _ProfilePageState extends State<ProfilePage> {
                       const SizedBox(height: 12),
                     ],
                   ],
+
+                  // --- Expérience ---
+                  const SizedBox(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(l.experienceTitle, style: text.titleMedium),
+                      IconButton(
+                        icon: const Icon(Icons.add_circle,
+                            color: AppColors.primary),
+                        tooltip: l.addExperience,
+                        onPressed: () => showExperienceFormDialog(
+                          context,
+                          studentId: studentId,
+                          defaultKind: ExperienceKind.experience,
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (!student.experiences
+                      .any((e) => e.kind == ExperienceKind.experience))
+                    Text(
+                      l.experienceEmpty,
+                      style: text.bodyMedium
+                          ?.copyWith(color: AppColors.textSecondary),
+                    )
+                  else
+                    for (final e in student.experiences
+                        .where((e) => e.kind == ExperienceKind.experience)) ...[
+                      ExperienceCard(
+                        entry: e,
+                        onTap: () => showExperienceFormDialog(
+                          context,
+                          studentId: studentId,
+                          entry: e,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                    ],
+
+                  // --- Formation ---
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(l.educationTitle, style: text.titleMedium),
+                      IconButton(
+                        icon: const Icon(Icons.add_circle,
+                            color: AppColors.primary),
+                        tooltip: l.addEducation,
+                        onPressed: () => showExperienceFormDialog(
+                          context,
+                          studentId: studentId,
+                          defaultKind: ExperienceKind.education,
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (!student.experiences
+                      .any((e) => e.kind == ExperienceKind.education))
+                    Text(
+                      l.educationEmpty,
+                      style: text.bodyMedium
+                          ?.copyWith(color: AppColors.textSecondary),
+                    )
+                  else
+                    for (final e in student.experiences
+                        .where((e) => e.kind == ExperienceKind.education)) ...[
+                      ExperienceCard(
+                        entry: e,
+                        onTap: () => showExperienceFormDialog(
+                          context,
+                          studentId: studentId,
+                          entry: e,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                    ],
 
                   // --- Dépôts GitHub (si un pseudo est renseigné) ---
                   if (student.githubUsername != null) ...[

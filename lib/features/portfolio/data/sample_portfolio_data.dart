@@ -1,6 +1,7 @@
 import '../../../shared/models/student.dart';
 import '../../../shared/models/skill.dart';
 import '../../../shared/models/project.dart';
+import '../../../shared/models/experience.dart';
 
 /// Données des portfolios (chargées dans la base sqflite au premier lancement).
 ///
@@ -96,6 +97,35 @@ const List<Student> sampleStudents = [
             'académiques (Java · JavaFX · MySQL).',
       ),
     ],
+    experiences: [
+      ExperienceEntry(
+        kind: ExperienceKind.experience,
+        title: 'Stagiaire Développeur Web — Projet PFA',
+        organization: 'Tekru Technologies · Tunis',
+        period: 'Juin – Juillet 2026',
+        description:
+            'Développement de l\'application web Al Seniour (restaurant libanais '
+            'haut de gamme) : interfaces responsives et animées. '
+            'Next.js · TypeScript · Tailwind CSS · Prisma.',
+      ),
+      ExperienceEntry(
+        kind: ExperienceKind.education,
+        title: 'Licence en Informatique (3e année)',
+        organization: 'Institut International de Technologie (IIT) · Sfax',
+        period: '2024 – 2027',
+      ),
+      ExperienceEntry(
+        kind: ExperienceKind.education,
+        title: 'Formation Développeur Front-End',
+        organization: 'GoMyCode',
+        period: '2024',
+      ),
+      ExperienceEntry(
+        kind: ExperienceKind.education,
+        title: 'Baccalauréat — Économie et Gestion',
+        period: '2024',
+      ),
+    ],
   ),
 
   // ---------------------------------------------------------------------------
@@ -148,6 +178,22 @@ const List<Student> sampleStudents = [
         description:
             'Application web de gestion de club : membres, événements et '
             'activités (PHP, MySQL, Bootstrap).',
+      ),
+    ],
+    experiences: [
+      ExperienceEntry(
+        kind: ExperienceKind.experience,
+        title: 'Stage — Développement web (Laravel)',
+      ),
+      ExperienceEntry(
+        kind: ExperienceKind.experience,
+        title: 'Summer camp',
+        organization: 'Wevioo',
+      ),
+      ExperienceEntry(
+        kind: ExperienceKind.education,
+        title: 'Licence en Informatique (3e année)',
+        organization: 'IIT · Sfax',
       ),
     ],
   ),

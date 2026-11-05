@@ -590,6 +590,108 @@ abstract class AppLocalizations {
   /// **'Lien (optionnel)'**
   String get linkLabel;
 
+  /// No description provided for @experienceTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Expérience'**
+  String get experienceTitle;
+
+  /// No description provided for @educationTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Formation'**
+  String get educationTitle;
+
+  /// No description provided for @addExperience.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter une expérience'**
+  String get addExperience;
+
+  /// No description provided for @addEducation.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter une formation'**
+  String get addEducation;
+
+  /// No description provided for @experienceEmpty.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune expérience. Appuie sur + pour en ajouter.'**
+  String get experienceEmpty;
+
+  /// No description provided for @educationEmpty.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune formation. Appuie sur + pour en ajouter.'**
+  String get educationEmpty;
+
+  /// No description provided for @entryAddTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter au parcours'**
+  String get entryAddTitle;
+
+  /// No description provided for @entryEditTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Modifier l\'entrée'**
+  String get entryEditTitle;
+
+  /// No description provided for @entryKindLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Type'**
+  String get entryKindLabel;
+
+  /// No description provided for @organizationLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Organisation / établissement'**
+  String get organizationLabel;
+
+  /// No description provided for @periodLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Période (optionnel)'**
+  String get periodLabel;
+
+  /// No description provided for @periodHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ex : 2024 – 2027'**
+  String get periodHint;
+
+  /// No description provided for @entryDescLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Description (optionnel)'**
+  String get entryDescLabel;
+
+  /// No description provided for @entryDeleteTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer cette entrée ?'**
+  String get entryDeleteTitle;
+
+  /// No description provided for @entryDeleteBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'« {title} » sera supprimé définitivement.'**
+  String entryDeleteBody(String title);
+
+  /// No description provided for @entrySaved.
+  ///
+  /// In fr, this message translates to:
+  /// **'Parcours enregistré'**
+  String get entrySaved;
+
+  /// No description provided for @entryDeleted.
+  ///
+  /// In fr, this message translates to:
+  /// **'Entrée supprimée'**
+  String get entryDeleted;
+
   /// No description provided for @pickGallery.
   ///
   /// In fr, this message translates to:

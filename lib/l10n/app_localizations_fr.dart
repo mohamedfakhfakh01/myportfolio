@@ -269,6 +269,61 @@ class AppLocalizationsFr extends AppLocalizations {
   String get linkLabel => 'Lien (optionnel)';
 
   @override
+  String get experienceTitle => 'Expérience';
+
+  @override
+  String get educationTitle => 'Formation';
+
+  @override
+  String get addExperience => 'Ajouter une expérience';
+
+  @override
+  String get addEducation => 'Ajouter une formation';
+
+  @override
+  String get experienceEmpty =>
+      'Aucune expérience. Appuie sur + pour en ajouter.';
+
+  @override
+  String get educationEmpty =>
+      'Aucune formation. Appuie sur + pour en ajouter.';
+
+  @override
+  String get entryAddTitle => 'Ajouter au parcours';
+
+  @override
+  String get entryEditTitle => 'Modifier l\'entrée';
+
+  @override
+  String get entryKindLabel => 'Type';
+
+  @override
+  String get organizationLabel => 'Organisation / établissement';
+
+  @override
+  String get periodLabel => 'Période (optionnel)';
+
+  @override
+  String get periodHint => 'Ex : 2024 – 2027';
+
+  @override
+  String get entryDescLabel => 'Description (optionnel)';
+
+  @override
+  String get entryDeleteTitle => 'Supprimer cette entrée ?';
+
+  @override
+  String entryDeleteBody(String title) {
+    return '« $title » sera supprimé définitivement.';
+  }
+
+  @override
+  String get entrySaved => 'Parcours enregistré';
+
+  @override
+  String get entryDeleted => 'Entrée supprimée';
+
+  @override
   String get pickGallery => 'Galerie';
 
   @override

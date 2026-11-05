@@ -94,6 +94,27 @@
   "descriptionRequired": "Description is required",
   "linkLabel": "Link (optional)",
 
+  "experienceTitle": "Experience",
+  "educationTitle": "Education",
+  "addExperience": "Add an experience",
+  "addEducation": "Add an education entry",
+  "experienceEmpty": "No experience yet. Tap + to add one.",
+  "educationEmpty": "No education yet. Tap + to add one.",
+  "entryAddTitle": "Add to journey",
+  "entryEditTitle": "Edit entry",
+  "entryKindLabel": "Type",
+  "organizationLabel": "Organization / school",
+  "periodLabel": "Period (optional)",
+  "periodHint": "e.g. 2024 – 2027",
+  "entryDescLabel": "Description (optional)",
+  "entryDeleteTitle": "Delete this entry?",
+  "entryDeleteBody": "“{title}” will be permanently deleted.",
+  "@entryDeleteBody": {
+    "placeholders": { "title": { "type": "String" } }
+  },
+  "entrySaved": "Journey saved",
+  "entryDeleted": "Entry deleted",
+
   "pickGallery": "Gallery",
   "pickCamera": "Camera",
   "newPortfolioTitle": "New portfolio",

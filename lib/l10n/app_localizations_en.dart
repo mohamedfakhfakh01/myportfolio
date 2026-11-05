@@ -268,6 +268,59 @@ class AppLocalizationsEn extends AppLocalizations {
   String get linkLabel => 'Link (optional)';
 
   @override
+  String get experienceTitle => 'Experience';
+
+  @override
+  String get educationTitle => 'Education';
+
+  @override
+  String get addExperience => 'Add an experience';
+
+  @override
+  String get addEducation => 'Add an education entry';
+
+  @override
+  String get experienceEmpty => 'No experience yet. Tap + to add one.';
+
+  @override
+  String get educationEmpty => 'No education yet. Tap + to add one.';
+
+  @override
+  String get entryAddTitle => 'Add to journey';
+
+  @override
+  String get entryEditTitle => 'Edit entry';
+
+  @override
+  String get entryKindLabel => 'Type';
+
+  @override
+  String get organizationLabel => 'Organization / school';
+
+  @override
+  String get periodLabel => 'Period (optional)';
+
+  @override
+  String get periodHint => 'e.g. 2024 – 2027';
+
+  @override
+  String get entryDescLabel => 'Description (optional)';
+
+  @override
+  String get entryDeleteTitle => 'Delete this entry?';
+
+  @override
+  String entryDeleteBody(String title) {
+    return '“$title” will be permanently deleted.';
+  }
+
+  @override
+  String get entrySaved => 'Journey saved';
+
+  @override
+  String get entryDeleted => 'Entry deleted';
+
+  @override
   String get pickGallery => 'Gallery';
 
   @override
