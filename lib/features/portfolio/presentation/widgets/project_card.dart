@@ -52,85 +52,107 @@ class ProjectCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            // --- Bandeau image (média plein cadre, coins arrondis par la carte) ---
             if (hasImage)
               Image.file(
                 File(project.imagePath!),
-                height: 140,
+                height: 160,
                 width: double.infinity,
                 fit: BoxFit.cover,
               ),
             Padding(
               padding: const EdgeInsets.all(16),
-              child: Row(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Icône dans un carré indigo clair.
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: AppColors.primarySoft,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Icon(
-                      Icons.folder_outlined,
-                      color: AppColors.primary,
-                      size: 22,
-                    ),
-                  ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(project.title, style: text.titleMedium),
-                        const SizedBox(height: 4),
-                        Text(
-                          project.description,
-                          style: text.bodyMedium?.copyWith(
-                            color: AppColors.textSecondary,
+                  // En-tête : sans image on garde la pastille dossier comme
+                  // ancrage visuel ; avec image, le titre prend toute la largeur.
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      if (!hasImage) ...[
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: AppColors.primarySoft,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: const Icon(
+                            Icons.folder_outlined,
+                            color: AppColors.primary,
+                            size: 22,
                           ),
                         ),
-                        // Lien cliquable, affiché seulement s'il existe : un tap
-                        // ouvre le projet dans le navigateur (sans déclencher le
-                        // tap de la carte qui, lui, ouvre la modification).
-                        if (project.link != null) ...[
-                          const SizedBox(height: 8),
-                          InkWell(
-                            onTap: () => _openLink(context, project.link!),
-                            borderRadius: BorderRadius.circular(6),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 2),
-                              child: Row(
-                                children: [
-                                  const Icon(
-                                    Icons.open_in_new,
-                                    size: 16,
-                                    color: AppColors.primary,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Flexible(
-                                    child: Text(
-                                      l.viewProject,
-                                      style: text.bodySmall?.copyWith(
-                                        color: AppColors.primary,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
+                        const SizedBox(width: 14),
                       ],
+                      Expanded(
+                        child: Text(project.title, style: text.titleLarge),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    project.description,
+                    style: text.bodyMedium?.copyWith(
+                      color: AppColors.textSecondary,
                     ),
                   ),
+                  // Lien en bouton pilule (comme les boutons d'action du design).
+                  // Un tap ouvre le projet sans déclencher le tap de la carte
+                  // (qui, lui, ouvre la modification).
+                  if (project.link != null) ...[
+                    const SizedBox(height: 14),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: _LinkButton(
+                        label: l.viewProject,
+                        onTap: () => _openLink(context, project.link!),
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Bouton **pilule** plein (bleu) pour ouvrir le lien d'un projet.
+class _LinkButton extends StatelessWidget {
+  const _LinkButton({required this.label, required this.onTap});
+
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final TextTheme text = Theme.of(context).textTheme;
+    return Material(
+      color: AppColors.primary,
+      borderRadius: BorderRadius.circular(999),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(999),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.open_in_new, size: 16, color: Colors.white),
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: text.labelLarge?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
