@@ -45,6 +45,69 @@ void main() {
       const project = Project(title: 'Titre', description: 'Desc');
       expect(Project.fromMap(project.toMap()).link, isNull);
     });
+
+    test('les technologies sont conservées (round-trip JSON)', () {
+      const project = Project(
+        title: 'Projet',
+        description: 'Desc',
+        tags: ['Flutter', 'Dart', 'Firebase'],
+      );
+      final restored = Project.fromMap(project.toMap());
+      expect(restored.tags, ['Flutter', 'Dart', 'Firebase']);
+    });
+
+    test('technologies avec caractères spéciaux (C#, ASP.NET, Node.js)', () {
+      const project = Project(
+        title: 'Projet',
+        description: 'Desc',
+        tags: ['C#', 'ASP.NET MVC', 'Node.js'],
+      );
+      final restored = Project.fromMap(project.toMap());
+      expect(restored.tags, ['C#', 'ASP.NET MVC', 'Node.js']);
+    });
+
+    test('tags par défaut : liste vide quand non renseignés', () {
+      const project = Project(title: 'Titre', description: 'Desc');
+      expect(project.tags, isEmpty);
+      expect(Project.fromMap(project.toMap()).tags, isEmpty);
+    });
+
+    test('fromMap tolérant : colonne tags absente ou null → liste vide', () {
+      final sansColonne = Project.fromMap({
+        'id': 1,
+        'title': 'T',
+        'description': 'D',
+      });
+      expect(sansColonne.tags, isEmpty);
+
+      final tagsNull = Project.fromMap({
+        'id': 1,
+        'title': 'T',
+        'description': 'D',
+        'tags': null,
+      });
+      expect(tagsNull.tags, isEmpty);
+    });
+
+    test('fromMap tolérant : JSON invalide → liste vide (ne plante pas)', () {
+      final project = Project.fromMap({
+        'id': 1,
+        'title': 'T',
+        'description': 'D',
+        'tags': 'pas du json',
+      });
+      expect(project.tags, isEmpty);
+    });
+
+    test('fromMap : entrées vides dans les tags sont ignorées', () {
+      final project = Project.fromMap({
+        'id': 1,
+        'title': 'T',
+        'description': 'D',
+        'tags': '["Flutter", "", "  ", "Dart"]',
+      });
+      expect(project.tags, ['Flutter', 'Dart']);
+    });
   });
 
   group('Student', () {
