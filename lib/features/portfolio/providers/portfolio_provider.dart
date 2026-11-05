@@ -135,11 +135,14 @@ class PortfolioProvider extends ChangeNotifier {
     Student student, {
     List<Project> projects = const [],
   }) async {
-    // On insère d'abord l'étudiant pour obtenir son id, puis ses compétences
-    // et ses projets.
+    // On insère d'abord l'étudiant pour obtenir son id, puis ses compétences,
+    // son parcours et ses projets.
     final int studentId = await _repository.insertStudent(student);
     for (final skill in student.skills) {
       await _repository.insertSkill(skill, studentId);
+    }
+    for (final exp in student.experiences) {
+      await _repository.insertExperience(exp, studentId);
     }
     for (final project in projects) {
       await _repository.insertProject(project, studentId);
