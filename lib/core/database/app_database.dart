@@ -14,6 +14,9 @@ class AppDatabase {
   AppDatabase._();
   static final AppDatabase instance = AppDatabase._();
 
+  /// Version courante du schéma (incrémentée à chaque migration).
+  static const int latestVersion = 7;
+
   /// La connexion ouverte, mise en cache après la première ouverture.
   Database? _db;
 
@@ -32,20 +35,25 @@ class AppDatabase {
 
     return openDatabase(
       path,
-      version: 7,
+      version: latestVersion,
       // Active le respect des clés étrangères (désactivé par défaut en SQLite).
-      onConfigure: (db) async {
-        await db.execute('PRAGMA foreign_keys = ON');
-      },
+      onConfigure: onConfigure,
       // Appelé UNE fois, à la toute première création de la base.
-      onCreate: _createTables,
+      onCreate: onCreate,
       // Appelé quand la version augmente : fait évoluer une base déjà installée.
-      onUpgrade: _onUpgrade,
+      onUpgrade: onUpgrade,
     );
   }
 
-  /// Crée les 3 tables liées : students, skills, projects.
-  Future<void> _createTables(Database db, int version) async {
+  /// Active le respect des clés étrangères (désactivé par défaut en SQLite).
+  /// Statique et public : réutilisé tel quel par les tests de migration.
+  static Future<void> onConfigure(Database db) async {
+    await db.execute('PRAGMA foreign_keys = ON');
+  }
+
+  /// Crée les tables liées : students, skills, projects, experiences.
+  /// Statique et public : réutilisé tel quel par les tests.
+  static Future<void> onCreate(Database db, int version) async {
     await db.execute('''
       CREATE TABLE students (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -102,7 +110,8 @@ class AppDatabase {
   /// Fait évoluer une base déjà installée vers une version plus récente, sans
   /// perdre les données existantes. Appelé automatiquement si la version du
   /// fichier sur l'appareil est inférieure à celle du code.
-  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+  static Future<void> onUpgrade(
+      Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
       // v2 : ajout de la colonne de la photo de profil.
       await db.execute('ALTER TABLE students ADD COLUMN photoPath TEXT');
