@@ -35,15 +35,40 @@ class AppTheme {
       scaffoldBackgroundColor: AppColors.background,
     );
 
+    // Typographie du design : Plus Jakarta Sans pour les titres/labels (identité
+    // « tech »), Inter pour le corps de texte (lisibilité). On récupère juste
+    // les noms de familles (String) via google_fonts — l'appel enregistre aussi
+    // la police pour son téléchargement — pour éviter tout conflit de types.
+    final String bodyFamily = GoogleFonts.inter().fontFamily!;
+    final String titleFamily = GoogleFonts.plusJakartaSans().fontFamily!;
+
+    // Base : tout en Inter, avec nos couleurs de texte.
+    final TextTheme interBase = base.textTheme.apply(
+      fontFamily: bodyFamily,
+      bodyColor: AppColors.textPrimary,
+      displayColor: AppColors.textPrimary,
+    );
+
+    // Les titres/labels repassent en Plus Jakarta Sans.
+    TextStyle? asTitle(TextStyle? style) => style?.copyWith(fontFamily: titleFamily);
+    final TextTheme textTheme = interBase.copyWith(
+      displayLarge: asTitle(interBase.displayLarge),
+      displayMedium: asTitle(interBase.displayMedium),
+      displaySmall: asTitle(interBase.displaySmall),
+      headlineLarge: asTitle(interBase.headlineLarge),
+      headlineMedium: asTitle(interBase.headlineMedium),
+      headlineSmall: asTitle(interBase.headlineSmall),
+      titleLarge: asTitle(interBase.titleLarge),
+      titleMedium: asTitle(interBase.titleMedium),
+      titleSmall: asTitle(interBase.titleSmall),
+      labelLarge: asTitle(interBase.labelLarge),
+      labelMedium: asTitle(interBase.labelMedium),
+      labelSmall: asTitle(interBase.labelSmall),
+    );
+
     // On surcharge le thème de base avec NOS choix précis.
     return base.copyWith(
-      // Typographie : police Poppins appliquée à tous les styles de texte,
-      // avec notre couleur de texte claire.
-      textTheme: base.textTheme.apply(
-        fontFamily: GoogleFonts.poppins().fontFamily,
-        bodyColor: AppColors.textPrimary,
-        displayColor: AppColors.textPrimary,
-      ),
+      textTheme: textTheme,
 
       // Barre supérieure : fond sombre (surface), texte clair, sans ombre.
       appBarTheme: AppBarTheme(
@@ -51,7 +76,7 @@ class AppTheme {
         foregroundColor: AppColors.textPrimary,
         elevation: 0,
         centerTitle: true,
-        titleTextStyle: GoogleFonts.poppins(
+        titleTextStyle: GoogleFonts.plusJakartaSans(
           fontSize: 20,
           fontWeight: FontWeight.w600,
           color: AppColors.textPrimary,
@@ -69,7 +94,7 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(_radius),
           ),
-          textStyle: GoogleFonts.poppins(
+          textStyle: GoogleFonts.plusJakartaSans(
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
@@ -85,7 +110,7 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(_radius),
           ),
-          textStyle: GoogleFonts.poppins(
+          textStyle: GoogleFonts.plusJakartaSans(
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
