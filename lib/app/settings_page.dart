@@ -22,7 +22,7 @@ class SettingsPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text(l.navSettings)),
       body: ListView(
-        padding: const EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.fromLTRB(0, 8, 0, 112),
         children: [
           _sectionHeader(context, l.appearance),
           SwitchListTile(

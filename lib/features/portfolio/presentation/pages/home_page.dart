@@ -153,7 +153,8 @@ class _HomePageState extends State<HomePage> {
             // État vide : message clair plutôt qu'un écran blanc.
             ? const _EmptyState()
             : ListView(
-                padding: const EdgeInsets.all(20),
+                // Marge basse pour dégager la nav flottante (extendBody).
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 112),
                 children: [
                   Text(l.homeHeadline, style: text.headlineSmall),
                   const SizedBox(height: 4),
@@ -216,10 +217,14 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => showStudentEditDialog(context),
-        icon: const Icon(Icons.add),
-        label: Text(l.addCv),
+      // Remonté pour ne pas chevaucher la nav flottante (extendBody).
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 108),
+        child: FloatingActionButton.extended(
+          onPressed: () => showStudentEditDialog(context),
+          icon: const Icon(Icons.add),
+          label: Text(l.addCv),
+        ),
       ),
     );
   }

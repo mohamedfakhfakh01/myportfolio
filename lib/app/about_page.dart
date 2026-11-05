@@ -18,7 +18,7 @@ class AboutPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text(l.navAbout)),
       body: ListView(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.fromLTRB(24, 24, 24, 112),
         children: [
           const SizedBox(height: 8),
           const Center(
