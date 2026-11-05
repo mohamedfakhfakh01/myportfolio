@@ -58,7 +58,9 @@ class ContactSection extends StatelessWidget {
                     style: text.bodyMedium?.copyWith(
                       color: url == null
                           ? AppColors.textSecondary
-                          : AppColors.accentDark,
+                          : AppColors.primary,
+                      fontWeight:
+                          url == null ? FontWeight.normal : FontWeight.w500,
                     ),
                   ),
                 ),

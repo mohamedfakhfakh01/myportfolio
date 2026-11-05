@@ -106,14 +106,14 @@ class ProjectCard extends StatelessWidget {
                                   const Icon(
                                     Icons.open_in_new,
                                     size: 16,
-                                    color: AppColors.accentDark,
+                                    color: AppColors.primary,
                                   ),
                                   const SizedBox(width: 4),
                                   Flexible(
                                     child: Text(
                                       l.viewProject,
                                       style: text.bodySmall?.copyWith(
-                                        color: AppColors.accentDark,
+                                        color: AppColors.primary,
                                         fontWeight: FontWeight.w600,
                                       ),
                                       overflow: TextOverflow.ellipsis,

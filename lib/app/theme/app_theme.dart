@@ -137,10 +137,14 @@ class AppTheme {
         ),
       ),
 
-      // Cartes : fond surface, coins arrondis, fine bordure (pas d'ombre).
+      // Cartes : fond surface, coins arrondis, fine bordure + ombre douce
+      // ambiante (niveau de profondeur du design Stitch). L'ombre est quasi
+      // invisible en thème sombre, elle donne surtout du relief en clair.
       cardTheme: CardThemeData(
         color: AppColors.surface,
-        elevation: 0,
+        elevation: 3,
+        shadowColor: const Color(0x140F172A), // bleu nuit très transparent
+        surfaceTintColor: Colors.transparent, // garde un blanc pur (M3)
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(_radius + 2),
           side: BorderSide(color: AppColors.border),

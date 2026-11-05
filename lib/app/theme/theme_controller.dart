@@ -12,9 +12,9 @@ import 'app_colors.dart';
 /// Le choix est enregistré dans un petit fichier du dossier de l'app
 /// (via `path_provider`, déjà utilisé pour les photos) : pas de nouveau paquet.
 class ThemeController extends ChangeNotifier {
-  Brightness _brightness = Brightness.dark;
+  Brightness _brightness = Brightness.light;
 
-  /// Luminosité actuelle (sombre par défaut).
+  /// Luminosité actuelle (clair par défaut, comme le design Stitch).
   Brightness get brightness => _brightness;
 
   /// Vrai si le thème sombre est actif.

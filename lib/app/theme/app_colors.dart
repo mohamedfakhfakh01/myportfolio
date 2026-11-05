@@ -64,8 +64,8 @@ class AppColors {
   static const Color _primarySoftDark = Color(0xFF172554);
   static const Color _accentSoftDark = Color(0xFF164E63);
 
-  // Valeurs du thème CLAIR.
-  static const Color _backgroundLight = Color(0xFFF1F5F9);
+  // Valeurs du thème CLAIR (calées sur le design Stitch « Kinetic Obsidian »).
+  static const Color _backgroundLight = Color(0xFFF8FAFC);
   static const Color _surfaceLight = Color(0xFFFFFFFF);
   static const Color _textPrimaryLight = Color(0xFF0F172A);
   static const Color _textSecondaryLight = Color(0xFF64748B);
