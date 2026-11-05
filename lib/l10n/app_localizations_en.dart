@@ -370,6 +370,27 @@ class AppLocalizationsEn extends AppLocalizations {
       'To show your GitHub repositories on the profile';
 
   @override
+  String get contactTitle => 'Contact';
+
+  @override
+  String get emailLabel => 'Email (optional)';
+
+  @override
+  String get phoneLabel => 'Phone (optional)';
+
+  @override
+  String get linkedinLabel => 'LinkedIn (optional)';
+
+  @override
+  String get linkedinHint => 'LinkedIn URL or handle';
+
+  @override
+  String get locationLabel => 'Location (optional)';
+
+  @override
+  String get locationHint => 'e.g. Sfax, Tunisia';
+
+  @override
   String get skillsOptional => 'Skills (optional)';
 
   @override

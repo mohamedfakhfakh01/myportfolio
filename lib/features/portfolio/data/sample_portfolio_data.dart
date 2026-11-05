@@ -26,6 +26,9 @@ const List<Student> sampleStudents = [
         'mettre mes compétences au service d\'une équipe et relever de nouveaux '
         'défis techniques.',
     githubUsername: 'mohamedfakhfakh01',
+    email: 'fakhfakhmohamed150@gmail.com',
+    phone: '+216 24 098 402',
+    location: 'Sfax, Tunisie',
     skills: [
       // Langages
       Skill(name: 'Java', level: 75, category: SkillCategory.language),

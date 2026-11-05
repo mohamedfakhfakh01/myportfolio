@@ -788,6 +788,48 @@ abstract class AppLocalizations {
   /// **'Pour afficher tes dépôts GitHub sur le profil'**
   String get githubUsernameHelp;
 
+  /// No description provided for @contactTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Contact'**
+  String get contactTitle;
+
+  /// No description provided for @emailLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'E-mail (optionnel)'**
+  String get emailLabel;
+
+  /// No description provided for @phoneLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Téléphone (optionnel)'**
+  String get phoneLabel;
+
+  /// No description provided for @linkedinLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'LinkedIn (optionnel)'**
+  String get linkedinLabel;
+
+  /// No description provided for @linkedinHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'URL ou pseudo LinkedIn'**
+  String get linkedinHint;
+
+  /// No description provided for @locationLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Localisation (optionnel)'**
+  String get locationLabel;
+
+  /// No description provided for @locationHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ex : Sfax, Tunisie'**
+  String get locationHint;
+
   /// No description provided for @skillsOptional.
   ///
   /// In fr, this message translates to:

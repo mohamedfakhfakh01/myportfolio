@@ -9,6 +9,7 @@ import '../../../../shared/models/skill.dart';
 import '../../../../shared/models/experience.dart';
 import '../../../github/presentation/widgets/github_repos_section.dart';
 import '../../providers/portfolio_provider.dart';
+import '../widgets/contact_section.dart';
 import '../widgets/experience_card.dart';
 import '../widgets/experience_form_dialog.dart';
 import '../widgets/project_card.dart';
@@ -178,6 +179,9 @@ class _ProfilePageState extends State<ProfilePage> {
                     Text(student.bio, style: text.bodyMedium),
                     const SizedBox(height: 24),
                   ],
+
+                  // --- Contact (e-mail, téléphone, LinkedIn, localisation) ---
+                  ContactSection(student: student),
 
                   // --- Compétences (avec bouton d'ajout) ---
                   Row(

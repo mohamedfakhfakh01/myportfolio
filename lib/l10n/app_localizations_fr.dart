@@ -373,6 +373,27 @@ class AppLocalizationsFr extends AppLocalizations {
       'Pour afficher tes dépôts GitHub sur le profil';
 
   @override
+  String get contactTitle => 'Contact';
+
+  @override
+  String get emailLabel => 'E-mail (optionnel)';
+
+  @override
+  String get phoneLabel => 'Téléphone (optionnel)';
+
+  @override
+  String get linkedinLabel => 'LinkedIn (optionnel)';
+
+  @override
+  String get linkedinHint => 'URL ou pseudo LinkedIn';
+
+  @override
+  String get locationLabel => 'Localisation (optionnel)';
+
+  @override
+  String get locationHint => 'Ex : Sfax, Tunisie';
+
+  @override
   String get skillsOptional => 'Compétences (optionnel)';
 
   @override

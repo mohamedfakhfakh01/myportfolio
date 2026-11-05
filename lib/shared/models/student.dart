@@ -26,6 +26,12 @@ class Student {
   /// initiales à la place.
   final String? photoPath;
 
+  /// Coordonnées de contact (toutes optionnelles).
+  final String? email;
+  final String? phone;
+  final String? linkedin;
+  final String? location;
+
   /// Liste des compétences de l'étudiant.
   final List<Skill> skills;
 
@@ -42,6 +48,10 @@ class Student {
     this.bio = '',
     this.githubUsername,
     this.photoPath,
+    this.email,
+    this.phone,
+    this.linkedin,
+    this.location,
     this.skills = const [],
     this.projects = const [],
     this.experiences = const [],
@@ -68,6 +78,10 @@ class Student {
         'bio': bio,
         'githubUsername': githubUsername,
         'photoPath': photoPath,
+        'email': email,
+        'phone': phone,
+        'linkedin': linkedin,
+        'location': location,
       };
 
   /// Reconstruit un étudiant à partir d'une ligne `students` (sans ses listes).
@@ -79,6 +93,10 @@ class Student {
         bio: (map['bio'] as String?) ?? '',
         githubUsername: map['githubUsername'] as String?,
         photoPath: map['photoPath'] as String?,
+        email: map['email'] as String?,
+        phone: map['phone'] as String?,
+        linkedin: map['linkedin'] as String?,
+        location: map['location'] as String?,
       );
 
   /// Renvoie une copie de l'étudiant en remplaçant seulement les champs fournis.
@@ -91,6 +109,10 @@ class Student {
     String? bio,
     String? githubUsername,
     String? photoPath,
+    String? email,
+    String? phone,
+    String? linkedin,
+    String? location,
     List<Skill>? skills,
     List<Project>? projects,
     List<ExperienceEntry>? experiences,
@@ -102,6 +124,10 @@ class Student {
         bio: bio ?? this.bio,
         githubUsername: githubUsername ?? this.githubUsername,
         photoPath: photoPath ?? this.photoPath,
+        email: email ?? this.email,
+        phone: phone ?? this.phone,
+        linkedin: linkedin ?? this.linkedin,
+        location: location ?? this.location,
         skills: skills ?? this.skills,
         projects: projects ?? this.projects,
         experiences: experiences ?? this.experiences,

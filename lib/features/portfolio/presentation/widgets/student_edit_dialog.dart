@@ -44,6 +44,10 @@ class _StudentFormPageState extends State<StudentFormPage> {
   late final TextEditingController _fieldController;
   late final TextEditingController _bioController;
   late final TextEditingController _githubController;
+  late final TextEditingController _emailController;
+  late final TextEditingController _phoneController;
+  late final TextEditingController _linkedinController;
+  late final TextEditingController _locationController;
   String? _photoPath;
 
   /// Compétences saisies pendant la création (avant que l'étudiant existe).
@@ -65,6 +69,12 @@ class _StudentFormPageState extends State<StudentFormPage> {
     _bioController = TextEditingController(text: widget.student?.bio ?? '');
     _githubController =
         TextEditingController(text: widget.student?.githubUsername ?? '');
+    _emailController = TextEditingController(text: widget.student?.email ?? '');
+    _phoneController = TextEditingController(text: widget.student?.phone ?? '');
+    _linkedinController =
+        TextEditingController(text: widget.student?.linkedin ?? '');
+    _locationController =
+        TextEditingController(text: widget.student?.location ?? '');
     _photoPath = widget.student?.photoPath;
   }
 
@@ -74,6 +84,10 @@ class _StudentFormPageState extends State<StudentFormPage> {
     _fieldController.dispose();
     _bioController.dispose();
     _githubController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
+    _linkedinController.dispose();
+    _locationController.dispose();
     super.dispose();
   }
 
@@ -164,6 +178,9 @@ class _StudentFormPageState extends State<StudentFormPage> {
     );
   }
 
+  /// Renvoie le texte nettoyé, ou null s'il est vide.
+  String? _orNull(String s) => s.trim().isEmpty ? null : s.trim();
+
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -178,6 +195,10 @@ class _StudentFormPageState extends State<StudentFormPage> {
       bio: _bioController.text.trim(),
       githubUsername: github.isEmpty ? null : github,
       photoPath: _photoPath,
+      email: _orNull(_emailController.text),
+      phone: _orNull(_phoneController.text),
+      linkedin: _orNull(_linkedinController.text),
+      location: _orNull(_locationController.text),
       skills: _isCreating ? _skills : (widget.student?.skills ?? const []),
       projects: widget.student?.projects ?? const [],
     );
@@ -281,6 +302,47 @@ class _StudentFormPageState extends State<StudentFormPage> {
                   hintText: l.githubUsernameHint,
                   helperText: l.githubUsernameHelp,
                   prefixIcon: const Icon(Icons.code),
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // --- Contact (optionnel) ---
+              Text(l.contactTitle, style: text.titleMedium),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: _emailController,
+                keyboardType: TextInputType.emailAddress,
+                decoration: InputDecoration(
+                  labelText: l.emailLabel,
+                  prefixIcon: const Icon(Icons.email_outlined),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _phoneController,
+                keyboardType: TextInputType.phone,
+                decoration: InputDecoration(
+                  labelText: l.phoneLabel,
+                  prefixIcon: const Icon(Icons.phone_outlined),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _linkedinController,
+                decoration: InputDecoration(
+                  labelText: l.linkedinLabel,
+                  hintText: l.linkedinHint,
+                  prefixIcon: const Icon(Icons.link),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _locationController,
+                textCapitalization: TextCapitalization.words,
+                decoration: InputDecoration(
+                  labelText: l.locationLabel,
+                  hintText: l.locationHint,
+                  prefixIcon: const Icon(Icons.place_outlined),
                 ),
               ),
               const SizedBox(height: 8),
