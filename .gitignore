@@ -46,3 +46,6 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# Archive du design Stitch (source de référence, pas de code)
+stitch_myportfolio_mobile_app_design.zip
