@@ -3,6 +3,7 @@ import 'package:printing/printing.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/widgets/fade_slide_route.dart';
 import '../../services/portfolio_pdf.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/skill.dart';
@@ -15,6 +16,7 @@ import '../widgets/experience_card.dart';
 import '../widgets/experience_form_dialog.dart';
 import '../widgets/project_card.dart';
 import '../widgets/project_form_dialog.dart';
+import 'project_detail_page.dart';
 import '../widgets/skill_category_label.dart';
 import '../widgets/skill_level_tile.dart';
 import '../widgets/stat_tile.dart';
@@ -321,10 +323,13 @@ class _ProfilePageState extends State<ProfilePage> {
                     for (final project in projects) ...[
                       ProjectCard(
                         project: project,
-                        onTap: () => showProjectFormDialog(
-                          context,
-                          studentId: studentId,
-                          project: project,
+                        onTap: () => Navigator.of(context).push(
+                          fadeSlideRoute(
+                            ProjectDetailPage(
+                              studentId: studentId,
+                              projectId: project.id!,
+                            ),
+                          ),
                         ),
                       ),
                       const SizedBox(height: 12),
