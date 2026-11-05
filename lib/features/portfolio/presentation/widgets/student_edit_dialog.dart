@@ -532,23 +532,31 @@ class _ProjectInputDialogState extends State<_ProjectInputDialog> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _linkController = TextEditingController();
+  final _tagsController = TextEditingController();
 
   @override
   void dispose() {
     _titleController.dispose();
     _descriptionController.dispose();
     _linkController.dispose();
+    _tagsController.dispose();
     super.dispose();
   }
 
   void _submit() {
     if (!_formKey.currentState!.validate()) return;
     final String link = _linkController.text.trim();
+    final List<String> tags = _tagsController.text
+        .split(',')
+        .map((t) => t.trim())
+        .where((t) => t.isNotEmpty)
+        .toList();
     Navigator.of(context).pop(
       Project(
         title: _titleController.text.trim(),
         description: _descriptionController.text.trim(),
         link: link.isEmpty ? null : link,
+        tags: tags,
       ),
     );
   }
@@ -587,6 +595,15 @@ class _ProjectInputDialogState extends State<_ProjectInputDialog> {
                 controller: _linkController,
                 keyboardType: TextInputType.url,
                 decoration: InputDecoration(labelText: l.linkLabel),
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: _tagsController,
+                textCapitalization: TextCapitalization.words,
+                decoration: InputDecoration(
+                  labelText: l.technologiesLabel,
+                  hintText: l.technologiesHint,
+                ),
               ),
             ],
           ),

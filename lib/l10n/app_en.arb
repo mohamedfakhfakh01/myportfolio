@@ -93,6 +93,8 @@
   "projectDescHint": "What does this project do?",
   "descriptionRequired": "Description is required",
   "linkLabel": "Link (optional)",
+  "technologiesLabel": "Technologies (comma-separated)",
+  "technologiesHint": "e.g. Flutter, Dart, Firebase",
 
   "experienceTitle": "Experience",
   "educationTitle": "Education",

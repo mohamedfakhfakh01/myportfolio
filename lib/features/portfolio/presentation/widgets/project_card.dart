@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/project.dart';
+import '../../../../shared/widgets/pill_tag.dart';
 
 /// Carte réutilisable affichant un projet (titre, description, lien éventuel).
 class ProjectCard extends StatelessWidget {
@@ -98,6 +99,18 @@ class ProjectCard extends StatelessWidget {
                       color: AppColors.textSecondary,
                     ),
                   ),
+                  // Technologies en chips (pilules neutres), si renseignées.
+                  if (project.tags.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        for (final tag in project.tags)
+                          PillTag(label: tag, color: AppColors.textSecondary),
+                      ],
+                    ),
+                  ],
                   // Lien en bouton pilule (comme les boutons d'action du design).
                   // Un tap ouvre le projet sans déclencher le tap de la carte
                   // (qui, lui, ouvre la modification).

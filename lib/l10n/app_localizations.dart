@@ -590,6 +590,18 @@ abstract class AppLocalizations {
   /// **'Lien (optionnel)'**
   String get linkLabel;
 
+  /// No description provided for @technologiesLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Technologies (séparées par des virgules)'**
+  String get technologiesLabel;
+
+  /// No description provided for @technologiesHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ex : Flutter, Dart, Firebase'**
+  String get technologiesHint;
+
   /// No description provided for @experienceTitle.
   ///
   /// In fr, this message translates to:

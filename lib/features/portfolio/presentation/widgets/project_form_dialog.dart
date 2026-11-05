@@ -38,6 +38,7 @@ class _ProjectFormDialogState extends State<_ProjectFormDialog> {
   late final TextEditingController _titleController;
   late final TextEditingController _descriptionController;
   late final TextEditingController _linkController;
+  late final TextEditingController _tagsController;
   String? _imagePath;
 
   bool get _hasImage => _imagePath != null && File(_imagePath!).existsSync();
@@ -52,6 +53,9 @@ class _ProjectFormDialogState extends State<_ProjectFormDialog> {
       text: widget.project?.description ?? '',
     );
     _linkController = TextEditingController(text: widget.project?.link ?? '');
+    _tagsController = TextEditingController(
+      text: (widget.project?.tags ?? const <String>[]).join(', '),
+    );
     _imagePath = widget.project?.imagePath;
   }
 
@@ -100,6 +104,7 @@ class _ProjectFormDialogState extends State<_ProjectFormDialog> {
     _titleController.dispose();
     _descriptionController.dispose();
     _linkController.dispose();
+    _tagsController.dispose();
     super.dispose();
   }
 
@@ -110,12 +115,18 @@ class _ProjectFormDialogState extends State<_ProjectFormDialog> {
     final ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
 
     final String link = _linkController.text.trim();
+    final List<String> tags = _tagsController.text
+        .split(',')
+        .map((t) => t.trim())
+        .where((t) => t.isNotEmpty)
+        .toList();
     final Project project = Project(
       id: widget.project?.id,
       title: _titleController.text.trim(),
       description: _descriptionController.text.trim(),
       link: link.isEmpty ? null : link,
       imagePath: _imagePath,
+      tags: tags,
     );
 
     final provider = context.read<PortfolioProvider>();
@@ -218,6 +229,15 @@ class _ProjectFormDialogState extends State<_ProjectFormDialog> {
               decoration: InputDecoration(
                 labelText: l.linkLabel,
                 hintText: 'https://github.com/...',
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: _tagsController,
+              textCapitalization: TextCapitalization.words,
+              decoration: InputDecoration(
+                labelText: l.technologiesLabel,
+                hintText: l.technologiesHint,
               ),
             ),
           ],

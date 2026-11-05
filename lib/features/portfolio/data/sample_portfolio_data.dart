@@ -61,7 +61,8 @@ const List<Student> sampleStudents = [
         description:
             'Application web d\'un restaurant libanais haut de gamme (stage PFA '
             'chez Tekru Technologies) : interfaces responsives et animées, '
-            'versions desktop et mobile. Next.js · TypeScript · Tailwind CSS · Prisma.',
+            'versions desktop et mobile.',
+        tags: ['Next.js', 'TypeScript', 'Tailwind CSS', 'Prisma'],
       ),
       Project(
         title: 'SIBIONICS — E-commerce',
@@ -78,26 +79,29 @@ const List<Student> sampleStudents = [
       Project(
         title: 'E-FastOrder',
         description:
-            'Application web de gestion de commandes développée en .NET '
-            '(ASP.NET MVC · C# · Entity Framework · SQL Server).',
+            'Application web de gestion de commandes développée en .NET.',
+        tags: ['ASP.NET MVC', 'C#', 'Entity Framework', 'SQL Server'],
       ),
       Project(
         title: 'Gestion de Club',
         description:
             'Plateforme de gestion d\'un club universitaire : membres, '
-            'événements et activités (PHP · MySQL · Bootstrap).',
+            'événements et activités.',
+        tags: ['PHP', 'MySQL', 'Bootstrap'],
       ),
       Project(
         title: 'My Portfolio — Mobile',
         description:
             'Application mobile de portfolio personnel présentant mes projets '
-            'et compétences (Flutter · Dart).',
+            'et compétences.',
+        tags: ['Flutter', 'Dart'],
       ),
       Project(
         title: 'Applications JavaFX',
         description:
             'Applications desktop de gestion réalisées dans le cadre de projets '
-            'académiques (Java · JavaFX · MySQL).',
+            'académiques.',
+        tags: ['Java', 'JavaFX', 'MySQL'],
       ),
     ],
     experiences: [
@@ -168,19 +172,21 @@ const List<Student> sampleStudents = [
         title: 'EFastOrder',
         description:
             'Application web de gestion de restaurant avec commandes en ligne '
-            '(C# ASP.NET Core MVC, Entity Framework, authentification avec rôles).',
+            'et authentification avec rôles.',
+        tags: ['C#', 'ASP.NET Core MVC', 'Entity Framework'],
       ),
       Project(
         title: 'Gestion École',
         description:
-            'Application desktop de gestion scolaire et de la vie associative '
-            '(Java, JavaFX, MySQL).',
+            'Application desktop de gestion scolaire et de la vie associative.',
+        tags: ['Java', 'JavaFX', 'MySQL'],
       ),
       Project(
         title: 'Gestion Club',
         description:
             'Application web de gestion de club : membres, événements et '
-            'activités (PHP, MySQL, Bootstrap).',
+            'activités.',
+        tags: ['PHP', 'MySQL', 'Bootstrap'],
       ),
     ],
     experiences: [
@@ -234,12 +240,14 @@ const List<Student> sampleStudents = [
         description:
             'Projet fictif de démonstration pour tester les cartes de projet.',
         link: 'https://github.com/mohamedfakhfakh01/myportfolio',
+        tags: ['Flutter', 'Dart', 'SQLite'],
       ),
       Project(
         title: 'Site Vitrine',
         description:
             'Autre projet de démo pour vérifier l\'affichage et le tri.',
         link: 'https://flutter.dev',
+        tags: ['HTML', 'CSS', 'JavaScript'],
       ),
     ],
   ),

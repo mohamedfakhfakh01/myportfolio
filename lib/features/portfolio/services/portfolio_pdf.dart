@@ -72,7 +72,8 @@ Future<Uint8List> buildPortfolioPdf(Student student, AppLocalizations l) async {
               if (student.projects.isNotEmpty) ...[
                 _sectionTitle(l.projects),
                 for (final project in student.projects)
-                  _projectCard(project.title, project.description),
+                  _projectCard(
+                      project.title, project.description, project.tags),
               ],
             ],
           ),
@@ -280,7 +281,7 @@ pw.Widget _skillChip(String name) {
 }
 
 /// Carte d'un projet : titre coloré + description, sur fond doux.
-pw.Widget _projectCard(String title, String description) {
+pw.Widget _projectCard(String title, String description, List<String> tags) {
   return pw.Container(
     width: double.infinity,
     margin: const pw.EdgeInsets.only(bottom: 10),
@@ -306,6 +307,17 @@ pw.Widget _projectCard(String title, String description) {
           description,
           style: pw.TextStyle(fontSize: 10, color: _ink, lineSpacing: 1.5),
         ),
+        if (tags.isNotEmpty) ...[
+          pw.SizedBox(height: 4),
+          pw.Text(
+            tags.join('  ·  '),
+            style: pw.TextStyle(
+              fontSize: 9,
+              fontWeight: pw.FontWeight.bold,
+              color: _primaryDark,
+            ),
+          ),
+        ],
       ],
     ),
   );

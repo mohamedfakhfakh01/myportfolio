@@ -113,6 +113,8 @@
   "projectDescHint": "Que fait ce projet ?",
   "descriptionRequired": "La description est obligatoire",
   "linkLabel": "Lien (optionnel)",
+  "technologiesLabel": "Technologies (séparées par des virgules)",
+  "technologiesHint": "Ex : Flutter, Dart, Firebase",
 
   "experienceTitle": "Expérience",
   "educationTitle": "Formation",

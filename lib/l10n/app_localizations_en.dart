@@ -268,6 +268,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get linkLabel => 'Link (optional)';
 
   @override
+  String get technologiesLabel => 'Technologies (comma-separated)';
+
+  @override
+  String get technologiesHint => 'e.g. Flutter, Dart, Firebase';
+
+  @override
   String get experienceTitle => 'Experience';
 
   @override
