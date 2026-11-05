@@ -1,3 +1,6 @@
+import 'package:flutter/material.dart';
+
+import '../../../../app/theme/app_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/skill.dart';
 
@@ -15,5 +18,19 @@ String skillCategoryLabel(AppLocalizations l, SkillCategory category) {
       return l.catTools;
     case SkillCategory.other:
       return l.catOther;
+  }
+}
+
+/// Couleur d'accent associée à une catégorie (pour les pilules du design).
+Color skillCategoryColor(SkillCategory category) {
+  switch (category) {
+    case SkillCategory.language:
+      return AppColors.primary; // bleu
+    case SkillCategory.framework:
+      return AppColors.violet; // violet
+    case SkillCategory.tool:
+      return AppColors.accent; // cyan
+    case SkillCategory.other:
+      return AppColors.textSecondary; // slate
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../shared/widgets/pill_tag.dart';
 import '../../data/github_repo.dart';
 
 /// Carte affichant un dépôt GitHub (nom, description, langage, étoiles).
@@ -38,10 +39,11 @@ class GithubRepoCard extends StatelessWidget {
             Row(
               children: [
                 if (repo.language != null) ...[
-                  const Icon(Icons.circle, size: 10, color: AppColors.accent),
-                  const SizedBox(width: 4),
-                  Text(repo.language!, style: text.bodySmall),
-                  const SizedBox(width: 16),
+                  PillTag(
+                    label: repo.language!,
+                    icon: Icons.circle,
+                  ),
+                  const SizedBox(width: 12),
                 ],
                 Icon(Icons.star_border,
                     size: 16, color: AppColors.textSecondary),

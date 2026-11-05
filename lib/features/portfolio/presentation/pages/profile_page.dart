@@ -7,6 +7,7 @@ import '../../services/portfolio_pdf.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/skill.dart';
 import '../../../../shared/models/experience.dart';
+import '../../../../shared/widgets/pill_tag.dart';
 import '../../../github/presentation/widgets/github_repos_section.dart';
 import '../../providers/portfolio_provider.dart';
 import '../widgets/contact_section.dart';
@@ -241,12 +242,12 @@ class _ProfilePageState extends State<ProfilePage> {
                     for (final category in SkillCategory.values)
                       if (skills.any((s) => s.category == category)) ...[
                         Padding(
-                          padding: const EdgeInsets.only(top: 10, bottom: 2),
-                          child: Text(
-                            skillCategoryLabel(l, category),
-                            style: text.labelLarge?.copyWith(
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.w600,
+                          padding: const EdgeInsets.only(top: 14, bottom: 4),
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: PillTag(
+                              label: skillCategoryLabel(l, category),
+                              color: skillCategoryColor(category),
                             ),
                           ),
                         ),
