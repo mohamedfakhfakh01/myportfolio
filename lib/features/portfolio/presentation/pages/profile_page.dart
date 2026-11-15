@@ -130,7 +130,7 @@ class _ProfilePageState extends State<ProfilePage> {
               padding: const EdgeInsets.fromLTRB(20, 24, 20, 28),
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [AppColors.primary, AppColors.primaryDark],
+                  colors: [AppColors.primary, AppColors.violet],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),

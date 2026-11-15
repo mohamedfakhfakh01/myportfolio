@@ -81,7 +81,7 @@ class _GradientLevelBar extends StatelessWidget {
                 height: height,
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
-                    colors: [AppColors.primaryDark, AppColors.violet],
+                    colors: [AppColors.primary, AppColors.violet],
                   ),
                   borderRadius: BorderRadius.circular(999),
                 ),

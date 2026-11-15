@@ -25,11 +25,11 @@ String skillCategoryLabel(AppLocalizations l, SkillCategory category) {
 Color skillCategoryColor(SkillCategory category) {
   switch (category) {
     case SkillCategory.language:
-      return AppColors.primary; // bleu
+      return AppColors.primary; // indigo
     case SkillCategory.framework:
       return AppColors.violet; // violet
     case SkillCategory.tool:
-      return AppColors.accent; // cyan
+      return AppColors.primary; // indigo (palette du design)
     case SkillCategory.other:
       return AppColors.textSecondary; // slate
   }

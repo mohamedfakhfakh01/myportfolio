@@ -117,6 +117,19 @@ class AppTheme {
         ),
       ),
 
+      // Bouton flottant : cercle indigo plein, icône et texte blancs
+      // (comme le bouton d'action du design).
+      floatingActionButtonTheme: const FloatingActionButtonThemeData(
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
+        elevation: 4,
+        extendedTextStyle: TextStyle(
+          fontSize: 15,
+          fontWeight: FontWeight.w600,
+          color: Colors.white,
+        ),
+      ),
+
       // Champs de saisie : fond sombre, bordure grise, bordure violette au focus.
       inputDecorationTheme: InputDecorationTheme(
         filled: true,

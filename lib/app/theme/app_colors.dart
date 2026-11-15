@@ -8,14 +8,14 @@ class AppColors {
   AppColors._();
 
   // --- Couleurs d'accent ---
-  /// Bleu : couleur principale (boutons, icônes, avatar, début de dégradé).
-  static const Color primary = Color(0xFF3B82F6);
+  /// Indigo : couleur principale (boutons, icônes, avatar, début de dégradé).
+  static const Color primary = Color(0xFF4F46E5);
 
-  /// Bleu plus foncé : fin de dégradé, états pressés.
-  static const Color primaryDark = Color(0xFF2563EB);
+  /// Indigo plus foncé : états pressés.
+  static const Color primaryDark = Color(0xFF4338CA);
 
-  /// Bleu clair : texte lisible sur les fonds bleus sombres (puces).
-  static const Color primaryLight = Color(0xFF93C5FD);
+  /// Indigo clair : texte lisible sur les fonds indigo sombres (puces).
+  static const Color primaryLight = Color(0xFFA5B4FC);
 
   /// Violet : accent secondaire du design (fin du dégradé des barres de niveau).
   static const Color violet = Color(0xFF7C3AED);
@@ -61,16 +61,16 @@ class AppColors {
   static const Color _textPrimaryDark = Color(0xFFF8FAFC);
   static const Color _textSecondaryDark = Color(0xFF94A3B8);
   static const Color _borderDark = Color(0xFF334155);
-  static const Color _primarySoftDark = Color(0xFF172554);
+  static const Color _primarySoftDark = Color(0xFF1E1B4B);
   static const Color _accentSoftDark = Color(0xFF164E63);
 
-  // Valeurs du thème CLAIR (calées sur le design Stitch « Kinetic Obsidian »).
-  static const Color _backgroundLight = Color(0xFFF8FAFC);
+  // Valeurs du thème CLAIR (palette indigo/violet).
+  static const Color _backgroundLight = Color(0xFFF7F8FC);
   static const Color _surfaceLight = Color(0xFFFFFFFF);
   static const Color _textPrimaryLight = Color(0xFF0F172A);
   static const Color _textSecondaryLight = Color(0xFF64748B);
   static const Color _borderLight = Color(0xFFE2E8F0);
-  static const Color _primarySoftLight = Color(0xFFDBEAFE);
+  static const Color _primarySoftLight = Color(0xFFE0E7FF);
   static const Color _accentSoftLight = Color(0xFFCFFAFE);
 
   /// Bascule toute la palette des surfaces/textes vers le thème choisi.
