@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/experience.dart';
+import '../../../../shared/widgets/form_sheet.dart';
 import '../../providers/portfolio_provider.dart';
 import 'experience_kind_label.dart';
 
@@ -14,8 +15,8 @@ Future<void> showExperienceFormDialog(
   ExperienceKind defaultKind = ExperienceKind.experience,
   ExperienceEntry? entry,
 }) {
-  return showDialog<void>(
-    context: context,
+  return showFormSheet<void>(
+    context,
     builder: (_) => _ExperienceFormDialog(
       studentId: studentId,
       defaultKind: defaultKind,
@@ -129,8 +130,8 @@ class _ExperienceFormDialogState extends State<_ExperienceFormDialog> {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l = AppLocalizations.of(context);
-    return AlertDialog(
-      title: Text(_isEditing ? l.entryEditTitle : l.entryAddTitle),
+    return FormSheetBody(
+      title: _isEditing ? l.entryEditTitle : l.entryAddTitle,
       content: Form(
         key: _formKey,
         child: SingleChildScrollView(

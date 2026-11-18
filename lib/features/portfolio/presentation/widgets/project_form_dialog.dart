@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/project.dart';
+import '../../../../shared/widgets/form_sheet.dart';
 import '../../providers/portfolio_provider.dart';
 
 /// Ouvre la boîte de dialogue d'ajout (si [project] est null) ou de modification
@@ -17,8 +18,8 @@ Future<void> showProjectFormDialog(
   required int studentId,
   Project? project,
 }) {
-  return showDialog<void>(
-    context: context,
+  return showFormSheet<void>(
+    context,
     builder: (_) => _ProjectFormDialog(studentId: studentId, project: project),
   );
 }
@@ -173,8 +174,8 @@ class _ProjectFormDialogState extends State<_ProjectFormDialog> {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l = AppLocalizations.of(context);
-    return AlertDialog(
-      title: Text(_isEditing ? l.projectEditTitle : l.projectAddTitle),
+    return FormSheetBody(
+      title: _isEditing ? l.projectEditTitle : l.projectAddTitle,
       content: Form(
         key: _formKey,
         child: Column(

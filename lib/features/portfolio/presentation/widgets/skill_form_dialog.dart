@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/skill.dart';
+import '../../../../shared/widgets/form_sheet.dart';
 import '../../providers/portfolio_provider.dart';
 import 'skill_category_label.dart';
 
@@ -14,8 +15,8 @@ Future<void> showSkillFormDialog(
   required int studentId,
   Skill? skill,
 }) {
-  return showDialog<void>(
-    context: context,
+  return showFormSheet<void>(
+    context,
     builder: (_) => _SkillFormDialog(studentId: studentId, skill: skill),
   );
 }
@@ -122,8 +123,8 @@ class _SkillFormDialogState extends State<_SkillFormDialog> {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l = AppLocalizations.of(context);
-    return AlertDialog(
-      title: Text(_isEditing ? l.skillEditTitle : l.skillAddTitle),
+    return FormSheetBody(
+      title: _isEditing ? l.skillEditTitle : l.skillAddTitle,
       content: Form(
         key: _formKey,
         child: Column(
