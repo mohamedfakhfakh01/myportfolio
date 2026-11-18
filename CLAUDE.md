@@ -50,7 +50,7 @@ export PATH="$HOME/flutter/bin:$PATH"      # Flutter n'est PAS dans le PATH
 export LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 # obligatoire avant tout build iOS
 
 flutter analyze                             # 0 erreur attendu
-flutter test                                # 64 tests
+flutter test                                # 73 tests
 flutter gen-l10n                            # APRÈS toute modif des .arb
 flutter run -d 87E626E0-E743-44A6-8A48-AA716FD7851B --debug   # simulateur iPhone 18 Pro Max
 flutter build ios --release                 # puis: flutter install -d <udid> --release
@@ -85,7 +85,13 @@ iPhone physique « iPhone de fakh » `00008120-000664510C70201E`.
 10. **Premier build Android très long et fragile** : la 1re tentative a échoué après **46 min**
     sur un téléchargement Gradle ; la relance automatique a réussi en ~2 min (cache rempli).
     En cas d'échec réseau, relancer avant de chercher plus loin.
-11. **Ne pas lancer `dart format` sur tout un fichier** pour corriger une indentation locale : le
+11. **Un formulaire dans une `ListView` ne valide pas les champs hors écran** : la `ListView`
+    détruit les champs qui sortent de l'écran, qui quittent alors le `Form`, et `validate()`
+    les ignore. Bug réel corrigé : on pouvait créer un portfolio **sans nom** en faisant défiler
+    avant de valider. Tout formulaire → `SingleChildScrollView` + `Column`.
+12. **En test de widget, un champ qui garde le focus ramène la vue vers lui** et annule
+    `ensureVisible` : appeler `FocusManager.instance.primaryFocus?.unfocus()` avant de défiler.
+13. **Ne pas lancer `dart format` sur tout un fichier** pour corriger une indentation locale : le
     projet n'est pas formaté partout, le diff devient illisible.
 
 ---
@@ -142,6 +148,9 @@ lib/
 
 **Créer un portfolio** : accueil → « Ajouter un CV » → formulaire (profil, contact, compétences,
 projets, parcours saisis en feuilles) → `addStudent` insère l'étudiant puis son contenu → retour liste.
+**Aucun doublon de nom** (création, renommage, import ; casse et espaces ignorés) : le formulaire
+affiche l'erreur sous le champ, et le provider refuse aussi (`DuplicatePortfolioNameException`)
+pour qu'aucun chemin ne contourne la règle.
 
 **Complétion du profil** : `profileCompletion(student)` évalue **11 critères** (photo, bio, e-mail,
 téléphone, LinkedIn, localisation, GitHub, ≥1 compétence, ≥1 projet, ≥1 expérience, ≥1 formation)
@@ -191,7 +200,6 @@ Aucune : l'application ne contacte que l'API GitHub publique, sans clé.
 
 - [ ] **Lancer l'APK Android** sur un émulateur ou un appareil (aucun AVD sur cette machine).
 - [ ] Configurer une **signature release** Android avant toute publication.
-- [ ] Empêcher la création manuelle d'un portfolio portant un nom déjà existant.
 - [ ] Monter la couverture de tests sur les écrans (profil, accueil) et l'export PDF.
 - [ ] Migrer CocoaPods → Swift Package Manager.
 

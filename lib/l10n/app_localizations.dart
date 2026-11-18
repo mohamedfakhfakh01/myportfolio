@@ -758,6 +758,12 @@ abstract class AppLocalizations {
   /// **'Import terminé : {added} ajouté(s), {replaced} remplacé(s).'**
   String importSuccess(int added, int replaced);
 
+  /// No description provided for @nameAlreadyExists.
+  ///
+  /// In fr, this message translates to:
+  /// **'Un portfolio porte déjà ce nom.'**
+  String get nameAlreadyExists;
+
   /// No description provided for @quickActions.
   ///
   /// In fr, this message translates to:

@@ -105,6 +105,15 @@ class _FakeRepo extends PortfolioRepository {
   }
 
   @override
+  Future<void> updateStudent(Student student) async {
+    final int i = _indexOf(student.id!);
+    _students[i] = _students[i].copyWith(
+      fullName: student.fullName,
+      field: student.field,
+    );
+  }
+
+  @override
   Future<int> insertStudent(Student student) async {
     final int id = _nextId++;
     // La vraie base n'insère QUE la ligne étudiant ; les compétences, le
@@ -282,6 +291,65 @@ void main() {
         expect(provider.students.single.field, 'Seconde version');
         expect(result.total, 2);
         expect(result.replaced, 1);
+      });
+    });
+
+    group('Anti-doublon à la création et au renommage', () {
+      Future<PortfolioProvider> makeProvider() async {
+        final provider = PortfolioProvider(
+          repository: _FakeRepo([
+            const Student(id: 1, fullName: 'Alice Martin', field: 'Info'),
+            const Student(id: 2, fullName: 'Bob Durand', field: 'Info'),
+          ]),
+        );
+        await pumpEventQueue();
+        return provider;
+      }
+
+      test('nameExists : casse et espaces (y compris internes) ignorés',
+          () async {
+        final provider = await makeProvider();
+        expect(provider.nameExists('Alice Martin'), isTrue);
+        expect(provider.nameExists('  alice   MARTIN '), isTrue);
+        expect(provider.nameExists('Carla'), isFalse);
+      });
+
+      test('nameExists : excludeId autorise à garder son propre nom', () async {
+        final provider = await makeProvider();
+        expect(provider.nameExists('Alice Martin', excludeId: 1), isFalse);
+        expect(provider.nameExists('Alice Martin', excludeId: 2), isTrue);
+      });
+
+      test('addStudent refuse un nom déjà pris, la liste ne change pas',
+          () async {
+        final provider = await makeProvider();
+        await expectLater(
+          provider.addStudent(
+            const Student(fullName: 'alice martin', field: 'Info'),
+          ),
+          throwsA(isA<DuplicatePortfolioNameException>()),
+        );
+        expect(provider.students, hasLength(2));
+      });
+
+      test('updateStudent refuse de renommer vers le nom d\'un autre',
+          () async {
+        final provider = await makeProvider();
+        await expectLater(
+          provider.updateStudent(
+            const Student(id: 2, fullName: 'Alice Martin', field: 'Info'),
+          ),
+          throwsA(isA<DuplicatePortfolioNameException>()),
+        );
+        expect(provider.studentById(2).fullName, 'Bob Durand');
+      });
+
+      test('updateStudent accepte de garder son propre nom', () async {
+        final provider = await makeProvider();
+        await provider.updateStudent(
+          const Student(id: 1, fullName: 'Alice Martin', field: 'Nouvelle'),
+        );
+        expect(provider.studentById(1).field, 'Nouvelle');
       });
     });
 

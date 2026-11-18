@@ -125,6 +125,10 @@ class PortfolioProvider extends ChangeNotifier {
 
   /// Met à jour les champs du profil (nom, filière, bio, GitHub).
   Future<void> updateStudent(Student student) async {
+    // Renommer vers le nom d'un AUTRE portfolio créerait un doublon.
+    if (nameExists(student.fullName, excludeId: student.id)) {
+      throw DuplicatePortfolioNameException(student.fullName);
+    }
     await _repository.updateStudent(student);
     await _reloadStudents();
   }
@@ -135,6 +139,11 @@ class PortfolioProvider extends ChangeNotifier {
     Student student, {
     List<Project> projects = const [],
   }) async {
+    // Garde-fou : l'interface prévient déjà, mais AUCUN chemin ne doit pouvoir
+    // créer un doublon (le provider fait foi, comme un serveur).
+    if (nameExists(student.fullName)) {
+      throw DuplicatePortfolioNameException(student.fullName);
+    }
     await _insertStudentWithContent(student, projects: projects);
     await _reloadStudents();
   }
@@ -169,14 +178,31 @@ class PortfolioProvider extends ChangeNotifier {
     return ImportResult(added: added, replaced: replaced);
   }
 
-  /// Retrouve un portfolio par son nom (insensible à la casse et aux espaces).
+  /// Vrai si un portfolio porte déjà ce nom (casse et espaces ignorés).
+  ///
+  /// [excludeId] écarte un portfolio de la recherche : lors d'une modification,
+  /// garder SON propre nom n'est pas un doublon.
+  bool nameExists(String fullName, {int? excludeId}) {
+    final String key = _normalizeName(fullName);
+    return _students.any(
+      (s) => s.id != excludeId && _normalizeName(s.fullName) == key,
+    );
+  }
+
+  /// Retrouve un portfolio par son nom (casse et espaces ignorés).
   Student? _findByName(String fullName) {
-    final String key = fullName.trim().toLowerCase();
+    final String key = _normalizeName(fullName);
     for (final student in _students) {
-      if (student.fullName.trim().toLowerCase() == key) return student;
+      if (_normalizeName(student.fullName) == key) return student;
     }
     return null;
   }
+
+  /// Forme canonique d'un nom, pour comparer « Alice Martin » et
+  /// « alice  MARTIN ». Une seule définition, partagée par l'import et la
+  /// création : les deux appliquent exactement la même règle.
+  static String _normalizeName(String name) =>
+      name.trim().toLowerCase().replaceAll(RegExp(r'\s+'), ' ');
 
   /// Insère un étudiant puis tout son contenu. Utilisé par la création d'un
   /// portfolio et par l'import (une seule source de vérité).
@@ -223,4 +249,15 @@ class ImportResult {
 
   /// Nombre total de portfolios traités.
   int get total => added + replaced;
+}
+
+/// Levée quand on tente de créer (ou renommer vers) un nom déjà pris.
+class DuplicatePortfolioNameException implements Exception {
+  const DuplicatePortfolioNameException(this.fullName);
+
+  /// Le nom en conflit.
+  final String fullName;
+
+  @override
+  String toString() => 'Un portfolio nommé « $fullName » existe déjà.';
 }

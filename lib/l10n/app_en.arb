@@ -137,6 +137,7 @@
       "replaced": { "type": "int" }
     }
   },
+  "nameAlreadyExists": "A portfolio with this name already exists.",
   "quickActions": "Quick actions",
   "journey": "Journey",
   "experienceTitle": "Experience",

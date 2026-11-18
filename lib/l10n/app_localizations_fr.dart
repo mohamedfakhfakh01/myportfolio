@@ -361,6 +361,9 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get nameAlreadyExists => 'Un portfolio porte déjà ce nom.';
+
+  @override
   String get quickActions => 'Actions rapides';
 
   @override

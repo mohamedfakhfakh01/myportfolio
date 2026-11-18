@@ -231,10 +231,16 @@ class _StudentFormPageState extends State<StudentFormPage> {
     );
 
     final provider = context.read<PortfolioProvider>();
-    if (_isCreating) {
-      await provider.addStudent(student, projects: _projects);
-    } else {
-      await provider.updateStudent(student);
+    try {
+      if (_isCreating) {
+        await provider.addStudent(student, projects: _projects);
+      } else {
+        await provider.updateStudent(student);
+      }
+    } on DuplicatePortfolioNameException {
+      // Normalement déjà bloqué par le validateur : filet de sécurité.
+      messenger.showSnackBar(SnackBar(content: Text(l.nameAlreadyExists)));
+      return;
     }
     if (!mounted) return;
     messenger.showSnackBar(SnackBar(content: Text(l.portfolioSaved)));
@@ -253,265 +259,279 @@ class _StudentFormPageState extends State<StudentFormPage> {
       body: SafeArea(
         child: Form(
           key: _formKey,
-          child: ListView(
+          // SingleChildScrollView + Column, et non ListView : une ListView
+          // détruit les champs sortis de l'écran, qui ne sont alors plus
+          // validés. On pouvait ainsi créer un portfolio SANS NOM en faisant
+          // défiler jusqu'au bouton avant de valider.
+          child: SingleChildScrollView(
             padding: const EdgeInsets.all(20),
-            children: [
-              // --- Photo de profil ---
-              Center(
-                child: Column(
-                  children: [
-                    CircleAvatar(
-                      radius: 56,
-                      backgroundColor: AppColors.primarySoft,
-                      backgroundImage:
-                          _hasPhoto ? FileImage(File(_photoPath!)) : null,
-                      child: _hasPhoto
-                          ? null
-                          : const Icon(Icons.person,
-                              color: AppColors.primaryLight, size: 52),
-                    ),
-                    const SizedBox(height: 8),
-                    TextButton.icon(
-                      onPressed: _chooseSource,
-                      icon: const Icon(Icons.add_a_photo_outlined),
-                      label: Text(_hasPhoto ? l.changePhoto : l.addPhoto),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // --- Informations ---
-              Text(l.information, style: text.titleMedium),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _nameController,
-                textCapitalization: TextCapitalization.words,
-                decoration: InputDecoration(
-                  labelText: l.fullNameLabel,
-                  hintText: l.fullNameHint,
-                  prefixIcon: const Icon(Icons.person_outline),
-                ),
-                validator: (value) => (value == null || value.trim().isEmpty)
-                    ? l.nameRequired
-                    : null,
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _fieldController,
-                textCapitalization: TextCapitalization.sentences,
-                decoration: InputDecoration(
-                  labelText: l.fieldLabel,
-                  hintText: l.fieldHint,
-                  prefixIcon: const Icon(Icons.school_outlined),
-                ),
-                validator: (value) => (value == null || value.trim().isEmpty)
-                    ? l.fieldRequired
-                    : null,
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _bioController,
-                textCapitalization: TextCapitalization.sentences,
-                maxLines: 3,
-                decoration: InputDecoration(
-                  labelText: l.bioLabel,
-                  hintText: l.bioHint,
-                  alignLabelWithHint: true,
-                  prefixIcon: const Icon(Icons.info_outline),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _githubController,
-                decoration: InputDecoration(
-                  labelText: l.githubUsernameLabel,
-                  hintText: l.githubUsernameHint,
-                  helperText: l.githubUsernameHelp,
-                  prefixIcon: const Icon(Icons.code),
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              // --- Contact (optionnel) ---
-              Text(l.contactTitle, style: text.titleMedium),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(
-                  labelText: l.emailLabel,
-                  prefixIcon: const Icon(Icons.email_outlined),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _phoneController,
-                keyboardType: TextInputType.phone,
-                decoration: InputDecoration(
-                  labelText: l.phoneLabel,
-                  prefixIcon: const Icon(Icons.phone_outlined),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _linkedinController,
-                decoration: InputDecoration(
-                  labelText: l.linkedinLabel,
-                  hintText: l.linkedinHint,
-                  prefixIcon: const Icon(Icons.link),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _locationController,
-                textCapitalization: TextCapitalization.words,
-                decoration: InputDecoration(
-                  labelText: l.locationLabel,
-                  hintText: l.locationHint,
-                  prefixIcon: const Icon(Icons.place_outlined),
-                ),
-              ),
-              const SizedBox(height: 8),
-
-              // --- Compétences & projets (ajoutés dès la création) ---
-              if (_isCreating) ...[
-                _sectionHeader(l.skillsOptional, l.addSkill, _addSkill),
-                if (_skills.isEmpty)
-                  Text(
-                    l.noSkillAdded,
-                    style: text.bodyMedium
-                        ?.copyWith(color: AppColors.textSecondary),
-                  )
-                else
-                  for (int i = 0; i < _skills.length; i++)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: Card(
-                        child: ListTile(
-                          title: Text(_skills[i].name),
-                          subtitle: Text(
-                            _skills[i].level != null
-                                ? '${skillCategoryLabel(l, _skills[i].category)} · ${_skills[i].level}%'
-                                : skillCategoryLabel(l, _skills[i].category),
-                          ),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.delete_outline),
-                            tooltip: l.remove,
-                            onPressed: () =>
-                                setState(() => _skills.removeAt(i)),
-                          ),
-                        ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // --- Photo de profil ---
+                Center(
+                  child: Column(
+                    children: [
+                      CircleAvatar(
+                        radius: 56,
+                        backgroundColor: AppColors.primarySoft,
+                        backgroundImage:
+                            _hasPhoto ? FileImage(File(_photoPath!)) : null,
+                        child: _hasPhoto
+                            ? null
+                            : const Icon(Icons.person,
+                                color: AppColors.primaryLight, size: 52),
                       ),
-                    ),
-                const SizedBox(height: 16),
-                _sectionHeader(l.projectsOptional, l.addProject, _addProject),
-                if (_projects.isEmpty)
-                  Text(
-                    l.noProjectAdded,
-                    style: text.bodyMedium
-                        ?.copyWith(color: AppColors.textSecondary),
-                  )
-                else
-                  for (int i = 0; i < _projects.length; i++)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: Card(
-                        child: ListTile(
-                          title: Text(_projects[i].title),
-                          subtitle: Text(
-                            _projects[i].description,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.delete_outline),
-                            tooltip: l.remove,
-                            onPressed: () =>
-                                setState(() => _projects.removeAt(i)),
-                          ),
-                        ),
+                      const SizedBox(height: 8),
+                      TextButton.icon(
+                        onPressed: _chooseSource,
+                        icon: const Icon(Icons.add_a_photo_outlined),
+                        label: Text(_hasPhoto ? l.changePhoto : l.addPhoto),
                       ),
-                    ),
+                    ],
+                  ),
+                ),
                 const SizedBox(height: 16),
 
-                // --- Expérience ---
-                _sectionHeader(l.experienceTitle, l.addExperience,
-                    () => _addExperienceEntry(ExperienceKind.experience)),
-                if (!_experiences
-                    .any((e) => e.kind == ExperienceKind.experience))
-                  Text(
-                    l.experienceEmpty,
-                    style: text.bodyMedium
-                        ?.copyWith(color: AppColors.textSecondary),
-                  )
-                else
-                  for (final e in _experiences
-                      .where((e) => e.kind == ExperienceKind.experience))
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: Card(
-                        child: ListTile(
-                          title: Text(e.title),
-                          subtitle: _experienceMeta(e) == null
-                              ? null
-                              : Text(_experienceMeta(e)!),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.delete_outline),
-                            tooltip: l.remove,
-                            onPressed: () =>
-                                setState(() => _experiences.remove(e)),
-                          ),
-                        ),
-                      ),
-                    ),
+                // --- Informations ---
+                Text(l.information, style: text.titleMedium),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: _nameController,
+                  textCapitalization: TextCapitalization.words,
+                  decoration: InputDecoration(
+                    labelText: l.fullNameLabel,
+                    hintText: l.fullNameHint,
+                    prefixIcon: const Icon(Icons.person_outline),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return l.nameRequired;
+                    }
+                    // En modification, garder son propre nom n'est pas un doublon.
+                    final bool taken = context
+                        .read<PortfolioProvider>()
+                        .nameExists(value, excludeId: widget.student?.id);
+                    return taken ? l.nameAlreadyExists : null;
+                  },
+                ),
                 const SizedBox(height: 16),
+                TextFormField(
+                  controller: _fieldController,
+                  textCapitalization: TextCapitalization.sentences,
+                  decoration: InputDecoration(
+                    labelText: l.fieldLabel,
+                    hintText: l.fieldHint,
+                    prefixIcon: const Icon(Icons.school_outlined),
+                  ),
+                  validator: (value) => (value == null || value.trim().isEmpty)
+                      ? l.fieldRequired
+                      : null,
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _bioController,
+                  textCapitalization: TextCapitalization.sentences,
+                  maxLines: 3,
+                  decoration: InputDecoration(
+                    labelText: l.bioLabel,
+                    hintText: l.bioHint,
+                    alignLabelWithHint: true,
+                    prefixIcon: const Icon(Icons.info_outline),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _githubController,
+                  decoration: InputDecoration(
+                    labelText: l.githubUsernameLabel,
+                    hintText: l.githubUsernameHint,
+                    helperText: l.githubUsernameHelp,
+                    prefixIcon: const Icon(Icons.code),
+                  ),
+                ),
+                const SizedBox(height: 20),
 
-                // --- Formation ---
-                _sectionHeader(l.educationTitle, l.addEducation,
-                    () => _addExperienceEntry(ExperienceKind.education)),
-                if (!_experiences
-                    .any((e) => e.kind == ExperienceKind.education))
-                  Text(
-                    l.educationEmpty,
-                    style: text.bodyMedium
-                        ?.copyWith(color: AppColors.textSecondary),
-                  )
-                else
-                  for (final e in _experiences
-                      .where((e) => e.kind == ExperienceKind.education))
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: Card(
-                        child: ListTile(
-                          title: Text(e.title),
-                          subtitle: _experienceMeta(e) == null
-                              ? null
-                              : Text(_experienceMeta(e)!),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.delete_outline),
-                            tooltip: l.remove,
-                            onPressed: () =>
-                                setState(() => _experiences.remove(e)),
+                // --- Contact (optionnel) ---
+                Text(l.contactTitle, style: text.titleMedium),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: _emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: InputDecoration(
+                    labelText: l.emailLabel,
+                    prefixIcon: const Icon(Icons.email_outlined),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _phoneController,
+                  keyboardType: TextInputType.phone,
+                  decoration: InputDecoration(
+                    labelText: l.phoneLabel,
+                    prefixIcon: const Icon(Icons.phone_outlined),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _linkedinController,
+                  decoration: InputDecoration(
+                    labelText: l.linkedinLabel,
+                    hintText: l.linkedinHint,
+                    prefixIcon: const Icon(Icons.link),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _locationController,
+                  textCapitalization: TextCapitalization.words,
+                  decoration: InputDecoration(
+                    labelText: l.locationLabel,
+                    hintText: l.locationHint,
+                    prefixIcon: const Icon(Icons.place_outlined),
+                  ),
+                ),
+                const SizedBox(height: 8),
+
+                // --- Compétences & projets (ajoutés dès la création) ---
+                if (_isCreating) ...[
+                  _sectionHeader(l.skillsOptional, l.addSkill, _addSkill),
+                  if (_skills.isEmpty)
+                    Text(
+                      l.noSkillAdded,
+                      style: text.bodyMedium
+                          ?.copyWith(color: AppColors.textSecondary),
+                    )
+                  else
+                    for (int i = 0; i < _skills.length; i++)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Card(
+                          child: ListTile(
+                            title: Text(_skills[i].name),
+                            subtitle: Text(
+                              _skills[i].level != null
+                                  ? '${skillCategoryLabel(l, _skills[i].category)} · ${_skills[i].level}%'
+                                  : skillCategoryLabel(l, _skills[i].category),
+                            ),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.delete_outline),
+                              tooltip: l.remove,
+                              onPressed: () =>
+                                  setState(() => _skills.removeAt(i)),
+                            ),
                           ),
                         ),
                       ),
-                    ),
+                  const SizedBox(height: 16),
+                  _sectionHeader(l.projectsOptional, l.addProject, _addProject),
+                  if (_projects.isEmpty)
+                    Text(
+                      l.noProjectAdded,
+                      style: text.bodyMedium
+                          ?.copyWith(color: AppColors.textSecondary),
+                    )
+                  else
+                    for (int i = 0; i < _projects.length; i++)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Card(
+                          child: ListTile(
+                            title: Text(_projects[i].title),
+                            subtitle: Text(
+                              _projects[i].description,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.delete_outline),
+                              tooltip: l.remove,
+                              onPressed: () =>
+                                  setState(() => _projects.removeAt(i)),
+                            ),
+                          ),
+                        ),
+                      ),
+                  const SizedBox(height: 16),
+
+                  // --- Expérience ---
+                  _sectionHeader(l.experienceTitle, l.addExperience,
+                      () => _addExperienceEntry(ExperienceKind.experience)),
+                  if (!_experiences
+                      .any((e) => e.kind == ExperienceKind.experience))
+                    Text(
+                      l.experienceEmpty,
+                      style: text.bodyMedium
+                          ?.copyWith(color: AppColors.textSecondary),
+                    )
+                  else
+                    for (final e in _experiences
+                        .where((e) => e.kind == ExperienceKind.experience))
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Card(
+                          child: ListTile(
+                            title: Text(e.title),
+                            subtitle: _experienceMeta(e) == null
+                                ? null
+                                : Text(_experienceMeta(e)!),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.delete_outline),
+                              tooltip: l.remove,
+                              onPressed: () =>
+                                  setState(() => _experiences.remove(e)),
+                            ),
+                          ),
+                        ),
+                      ),
+                  const SizedBox(height: 16),
+
+                  // --- Formation ---
+                  _sectionHeader(l.educationTitle, l.addEducation,
+                      () => _addExperienceEntry(ExperienceKind.education)),
+                  if (!_experiences
+                      .any((e) => e.kind == ExperienceKind.education))
+                    Text(
+                      l.educationEmpty,
+                      style: text.bodyMedium
+                          ?.copyWith(color: AppColors.textSecondary),
+                    )
+                  else
+                    for (final e in _experiences
+                        .where((e) => e.kind == ExperienceKind.education))
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Card(
+                          child: ListTile(
+                            title: Text(e.title),
+                            subtitle: _experienceMeta(e) == null
+                                ? null
+                                : Text(_experienceMeta(e)!),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.delete_outline),
+                              tooltip: l.remove,
+                              onPressed: () =>
+                                  setState(() => _experiences.remove(e)),
+                            ),
+                          ),
+                        ),
+                      ),
+                ],
+                const SizedBox(height: 28),
+
+                // --- Bouton Enregistrer (bien visible) ---
+                ElevatedButton.icon(
+                  onPressed: _save,
+                  icon: const Icon(Icons.check),
+                  label: Text(_isCreating ? l.createPortfolio : l.save),
+                ),
+                const SizedBox(height: 8),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text(l.cancel),
+                ),
               ],
-              const SizedBox(height: 28),
-
-              // --- Bouton Enregistrer (bien visible) ---
-              ElevatedButton.icon(
-                onPressed: _save,
-                icon: const Icon(Icons.check),
-                label: Text(_isCreating ? l.createPortfolio : l.save),
-              ),
-              const SizedBox(height: 8),
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text(l.cancel),
-              ),
-            ],
+            ),
           ),
         ),
       ),

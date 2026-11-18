@@ -109,12 +109,13 @@ section *Dépôts GitHub* charge les dépôts publics.
 
 ```bash
 flutter analyze          # 0 erreur attendu
-flutter test             # 64 tests
+flutter test             # 73 tests
 flutter test --coverage  # génère coverage/lcov.info
 ```
 
 Ce qui est couvert : modèles et sérialisation, calcul de complétion, sauvegarde JSON, CRUD du
-provider, service GitHub (délai dépassé / hors-ligne), quelques widgets, et surtout les
+provider (dont l'interdiction des doublons de nom), service GitHub (délai dépassé / hors-ligne),
+le formulaire de création, quelques widgets, et surtout les
 **migrations de la base** (via `sqflite_common_ffi`, pour garantir qu'une mise à jour ne perde
 aucune donnée).
 
