@@ -608,6 +608,36 @@ abstract class AppLocalizations {
   /// **'Ex : Flutter, Dart, Firebase'**
   String get technologiesHint;
 
+  /// No description provided for @greetingName.
+  ///
+  /// In fr, this message translates to:
+  /// **'Bonjour, {name}'**
+  String greetingName(String name);
+
+  /// No description provided for @profileCompletionTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Complétion du profil'**
+  String get profileCompletionTitle;
+
+  /// No description provided for @profileCompletionSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'{done} éléments sur {total} renseignés'**
+  String profileCompletionSubtitle(int done, int total);
+
+  /// No description provided for @quickActions.
+  ///
+  /// In fr, this message translates to:
+  /// **'Actions rapides'**
+  String get quickActions;
+
+  /// No description provided for @journey.
+  ///
+  /// In fr, this message translates to:
+  /// **'Parcours'**
+  String get journey;
+
   /// No description provided for @experienceTitle.
   ///
   /// In fr, this message translates to:

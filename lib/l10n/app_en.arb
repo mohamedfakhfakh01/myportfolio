@@ -97,6 +97,20 @@
   "technologiesLabel": "Technologies (comma-separated)",
   "technologiesHint": "e.g. Flutter, Dart, Firebase",
 
+  "greetingName": "Hello, {name}",
+  "@greetingName": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "profileCompletionTitle": "Profile completion",
+  "profileCompletionSubtitle": "{done} of {total} items filled",
+  "@profileCompletionSubtitle": {
+    "placeholders": {
+      "done": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "quickActions": "Quick actions",
+  "journey": "Journey",
   "experienceTitle": "Experience",
   "educationTitle": "Education",
   "addExperience": "Add an experience",

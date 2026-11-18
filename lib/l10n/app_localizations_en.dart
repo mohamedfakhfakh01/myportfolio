@@ -277,6 +277,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get technologiesHint => 'e.g. Flutter, Dart, Firebase';
 
   @override
+  String greetingName(String name) {
+    return 'Hello, $name';
+  }
+
+  @override
+  String get profileCompletionTitle => 'Profile completion';
+
+  @override
+  String profileCompletionSubtitle(int done, int total) {
+    return '$done of $total items filled';
+  }
+
+  @override
+  String get quickActions => 'Quick actions';
+
+  @override
+  String get journey => 'Journey';
+
+  @override
   String get experienceTitle => 'Experience';
 
   @override

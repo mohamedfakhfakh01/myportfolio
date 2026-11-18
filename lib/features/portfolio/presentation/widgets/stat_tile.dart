@@ -12,11 +12,15 @@ class StatTile extends StatelessWidget {
     required this.label,
     required this.value,
     required this.icon,
+    this.highlighted = false,
   });
 
   final String label;
   final String value;
   final IconData icon;
+
+  /// Mise en avant : fond indigo doux et sans bordure (style du design).
+  final bool highlighted;
 
   @override
   Widget build(BuildContext context) {
@@ -25,9 +29,9 @@ class StatTile extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
       decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.border),
+        color: highlighted ? AppColors.primarySoft : AppColors.surface,
+        borderRadius: BorderRadius.circular(18),
+        border: highlighted ? null : Border.all(color: AppColors.border),
       ),
       child: Column(
         children: [

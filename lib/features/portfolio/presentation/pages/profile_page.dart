@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/widgets/fade_slide_route.dart';
+import '../../domain/profile_completion.dart';
 import '../../services/portfolio_pdf.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/skill.dart';
@@ -14,9 +15,11 @@ import '../../providers/portfolio_provider.dart';
 import '../widgets/contact_section.dart';
 import '../widgets/experience_card.dart';
 import '../widgets/experience_form_dialog.dart';
+import '../widgets/profile_completion_card.dart';
 import '../widgets/project_card.dart';
 import '../widgets/project_form_dialog.dart';
 import 'project_detail_page.dart';
+import '../widgets/quick_actions_row.dart';
 import '../widgets/skill_category_label.dart';
 import '../widgets/skill_level_tile.dart';
 import '../widgets/stat_tile.dart';
@@ -58,6 +61,11 @@ class _ProfilePageState extends State<ProfilePage> {
     final AppLocalizations l = AppLocalizations.of(context);
     // On écoute le provider : l'étudiant est toujours à jour.
     final student = context.watch<PortfolioProvider>().studentById(studentId);
+
+    // Complétion du portfolio, calculée depuis les champs réellement remplis.
+    final ProfileCompletion completion = profileCompletion(student);
+    // Prénom pour la salutation (premier mot du nom complet).
+    final String firstName = student.fullName.trim().split(' ').first;
 
     // Listes triées selon le critère choisi (on copie pour ne pas modifier
     // l'original).
@@ -125,36 +133,38 @@ class _ProfilePageState extends State<ProfilePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // --- En-tête : bandeau dégradé avec avatar + nom + filière ---
-            Container(
-              padding: const EdgeInsets.fromLTRB(20, 24, 20, 28),
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [AppColors.primary, AppColors.violet],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-              ),
-              child: Column(
+            // --- Salutation : avatar + « Bonjour, prénom » + filière ---
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 4, 20, 0),
+              child: Row(
                 children: [
                   // Avatar animé (Hero) : même tag que sur la carte d'accueil.
                   StudentAvatar(
                     heroTag: 'avatar-${student.id}',
                     initials: student.initials,
                     photoPath: student.photoPath,
-                    radius: 44,
+                    radius: 30,
                   ),
-                  const SizedBox(height: 12),
-                  Text(
-                    student.fullName,
-                    textAlign: TextAlign.center,
-                    style: text.headlineSmall?.copyWith(color: Colors.white),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    student.field,
-                    textAlign: TextAlign.center,
-                    style: text.bodyMedium?.copyWith(color: Colors.white70),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l.greetingName(firstName),
+                          style: text.headlineSmall?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          student.field,
+                          style: text.bodyMedium?.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -166,7 +176,11 @@ class _ProfilePageState extends State<ProfilePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // --- Statistiques (compétences, projets) ---
+                  // --- Complétion du portfolio (score calculé, non inventé) ---
+                  ProfileCompletionCard(completion: completion),
+                  const SizedBox(height: 16),
+
+                  // --- Statistiques (compétences, projets, parcours) ---
                   Row(
                     children: [
                       Expanded(
@@ -174,6 +188,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           label: l.skills,
                           value: '${student.skills.length}',
                           icon: Icons.star_outline,
+                          highlighted: true,
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -182,6 +197,57 @@ class _ProfilePageState extends State<ProfilePage> {
                           label: l.projects,
                           value: '${student.projects.length}',
                           icon: Icons.folder_outlined,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: StatTile(
+                          label: l.journey,
+                          value: '${student.experiences.length}',
+                          icon: Icons.timeline_outlined,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+
+                  // --- Actions rapides (raccourcis d'ajout) ---
+                  Text(l.quickActions, style: text.titleMedium),
+                  const SizedBox(height: 12),
+                  QuickActionsRow(
+                    actions: [
+                      QuickAction(
+                        icon: Icons.folder_outlined,
+                        tooltip: l.addProject,
+                        onTap: () => showProjectFormDialog(
+                          context,
+                          studentId: studentId,
+                        ),
+                      ),
+                      QuickAction(
+                        icon: Icons.star_outline,
+                        tooltip: l.addSkill,
+                        onTap: () => showSkillFormDialog(
+                          context,
+                          studentId: studentId,
+                        ),
+                      ),
+                      QuickAction(
+                        icon: Icons.work_outline,
+                        tooltip: l.addExperience,
+                        onTap: () => showExperienceFormDialog(
+                          context,
+                          studentId: studentId,
+                          defaultKind: ExperienceKind.experience,
+                        ),
+                      ),
+                      QuickAction(
+                        icon: Icons.school_outlined,
+                        tooltip: l.addEducation,
+                        onTap: () => showExperienceFormDialog(
+                          context,
+                          studentId: studentId,
+                          defaultKind: ExperienceKind.education,
                         ),
                       ),
                     ],
