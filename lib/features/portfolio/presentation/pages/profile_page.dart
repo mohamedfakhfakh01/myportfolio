@@ -21,7 +21,7 @@ import '../widgets/project_form_dialog.dart';
 import 'project_detail_page.dart';
 import '../widgets/quick_actions_row.dart';
 import '../widgets/skill_category_label.dart';
-import '../widgets/skill_level_tile.dart';
+import '../widgets/skill_dot_chip.dart';
 import '../widgets/stat_tile.dart';
 import '../widgets/skill_form_dialog.dart';
 import '../widgets/student_avatar.dart';
@@ -332,16 +332,23 @@ class _ProfilePageState extends State<ProfilePage> {
                             ),
                           ),
                         ),
-                        for (final skill
-                            in skills.where((s) => s.category == category))
-                          SkillLevelTile(
-                            skill: skill,
-                            onTap: () => showSkillFormDialog(
-                              context,
-                              studentId: studentId,
-                              skill: skill,
-                            ),
-                          ),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            for (final skill in skills
+                                .where((s) => s.category == category))
+                              SkillDotChip(
+                                skill: skill,
+                                color: skillCategoryColor(category),
+                                onTap: () => showSkillFormDialog(
+                                  context,
+                                  studentId: studentId,
+                                  skill: skill,
+                                ),
+                              ),
+                          ],
+                        ),
                       ],
                   ],
                   const SizedBox(height: 24),
