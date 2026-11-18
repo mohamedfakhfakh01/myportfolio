@@ -883,4 +883,73 @@ de CV et photo (conservée après fermeture/réouverture) testés sur iPhone.
 
 ---
 
-*Dernière mise à jour : finitions — thème sombre bleu, animations, bouton Ajouter un CV, photo de profil. Projet complet et testé sur iPhone.*
+### Refonte du design et fonctionnalités avancées (18 novembre 2026)
+
+**Objectif** : reprendre deux maquettes externes, enrichir le portfolio, et sécuriser les données.
+
+#### Concepts nouveaux à retenir
+
+**1. SQLite ne connaît pas les listes → sérialiser en JSON**
+Pour stocker les *technologies* d'un projet (`['Flutter', 'Dart']`), SQLite n'offre aucun type
+tableau. La solution : une colonne `TEXT` contenant du **JSON** (`jsonEncode` / `jsonDecode`).
+Le décodage est **tolérant** : colonne absente, `null` ou JSON invalide → liste vide plutôt qu'un
+plantage. *Fichier : `shared/models/project.dart` — migration **v7**.*
+
+**2. Tester les migrations, pas seulement le code**
+Une migration ratée = **perte de données chez l'utilisateur** au moment de la mise à jour. C'est le
+risque le plus coûteux d'une app qui stocke en local. On le teste avec `sqflite_common_ffi`, qui
+exécute un vrai SQLite sur la machine de test : on crée une base « ancienne » (v6), on insère une
+ligne, on rouvre en v7, et on vérifie que la colonne est ajoutée **et** que la ligne est intacte.
+Pour cela, les callbacks de schéma d'`AppDatabase` sont devenus **statiques et publics**.
+*Fichier : `test/db_migration_test.dart`.*
+
+**3. Une logique métier = une fonction pure, donc testable**
+Le score de complétion du profil n'est pas calculé dans le widget : c'est une **fonction pure**
+(`profileCompletion(Student)`) placée dans un dossier `domain/`, qui renvoie la liste des critères
+manquants (un `enum ProfileCriterion`). Avantages : testable sans interface, réutilisable par la
+carte *et* par la feuille de détail, et le score reste **justifiable** (11 champs réellement
+remplis, aucune valeur inventée). *Fichiers : `features/portfolio/domain/`.*
+
+**4. Un composant partagé plutôt que du copier-coller**
+Trois formulaires avaient la même mise en page. Plutôt que de la répéter, elle vit dans
+`showFormSheet` / `FormSheetBody` : changer l'apparence se fait **en un seul endroit**. Même
+principe pour `PillTag` (les étiquettes en pilule). C'est le principe « une seule source de
+vérité » appliqué à l'interface. *Fichiers : `shared/widgets/`.*
+
+**5. Feuille (bottom sheet) et clavier**
+Une feuille qui contient un formulaire doit **remonter au-dessus du clavier**, sinon les champs
+sont cachés. On y parvient avec `isScrollControlled: true` et une marge basse égale à
+`MediaQuery.viewInsetsOf(context).bottom`. On garde en revanche les **confirmations de suppression
+en boîte de dialogue** : une feuille se referme d'un glissement, trop risqué pour une action
+destructive.
+
+**6. Importer, c'est restaurer — pas empiler**
+À l'import d'une sauvegarde, un portfolio du **même nom est remplacé**, jamais ajouté en double.
+Pourquoi remplacer et non ignorer ? Parce qu'après une réinstallation l'app recrée les portfolios
+d'exemple : les ignorer empêcherait de récupérer ses vraies données. Le dédoublonnage fonctionne
+aussi quand le doublon est **à l'intérieur du fichier**. *Fichier : `providers/portfolio_provider.dart`.*
+
+**7. Deux pièges Flutter rencontrés**
+- `LinearProgressIndicator` ne sait afficher qu'une **couleur unie** : pour une barre en dégradé,
+  il faut construire le widget à la main (une piste + un rectangle rempli d'un `LinearGradient`).
+- Le paquet `material_ui` définit **son propre type `TextTheme`**, incompatible avec celui de
+  Flutter : les helpers `GoogleFonts.*TextTheme()` ne compilent pas. Contournement : récupérer
+  seulement le **nom de la police** (`GoogleFonts.inter().fontFamily`, une `String`).
+
+#### Réalisé
+- **Design** repris de deux maquettes : typographie **Plus Jakarta Sans + Inter**, palette
+  **indigo/violet**, thème **clair par défaut**, barre de navigation **flottante**, cartes projets
+  enrichies, étiquettes en pilule.
+- **Tableau de bord** du profil : salutation, carte de complétion avec anneau (et détail des
+  critères manquants au toucher), tuiles de statistiques, actions rapides.
+- **Technologies par projet** (migration v7) + **écran détail** et **filtre par technologie**.
+- **Sauvegarde JSON** : export (partage iOS) et import avec dédoublonnage.
+- **Formulaires en feuilles** remontantes, via un composant partagé.
+
+#### Vérifié
+`flutter analyze` → 0 erreur · `flutter test` → **64 tests** (contre 15 à l'étape 10) ·
+export/import testés de bout en bout sur simulateur · rendu contrôlé en thème clair **et** sombre.
+
+---
+
+*Dernière mise à jour (18 novembre 2026) : refonte du design (indigo/violet, tableau de bord, nav flottante), technologies par projet, écran détail, sauvegarde JSON export/import, formulaires en feuilles. 64 tests, analyse sans erreur.*

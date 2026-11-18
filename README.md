@@ -3,33 +3,55 @@
 [![CI](https://github.com/mohamedfakhfakh01/myportfolio/actions/workflows/ci.yml/badge.svg)](https://github.com/mohamedfakhfakh01/myportfolio/actions/workflows/ci.yml)
 
 Application mobile **Flutter** de portfolio étudiant, réalisée dans le cadre du module
-*Développement Mobile*. Elle présente les portfolios de **deux étudiants** (binôme) — informations,
-compétences et projets — avec **persistance locale** et intégration de l'**API GitHub**.
+*Développement Mobile*. Elle permet de créer et consulter plusieurs portfolios — profil,
+compétences, projets, parcours et contact — avec **persistance locale**, **sauvegarde des
+données**, **export PDF** et intégration de l'**API GitHub**.
 
 > 📘 Pour l'explication détaillée du code et la préparation à l'oral, voir **[`apprentissage.md`](apprentissage.md)**.
 
 ## Fonctionnalités
 
-- Consulter les **deux portfolios** étudiants.
-- Afficher les **informations**, **compétences** et **projets** de chaque étudiant.
-- **Ajouter / modifier / supprimer** compétences et projets, et **éditer le profil** (CRUD complet).
-- **Conserver les données** après fermeture de l'app (base locale SQLite).
-- Afficher les **dépôts GitHub** publics d'un étudiant (API REST externe).
-- Navigation fluide entre l'accueil et le profil.
+**Consultation**
+- Liste des portfolios avec **recherche** par nom ou filière.
+- **Tableau de bord** du profil : salutation, **complétion du profil** (score calculé sur
+  11 critères réellement remplis, avec le détail de ce qui manque), compteurs et actions rapides.
+- **Compétences** groupées par catégorie, avec barre de niveau en dégradé.
+- **Projets** : image, description, **technologies**, lien cliquable, **écran détail** dédié et
+  **filtre par technologie**.
+- **Parcours** : expériences et formations.
+- **Contact** cliquable (e-mail, téléphone, LinkedIn, localisation).
+- **Dépôts GitHub** publics de l'étudiant (API REST externe).
+
+**Édition**
+- **Créer, modifier, supprimer** un portfolio, ses compétences, projets et entrées de parcours.
+- **Photo de profil** et **capture d'écran** par projet (galerie ou appareil photo).
+
+**Sortie et sauvegarde**
+- **Export PDF** du portfolio (partage iOS).
+- **Export / import JSON** de toutes les données : un import est une *restauration*, un portfolio
+  du même nom est **remplacé** et jamais dupliqué.
+
+**Confort**
+- Thème **clair** (par défaut) ou **sombre**, mémorisé entre les lancements.
+- Interface en **français** et en **anglais**.
 
 ## Stack technique
 
-- **Flutter** 3.47.4 · **Dart** 3.13.3 (canal stable)
+- **Flutter** 3.47.4 · **Dart** 3.13.3 (canal stable) · Material 3
 - `provider` — gestion de l'état
-- `sqflite` + `path` — base de données locale SQLite
+- `sqflite` + `path` — base de données locale SQLite (schéma versionné, **v7**)
 - `http` — appels à l'API REST GitHub
-- `google_fonts` — typographie (Poppins)
+- `google_fonts` — typographie (**Plus Jakarta Sans** pour les titres, **Inter** pour le corps)
+- `pdf` + `printing` — génération et partage du PDF
+- `share_plus` + `file_picker` — export et import de la sauvegarde
+- `image_picker` + `path_provider` — photos et stockage local
+- `url_launcher` — ouverture des liens (mailto, tel, web)
 
 ## Prérequis
 
 - **Flutter SDK** installé (`flutter --version`).
-- **Pour iOS** : Xcode, **CocoaPods** (`brew install cocoapods` ou `sudo gem install cocoapods`), et
-  soit un **simulateur iOS**, soit un **iPhone** en *Mode développeur* (signature configurée dans Xcode).
+- **Pour iOS** : Xcode, **CocoaPods** (`brew install cocoapods`), et soit un **simulateur iOS**,
+  soit un **iPhone** en *Mode développeur* (signature configurée dans Xcode).
 - **Pour Android** : Android Studio et un **émulateur** (AVD).
 
 > ⚠️ Le chemin du projet ne doit **pas contenir d'espaces** (Flutter échoue sinon sur les builds natifs).
@@ -37,9 +59,13 @@ compétences et projets — avec **persistance locale** et intégration de l'**A
 > 💡 Sur la machine de développement, Flutter n'est pas dans le `PATH` : utiliser
 > `~/flutter/bin/flutter` à la place de `flutter`.
 
-## Installation
+> ⚠️ **macOS avec Ruby 4.0** : exporter une locale UTF-8 avant tout build iOS, sinon `pod install`
+> échoue (`Unicode Normalization not appropriate for ASCII-8BIT`) :
+> ```bash
+> export LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
+> ```
 
-Récupérer les dépendances :
+## Installation
 
 ```bash
 flutter pub get
@@ -47,21 +73,9 @@ flutter pub get
 
 ## Lancer l'application
 
-Lister les appareils disponibles :
-
 ```bash
-flutter devices
-```
-
-Lancer sur l'appareil par défaut :
-
-```bash
-flutter run
-```
-
-Ou cibler un appareil précis :
-
-```bash
+flutter devices          # lister les appareils
+flutter run              # appareil par défaut
 flutter run -d <device-id>
 ```
 
@@ -75,40 +89,56 @@ Dans un profil, appuyer sur **✏️**, renseigner un **pseudo GitHub** public, 
 section *Dépôts GitHub* charge les dépôts publics.
 *(Connexion internet requise ; l'API publique est limitée à 60 requêtes/heure sans authentification.)*
 
+## Sauvegarder ses données
+
+*Réglages ▸ Sauvegarde* :
+- **Exporter mes données** écrit un fichier JSON daté et ouvre le partage iOS (Fichiers, mail, AirDrop).
+- **Importer une sauvegarde** relit un `.json` ; un portfolio du même nom est remplacé.
+
+> Les **photos ne sont pas incluses** dans le fichier : elles sont référencées par leur chemin local
+> et ne suivent donc pas la sauvegarde sur un autre appareil.
+
 ## Vérifications et tests
 
-Analyse statique (0 erreur attendu) :
-
 ```bash
-flutter analyze
+flutter analyze          # 0 erreur attendu
+flutter test             # 64 tests
+flutter test --coverage  # génère coverage/lcov.info
 ```
 
-Tests :
-
-```bash
-flutter test
-```
-
-> Note : le test de widget vérifie que l'application démarre. Il ne touche pas la vraie base de
-> données (sqflite nécessite un appareil ou un simulateur).
+Ce qui est couvert : modèles et sérialisation, calcul de complétion, sauvegarde JSON, CRUD du
+provider, service GitHub (délai dépassé / hors-ligne), quelques widgets, et surtout les
+**migrations de la base** (via `sqflite_common_ffi`, pour garantir qu'une mise à jour ne perde
+aucune donnée).
 
 ## Structure du projet (résumé)
 
 ```
 lib/
-├── main.dart              # Point d'entrée
-├── app/                   # Widget racine + thème (couleurs, typographie)
-├── core/database/         # Ouverture de la base SQLite + tables
-├── shared/models/         # Modèles : Student, Skill, Project
+├── main.dart                  # Point d'entrée
+├── app/                       # Racine, thème, navigation, À propos, Réglages
+├── core/                      # Base SQLite (schéma + migrations), transitions
+├── shared/
+│   ├── models/                # Student, Skill, Project, ExperienceEntry
+│   └── widgets/               # Composants réutilisables (pilules, feuilles)
 └── features/
-    ├── portfolio/         # Accueil, profil, état (Provider) et CRUD
-    └── github/            # Intégration de l'API GitHub
+    ├── portfolio/
+    │   ├── data/              # Repository + données d'exemple
+    │   ├── domain/            # Complétion du profil, sauvegarde JSON
+    │   ├── providers/         # État (Provider)
+    │   ├── presentation/      # Écrans et widgets
+    │   └── services/          # Génération du PDF
+    └── github/                # Intégration de l'API GitHub
 ```
 
 ## Limites connues / améliorations possibles
 
-- Pas d'authentification (version 1).
-- Les niveaux de compétence sont optionnels (non fournis pour tous les profils).
-- L'affichage des dépôts GitHub nécessite une connexion internet ; avec un compte Apple gratuit, le
-  profil de développement iOS expire après ~7 jours (relancer depuis Xcode pour le renouveler).
-- Les informations de l'étudiant 1 peuvent être complétées directement dans l'application (CRUD).
+- Pas d'authentification ni de synchronisation en ligne : les données vivent sur l'appareil
+  (d'où l'export/import JSON).
+- Les **photos** ne sont pas incluses dans la sauvegarde JSON.
+- La version **Android n'a jamais été compilée** : seul iOS est testé.
+- Couverture de tests ≈ 21 % : le cœur logique est couvert, les écrans le sont peu.
+- Avec un compte Apple gratuit, le profil de développement iOS expire après ~7 jours
+  (relancer depuis Xcode pour le renouveler).
+- Flutter signale que les plugins sont disponibles en **Swift Packages** : migrer depuis CocoaPods
+  accélérerait les builds et supprimerait le piège de la locale UTF-8.
