@@ -79,6 +79,13 @@ flutter run              # appareil par défaut
 flutter run -d <device-id>
 ```
 
+Construire l'APK Android :
+
+```bash
+flutter build apk --release                 # APK unique (~60 Mo, toutes architectures)
+flutter build apk --release --split-per-abi # un APK plus léger par architecture
+```
+
 **Sur iPhone physique** : ouvrir `ios/Runner.xcworkspace` dans Xcode, onglet *Signing & Capabilities*,
 choisir une *Team* (Apple ID), lancer une première fois depuis Xcode pour créer le certificat, puis
 *faire confiance* au certificat sur l'iPhone (Réglages ▸ Général ▸ VPN et gestion de l'appareil).
@@ -136,7 +143,8 @@ lib/
 - Pas d'authentification ni de synchronisation en ligne : les données vivent sur l'appareil
   (d'où l'export/import JSON).
 - Les **photos** ne sont pas incluses dans la sauvegarde JSON.
-- La version **Android n'a jamais été compilée** : seul iOS est testé.
+- **Android** : l'APK release compile, mais n'a pas encore été testé sur un appareil ou un
+  émulateur. Il est signé avec la **clé de debug** (installable, mais refusé par le Play Store).
 - Couverture de tests ≈ 21 % : le cœur logique est couvert, les écrans le sont peu.
 - Avec un compte Apple gratuit, le profil de développement iOS expire après ~7 jours
   (relancer depuis Xcode pour le renouveler).

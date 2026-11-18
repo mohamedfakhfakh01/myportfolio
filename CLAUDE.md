@@ -14,7 +14,8 @@ parcours) et de le montrer à un recruteur, hors ligne, depuis son téléphone.
 **Périmètre réel :** plusieurs portfolios, CRUD complet, tableau de bord avec score de complétion,
 export PDF, sauvegarde JSON, dépôts GitHub, thèmes clair/sombre, FR/EN.
 **Stack :** Flutter 3.47 / Dart 3.13 · Material 3 · Provider · sqflite · API GitHub.
-**Cible testée :** **iOS uniquement** (simulateur + iPhone physique). Android jamais compilé.
+**Cible testée :** **iOS** (simulateur + iPhone physique). Android : **compile** (APK release),
+mais jamais lancé sur appareil ni émulateur.
 
 ---
 
@@ -53,6 +54,7 @@ flutter test                                # 64 tests
 flutter gen-l10n                            # APRÈS toute modif des .arb
 flutter run -d 87E626E0-E743-44A6-8A48-AA716FD7851B --debug   # simulateur iPhone 18 Pro Max
 flutter build ios --release                 # puis: flutter install -d <udid> --release
+flutter build apk --release                 # APK Android (signé clé debug)
 ```
 
 **Appareils :** simulateur `87E626E0-E743-44A6-8A48-AA716FD7851B` ·
@@ -80,7 +82,10 @@ iPhone physique « iPhone de fakh » `00008120-000664510C70201E`.
 8. **Toute modif des `.arb` exige `flutter gen-l10n`**, sinon le getter n'existe pas.
 9. **Changement de schéma = incrémenter `AppDatabase.latestVersion` + ajouter un bloc `onUpgrade`**,
    sinon les bases existantes ne migrent pas.
-10. **Ne pas lancer `dart format` sur tout un fichier** pour corriger une indentation locale : le
+10. **Premier build Android très long et fragile** : la 1re tentative a échoué après **46 min**
+    sur un téléchargement Gradle ; la relance automatique a réussi en ~2 min (cache rempli).
+    En cas d'échec réseau, relancer avant de chercher plus loin.
+11. **Ne pas lancer `dart format` sur tout un fichier** pour corriger une indentation locale : le
     projet n'est pas formaté partout, le diff devient illisible.
 
 ---
@@ -155,7 +160,8 @@ validation côté serveur ne s'appliquent pas ici.
 - ✅ Données persistées localement, migrations testées (aucune perte à la mise à jour).
 - ✅ Sauvegarde/restauration utilisateur (export JSON).
 - ⚠️ **Photos non incluses** dans la sauvegarde (chemins locaux uniquement).
-- ⚠️ **Android jamais compilé.**
+- ⚠️ **Android compilé mais jamais exécuté** ; APK signé avec la **clé de debug**
+  (`android/app/build.gradle.kts`), donc non publiable sur le Play Store.
 - ⚠️ Couverture de tests ≈ 21 % : cœur logique couvert, écrans peu testés.
 - ⚠️ CocoaPods au lieu de Swift Package Manager (builds plus lents, piège de la locale).
 
@@ -183,7 +189,8 @@ Aucune : l'application ne contacte que l'API GitHub publique, sans clé.
 
 ## 11. À faire
 
-- [ ] Compiler et tester la version **Android**.
+- [ ] **Lancer l'APK Android** sur un émulateur ou un appareil (aucun AVD sur cette machine).
+- [ ] Configurer une **signature release** Android avant toute publication.
 - [ ] Empêcher la création manuelle d'un portfolio portant un nom déjà existant.
 - [ ] Monter la couverture de tests sur les écrans (profil, accueil) et l'export PDF.
 - [ ] Migrer CocoaPods → Swift Package Manager.
