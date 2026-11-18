@@ -14,6 +14,7 @@ import '../../../../shared/models/experience.dart';
 import '../../../../shared/models/project.dart';
 import '../../../../shared/models/skill.dart';
 import '../../../../shared/models/student.dart';
+import '../../../../shared/widgets/form_sheet.dart';
 import '../../providers/portfolio_provider.dart';
 import 'skill_category_label.dart';
 
@@ -149,8 +150,8 @@ class _StudentFormPageState extends State<StudentFormPage> {
   /// Ouvre un petit formulaire pour saisir un projet et l'ajoute à la liste
   /// locale (il sera enregistré en base au moment de créer le portfolio).
   Future<void> _addProject() async {
-    final Project? project = await showDialog<Project>(
-      context: context,
+    final Project? project = await showFormSheet<Project>(
+      context,
       builder: (_) => const _ProjectInputDialog(),
     );
     if (project != null) setState(() => _projects.add(project));
@@ -159,8 +160,8 @@ class _StudentFormPageState extends State<StudentFormPage> {
   /// Ouvre un petit formulaire pour saisir une compétence et l'ajoute à la
   /// liste locale (enregistrée en base au moment de créer le portfolio).
   Future<void> _addSkill() async {
-    final Skill? skill = await showDialog<Skill>(
-      context: context,
+    final Skill? skill = await showFormSheet<Skill>(
+      context,
       builder: (_) => const _SkillInputDialog(),
     );
     if (skill != null) setState(() => _skills.add(skill));
@@ -169,8 +170,8 @@ class _StudentFormPageState extends State<StudentFormPage> {
   /// Ouvre un formulaire pour saisir une entrée de parcours (du type donné) et
   /// l'ajoute à la liste locale.
   Future<void> _addExperienceEntry(ExperienceKind kind) async {
-    final ExperienceEntry? entry = await showDialog<ExperienceEntry>(
-      context: context,
+    final ExperienceEntry? entry = await showFormSheet<ExperienceEntry>(
+      context,
       builder: (_) => _ExperienceInputDialog(kind: kind),
     );
     if (entry != null) setState(() => _experiences.add(entry));
@@ -564,49 +565,47 @@ class _ProjectInputDialogState extends State<_ProjectInputDialog> {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l = AppLocalizations.of(context);
-    return AlertDialog(
-      title: Text(l.projectAddTitle),
+    return FormSheetBody(
+      title: l.projectAddTitle,
       content: Form(
         key: _formKey,
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextFormField(
-                controller: _titleController,
-                textCapitalization: TextCapitalization.sentences,
-                decoration: InputDecoration(labelText: l.titleLabel),
-                validator: (v) => (v == null || v.trim().isEmpty)
-                    ? l.titleRequired
-                    : null,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextFormField(
+              controller: _titleController,
+              textCapitalization: TextCapitalization.sentences,
+              decoration: InputDecoration(labelText: l.titleLabel),
+              validator: (v) => (v == null || v.trim().isEmpty)
+                  ? l.titleRequired
+                  : null,
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: _descriptionController,
+              textCapitalization: TextCapitalization.sentences,
+              maxLines: 3,
+              decoration: InputDecoration(labelText: l.descriptionLabel),
+              validator: (v) => (v == null || v.trim().isEmpty)
+                  ? l.descriptionRequired
+                  : null,
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: _linkController,
+              keyboardType: TextInputType.url,
+              decoration: InputDecoration(labelText: l.linkLabel),
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: _tagsController,
+              textCapitalization: TextCapitalization.words,
+              decoration: InputDecoration(
+                labelText: l.technologiesLabel,
+                hintText: l.technologiesHint,
               ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _descriptionController,
-                textCapitalization: TextCapitalization.sentences,
-                maxLines: 3,
-                decoration: InputDecoration(labelText: l.descriptionLabel),
-                validator: (v) => (v == null || v.trim().isEmpty)
-                    ? l.descriptionRequired
-                    : null,
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _linkController,
-                keyboardType: TextInputType.url,
-                decoration: InputDecoration(labelText: l.linkLabel),
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _tagsController,
-                textCapitalization: TextCapitalization.words,
-                decoration: InputDecoration(
-                  labelText: l.technologiesLabel,
-                  hintText: l.technologiesHint,
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
       actions: [
@@ -660,55 +659,53 @@ class _SkillInputDialogState extends State<_SkillInputDialog> {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l = AppLocalizations.of(context);
-    return AlertDialog(
-      title: Text(l.skillAddTitle),
+    return FormSheetBody(
+      title: l.skillAddTitle,
       content: Form(
         key: _formKey,
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextFormField(
-                controller: _nameController,
-                textCapitalization: TextCapitalization.words,
-                decoration: InputDecoration(
-                  labelText: l.nameLabel,
-                  hintText: l.skillNameHint,
-                ),
-                validator: (v) =>
-                    (v == null || v.trim().isEmpty) ? l.nameRequired : null,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextFormField(
+              controller: _nameController,
+              textCapitalization: TextCapitalization.words,
+              decoration: InputDecoration(
+                labelText: l.nameLabel,
+                hintText: l.skillNameHint,
               ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _levelController,
-                keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                decoration: InputDecoration(labelText: l.levelLabel),
-                validator: (v) {
-                  if (v == null || v.trim().isEmpty) return null;
-                  final int? n = int.tryParse(v.trim());
-                  if (n == null) return l.enterNumber;
-                  if (n < 0 || n > 100) return l.between0and100;
-                  return null;
-                },
-              ),
-              const SizedBox(height: 12),
-              DropdownButtonFormField<SkillCategory>(
-                initialValue: _category,
-                decoration: InputDecoration(labelText: l.categoryLabel),
-                items: [
-                  for (final c in SkillCategory.values)
-                    DropdownMenuItem(
-                      value: c,
-                      child: Text(skillCategoryLabel(l, c)),
-                    ),
-                ],
-                onChanged: (value) {
-                  if (value != null) setState(() => _category = value);
-                },
-              ),
-            ],
-          ),
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? l.nameRequired : null,
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: _levelController,
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              decoration: InputDecoration(labelText: l.levelLabel),
+              validator: (v) {
+                if (v == null || v.trim().isEmpty) return null;
+                final int? n = int.tryParse(v.trim());
+                if (n == null) return l.enterNumber;
+                if (n < 0 || n > 100) return l.between0and100;
+                return null;
+              },
+            ),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<SkillCategory>(
+              initialValue: _category,
+              decoration: InputDecoration(labelText: l.categoryLabel),
+              items: [
+                for (final c in SkillCategory.values)
+                  DropdownMenuItem(
+                    value: c,
+                    child: Text(skillCategoryLabel(l, c)),
+                  ),
+              ],
+              onChanged: (value) {
+                if (value != null) setState(() => _category = value);
+              },
+            ),
+          ],
         ),
       ),
       actions: [
@@ -771,44 +768,42 @@ class _ExperienceInputDialogState extends State<_ExperienceInputDialog> {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l = AppLocalizations.of(context);
-    return AlertDialog(
-      title: Text(l.entryAddTitle),
+    return FormSheetBody(
+      title: l.entryAddTitle,
       content: Form(
         key: _formKey,
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextFormField(
-                controller: _titleController,
-                textCapitalization: TextCapitalization.sentences,
-                decoration: InputDecoration(labelText: l.titleLabel),
-                validator: (v) =>
-                    (v == null || v.trim().isEmpty) ? l.titleRequired : null,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextFormField(
+              controller: _titleController,
+              textCapitalization: TextCapitalization.sentences,
+              decoration: InputDecoration(labelText: l.titleLabel),
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? l.titleRequired : null,
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: _orgController,
+              textCapitalization: TextCapitalization.words,
+              decoration: InputDecoration(labelText: l.organizationLabel),
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: _periodController,
+              decoration: InputDecoration(
+                labelText: l.periodLabel,
+                hintText: l.periodHint,
               ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _orgController,
-                textCapitalization: TextCapitalization.words,
-                decoration: InputDecoration(labelText: l.organizationLabel),
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _periodController,
-                decoration: InputDecoration(
-                  labelText: l.periodLabel,
-                  hintText: l.periodHint,
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _descController,
-                textCapitalization: TextCapitalization.sentences,
-                maxLines: 3,
-                decoration: InputDecoration(labelText: l.entryDescLabel),
-              ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: _descController,
+              textCapitalization: TextCapitalization.sentences,
+              maxLines: 3,
+              decoration: InputDecoration(labelText: l.entryDescLabel),
+            ),
+          ],
         ),
       ),
       actions: [
