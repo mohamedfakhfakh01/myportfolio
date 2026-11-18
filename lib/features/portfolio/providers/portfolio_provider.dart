@@ -135,6 +135,26 @@ class PortfolioProvider extends ChangeNotifier {
     Student student, {
     List<Project> projects = const [],
   }) async {
+    await _insertStudentWithContent(student, projects: projects);
+    await _reloadStudents();
+  }
+
+  /// Importe des portfolios issus d'une sauvegarde. Ils **s'ajoutent** aux
+  /// portfolios existants : rien n'est écrasé. Renvoie le nombre importé.
+  Future<int> importStudents(List<Student> students) async {
+    for (final student in students) {
+      await _insertStudentWithContent(student, projects: student.projects);
+    }
+    await _reloadStudents();
+    return students.length;
+  }
+
+  /// Insère un étudiant puis tout son contenu. Utilisé par la création d'un
+  /// portfolio et par l'import (une seule source de vérité).
+  Future<void> _insertStudentWithContent(
+    Student student, {
+    required List<Project> projects,
+  }) async {
     // On insère d'abord l'étudiant pour obtenir son id, puis ses compétences,
     // son parcours et ses projets.
     final int studentId = await _repository.insertStudent(student);
@@ -147,7 +167,6 @@ class PortfolioProvider extends ChangeNotifier {
     for (final project in projects) {
       await _repository.insertProject(project, studentId);
     }
-    await _reloadStudents();
   }
 
   /// Supprime un portfolio (étudiant) et rafraîchit la liste.

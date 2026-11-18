@@ -330,6 +330,37 @@ class AppLocalizationsEn extends AppLocalizations {
   String get criterionEducation => 'At least one education entry';
 
   @override
+  String get backupSection => 'Backup';
+
+  @override
+  String get exportData => 'Export my data';
+
+  @override
+  String get exportDataSubtitle =>
+      'A JSON file to keep (photos are not included)';
+
+  @override
+  String get importData => 'Import a backup';
+
+  @override
+  String get importDataSubtitle =>
+      'Portfolios from the file are added to yours';
+
+  @override
+  String get exportError => 'Could not export the data.';
+
+  @override
+  String get importInvalid => 'Invalid backup file.';
+
+  @override
+  String get importError => 'Could not import the file.';
+
+  @override
+  String importSuccess(int count) {
+    return 'Imported: $count portfolio(s).';
+  }
+
+  @override
   String get quickActions => 'Quick actions';
 
   @override

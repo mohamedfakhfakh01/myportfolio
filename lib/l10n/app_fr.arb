@@ -142,6 +142,18 @@
   "criterionProjects": "Au moins un projet",
   "criterionExperience": "Au moins une expérience",
   "criterionEducation": "Au moins une formation",
+  "backupSection": "Sauvegarde",
+  "exportData": "Exporter mes données",
+  "exportDataSubtitle": "Un fichier JSON à conserver (les photos ne sont pas incluses)",
+  "importData": "Importer une sauvegarde",
+  "importDataSubtitle": "Les portfolios du fichier s'ajoutent aux tiens",
+  "exportError": "Impossible d'exporter les données.",
+  "importInvalid": "Fichier de sauvegarde invalide.",
+  "importError": "Impossible d'importer le fichier.",
+  "importSuccess": "Import réussi : {count} portfolio(s).",
+  "@importSuccess": {
+    "placeholders": { "count": { "type": "int" } }
+  },
   "quickActions": "Actions rapides",
   "journey": "Parcours",
   "experienceTitle": "Expérience",

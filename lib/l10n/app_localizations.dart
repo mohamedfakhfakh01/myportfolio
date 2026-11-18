@@ -704,6 +704,60 @@ abstract class AppLocalizations {
   /// **'Au moins une formation'**
   String get criterionEducation;
 
+  /// No description provided for @backupSection.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sauvegarde'**
+  String get backupSection;
+
+  /// No description provided for @exportData.
+  ///
+  /// In fr, this message translates to:
+  /// **'Exporter mes données'**
+  String get exportData;
+
+  /// No description provided for @exportDataSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Un fichier JSON à conserver (les photos ne sont pas incluses)'**
+  String get exportDataSubtitle;
+
+  /// No description provided for @importData.
+  ///
+  /// In fr, this message translates to:
+  /// **'Importer une sauvegarde'**
+  String get importData;
+
+  /// No description provided for @importDataSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Les portfolios du fichier s\'ajoutent aux tiens'**
+  String get importDataSubtitle;
+
+  /// No description provided for @exportError.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible d\'exporter les données.'**
+  String get exportError;
+
+  /// No description provided for @importInvalid.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fichier de sauvegarde invalide.'**
+  String get importInvalid;
+
+  /// No description provided for @importError.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible d\'importer le fichier.'**
+  String get importError;
+
+  /// No description provided for @importSuccess.
+  ///
+  /// In fr, this message translates to:
+  /// **'Import réussi : {count} portfolio(s).'**
+  String importSuccess(int count);
+
   /// No description provided for @quickActions.
   ///
   /// In fr, this message translates to:
