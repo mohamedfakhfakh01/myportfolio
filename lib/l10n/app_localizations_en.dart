@@ -290,6 +290,46 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get completionMissingTitle => 'To reach 100%';
+
+  @override
+  String get completionAllDone =>
+      'Everything is filled in: the profile is complete.';
+
+  @override
+  String get criterionPhoto => 'Profile photo';
+
+  @override
+  String get criterionBio => 'Bio';
+
+  @override
+  String get criterionEmail => 'Email address';
+
+  @override
+  String get criterionPhone => 'Phone number';
+
+  @override
+  String get criterionLinkedin => 'LinkedIn profile';
+
+  @override
+  String get criterionLocation => 'Location';
+
+  @override
+  String get criterionGithub => 'GitHub username';
+
+  @override
+  String get criterionSkills => 'At least one skill';
+
+  @override
+  String get criterionProjects => 'At least one project';
+
+  @override
+  String get criterionExperience => 'At least one experience';
+
+  @override
+  String get criterionEducation => 'At least one education entry';
+
+  @override
   String get quickActions => 'Quick actions';
 
   @override

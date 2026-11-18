@@ -626,6 +626,84 @@ abstract class AppLocalizations {
   /// **'{done} éléments sur {total} renseignés'**
   String profileCompletionSubtitle(int done, int total);
 
+  /// No description provided for @completionMissingTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'À compléter pour atteindre 100 %'**
+  String get completionMissingTitle;
+
+  /// No description provided for @completionAllDone.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tout est renseigné : le profil est complet.'**
+  String get completionAllDone;
+
+  /// No description provided for @criterionPhoto.
+  ///
+  /// In fr, this message translates to:
+  /// **'Photo de profil'**
+  String get criterionPhoto;
+
+  /// No description provided for @criterionBio.
+  ///
+  /// In fr, this message translates to:
+  /// **'Biographie'**
+  String get criterionBio;
+
+  /// No description provided for @criterionEmail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Adresse e-mail'**
+  String get criterionEmail;
+
+  /// No description provided for @criterionPhone.
+  ///
+  /// In fr, this message translates to:
+  /// **'Numéro de téléphone'**
+  String get criterionPhone;
+
+  /// No description provided for @criterionLinkedin.
+  ///
+  /// In fr, this message translates to:
+  /// **'Profil LinkedIn'**
+  String get criterionLinkedin;
+
+  /// No description provided for @criterionLocation.
+  ///
+  /// In fr, this message translates to:
+  /// **'Localisation'**
+  String get criterionLocation;
+
+  /// No description provided for @criterionGithub.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pseudo GitHub'**
+  String get criterionGithub;
+
+  /// No description provided for @criterionSkills.
+  ///
+  /// In fr, this message translates to:
+  /// **'Au moins une compétence'**
+  String get criterionSkills;
+
+  /// No description provided for @criterionProjects.
+  ///
+  /// In fr, this message translates to:
+  /// **'Au moins un projet'**
+  String get criterionProjects;
+
+  /// No description provided for @criterionExperience.
+  ///
+  /// In fr, this message translates to:
+  /// **'Au moins une expérience'**
+  String get criterionExperience;
+
+  /// No description provided for @criterionEducation.
+  ///
+  /// In fr, this message translates to:
+  /// **'Au moins une formation'**
+  String get criterionEducation;
+
   /// No description provided for @quickActions.
   ///
   /// In fr, this message translates to:

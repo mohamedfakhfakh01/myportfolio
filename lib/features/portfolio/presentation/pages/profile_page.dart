@@ -16,6 +16,7 @@ import '../widgets/contact_section.dart';
 import '../widgets/experience_card.dart';
 import '../widgets/experience_form_dialog.dart';
 import '../widgets/profile_completion_card.dart';
+import '../widgets/profile_completion_sheet.dart';
 import '../widgets/project_card.dart';
 import '../widgets/project_form_dialog.dart';
 import 'project_detail_page.dart';
@@ -177,7 +178,11 @@ class _ProfilePageState extends State<ProfilePage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // --- Complétion du portfolio (score calculé, non inventé) ---
-                  ProfileCompletionCard(completion: completion),
+                  ProfileCompletionCard(
+                    completion: completion,
+                    onTap: () =>
+                        showProfileCompletionSheet(context, completion),
+                  ),
                   const SizedBox(height: 16),
 
                   // --- Statistiques (compétences, projets, parcours) ---

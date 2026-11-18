@@ -291,6 +291,45 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get completionMissingTitle => 'À compléter pour atteindre 100 %';
+
+  @override
+  String get completionAllDone => 'Tout est renseigné : le profil est complet.';
+
+  @override
+  String get criterionPhoto => 'Photo de profil';
+
+  @override
+  String get criterionBio => 'Biographie';
+
+  @override
+  String get criterionEmail => 'Adresse e-mail';
+
+  @override
+  String get criterionPhone => 'Numéro de téléphone';
+
+  @override
+  String get criterionLinkedin => 'Profil LinkedIn';
+
+  @override
+  String get criterionLocation => 'Localisation';
+
+  @override
+  String get criterionGithub => 'Pseudo GitHub';
+
+  @override
+  String get criterionSkills => 'Au moins une compétence';
+
+  @override
+  String get criterionProjects => 'Au moins un projet';
+
+  @override
+  String get criterionExperience => 'Au moins une expérience';
+
+  @override
+  String get criterionEducation => 'Au moins une formation';
+
+  @override
   String get quickActions => 'Actions rapides';
 
   @override

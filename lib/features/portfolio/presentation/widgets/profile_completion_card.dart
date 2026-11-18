@@ -10,16 +10,23 @@ import '../../domain/profile_completion.dart';
 /// Le pourcentage est **calculé depuis les champs réellement remplis**
 /// (voir [profileCompletion]) : ce n'est pas un score inventé.
 class ProfileCompletionCard extends StatelessWidget {
-  const ProfileCompletionCard({super.key, required this.completion});
+  const ProfileCompletionCard({
+    super.key,
+    required this.completion,
+    this.onTap,
+  });
 
   final ProfileCompletion completion;
+
+  /// Action au toucher (ex : afficher ce qu'il reste à renseigner).
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final TextTheme text = Theme.of(context).textTheme;
     final AppLocalizations l = AppLocalizations.of(context);
 
-    return Container(
+    final Widget card = Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -90,6 +97,19 @@ class ProfileCompletionCard extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+
+    if (onTap == null) return card;
+
+    // Toute la carte est cliquable : un appui ouvre le détail des manquants.
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(24),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(24),
+        onTap: onTap,
+        child: card,
       ),
     );
   }
