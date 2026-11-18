@@ -344,7 +344,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get importDataSubtitle =>
-      'Les portfolios du fichier s\'ajoutent aux tiens';
+      'Un portfolio du même nom est remplacé, jamais dupliqué';
 
   @override
   String get exportError => 'Impossible d\'exporter les données.';
@@ -356,8 +356,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get importError => 'Impossible d\'importer le fichier.';
 
   @override
-  String importSuccess(int count) {
-    return 'Import réussi : $count portfolio(s).';
+  String importSuccess(int added, int replaced) {
+    return 'Import terminé : $added ajouté(s), $replaced remplacé(s).';
   }
 
   @override

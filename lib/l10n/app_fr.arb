@@ -146,13 +146,16 @@
   "exportData": "Exporter mes données",
   "exportDataSubtitle": "Un fichier JSON à conserver (les photos ne sont pas incluses)",
   "importData": "Importer une sauvegarde",
-  "importDataSubtitle": "Les portfolios du fichier s'ajoutent aux tiens",
+  "importDataSubtitle": "Un portfolio du même nom est remplacé, jamais dupliqué",
   "exportError": "Impossible d'exporter les données.",
   "importInvalid": "Fichier de sauvegarde invalide.",
   "importError": "Impossible d'importer le fichier.",
-  "importSuccess": "Import réussi : {count} portfolio(s).",
+  "importSuccess": "Import terminé : {added} ajouté(s), {replaced} remplacé(s).",
   "@importSuccess": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "added": { "type": "int" },
+      "replaced": { "type": "int" }
+    }
   },
   "quickActions": "Actions rapides",
   "journey": "Parcours",

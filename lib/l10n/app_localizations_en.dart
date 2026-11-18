@@ -344,7 +344,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get importDataSubtitle =>
-      'Portfolios from the file are added to yours';
+      'A portfolio with the same name is replaced, never duplicated';
 
   @override
   String get exportError => 'Could not export the data.';
@@ -356,8 +356,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get importError => 'Could not import the file.';
 
   @override
-  String importSuccess(int count) {
-    return 'Imported: $count portfolio(s).';
+  String importSuccess(int added, int replaced) {
+    return 'Import done: $added added, $replaced replaced.';
   }
 
   @override

@@ -126,13 +126,16 @@
   "exportData": "Export my data",
   "exportDataSubtitle": "A JSON file to keep (photos are not included)",
   "importData": "Import a backup",
-  "importDataSubtitle": "Portfolios from the file are added to yours",
+  "importDataSubtitle": "A portfolio with the same name is replaced, never duplicated",
   "exportError": "Could not export the data.",
   "importInvalid": "Invalid backup file.",
   "importError": "Could not import the file.",
-  "importSuccess": "Imported: {count} portfolio(s).",
+  "importSuccess": "Import done: {added} added, {replaced} replaced.",
   "@importSuccess": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "added": { "type": "int" },
+      "replaced": { "type": "int" }
+    }
   },
   "quickActions": "Quick actions",
   "journey": "Journey",

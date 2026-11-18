@@ -731,7 +731,7 @@ abstract class AppLocalizations {
   /// No description provided for @importDataSubtitle.
   ///
   /// In fr, this message translates to:
-  /// **'Les portfolios du fichier s\'ajoutent aux tiens'**
+  /// **'Un portfolio du même nom est remplacé, jamais dupliqué'**
   String get importDataSubtitle;
 
   /// No description provided for @exportError.
@@ -755,8 +755,8 @@ abstract class AppLocalizations {
   /// No description provided for @importSuccess.
   ///
   /// In fr, this message translates to:
-  /// **'Import réussi : {count} portfolio(s).'**
-  String importSuccess(int count);
+  /// **'Import terminé : {added} ajouté(s), {replaced} remplacé(s).'**
+  String importSuccess(int added, int replaced);
 
   /// No description provided for @quickActions.
   ///

@@ -124,9 +124,13 @@ class SettingsPage extends StatelessWidget {
       if (path == null) return;
 
       final String source = await File(path).readAsString();
-      final int count =
+      final ImportResult result =
           await provider.importStudents(decodePortfolioBackup(source));
-      messenger.showSnackBar(SnackBar(content: Text(l.importSuccess(count))));
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(l.importSuccess(result.added, result.replaced)),
+        ),
+      );
     } on FormatException {
       // Fichier lisible mais qui n'est pas une sauvegarde valide.
       messenger.showSnackBar(SnackBar(content: Text(l.importInvalid)));

@@ -214,6 +214,77 @@ void main() {
       });
     });
 
+    group('Import sans doublon', () {
+      test('portfolios inconnus : simplement ajoutés', () async {
+        final provider = PortfolioProvider(repository: _FakeRepo([]));
+        await pumpEventQueue();
+
+        final result = await provider.importStudents(const [
+          Student(fullName: 'Alice', field: 'Info'),
+          Student(fullName: 'Bob', field: 'Info'),
+        ]);
+
+        expect(result.added, 2);
+        expect(result.replaced, 0);
+        expect(provider.students, hasLength(2));
+      });
+
+      test('même nom déjà présent : remplacé, pas dupliqué', () async {
+        final provider = PortfolioProvider(
+          repository: _FakeRepo([
+            const Student(id: 1, fullName: 'Alice', field: 'Ancienne filière'),
+          ]),
+        );
+        await pumpEventQueue();
+
+        final result = await provider.importStudents(const [
+          Student(
+            fullName: 'Alice',
+            field: 'Nouvelle filière',
+            skills: [Skill(name: 'Dart')],
+          ),
+        ]);
+
+        expect(result.replaced, 1);
+        expect(result.added, 0);
+        // Toujours un seul portfolio, avec le contenu du fichier importé.
+        expect(provider.students, hasLength(1));
+        expect(provider.students.single.field, 'Nouvelle filière');
+        expect(provider.students.single.skills.map((k) => k.name), ['Dart']);
+      });
+
+      test('comparaison insensible à la casse et aux espaces', () async {
+        final provider = PortfolioProvider(
+          repository: _FakeRepo([
+            const Student(id: 1, fullName: 'Alice Martin', field: 'Info'),
+          ]),
+        );
+        await pumpEventQueue();
+
+        final result = await provider.importStudents(const [
+          Student(fullName: '  alice MARTIN  ', field: 'Info'),
+        ]);
+
+        expect(result.replaced, 1);
+        expect(provider.students, hasLength(1));
+      });
+
+      test('doublon À L\'INTÉRIEUR du fichier : un seul conservé', () async {
+        final provider = PortfolioProvider(repository: _FakeRepo([]));
+        await pumpEventQueue();
+
+        final result = await provider.importStudents(const [
+          Student(fullName: 'Alice', field: 'Première version'),
+          Student(fullName: 'Alice', field: 'Seconde version'),
+        ]);
+
+        expect(provider.students, hasLength(1));
+        expect(provider.students.single.field, 'Seconde version');
+        expect(result.total, 2);
+        expect(result.replaced, 1);
+      });
+    });
+
     test('addSkill ajoute une compétence à l\'étudiant', () async {
       final provider = PortfolioProvider(
         repository: _FakeRepo([
