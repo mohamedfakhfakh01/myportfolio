@@ -78,7 +78,7 @@ myportfolio/
 │   │   └── theme/
 │   │       ├── app_colors.dart            # Palette de couleurs centralisée
 │   │       ├── app_theme.dart             # ThemeData (Material 3) : couleurs, Poppins, styles
-│   │       └── theme_showcase_page.dart   # Ancienne vitrine du thème (désormais inutilisée)
+│   │       └── theme_showcase_page.dart   # (supprimé le 19 nov. 2026)
 │   ├── core/
 │   │   ├── database/
 │   │   │   └── app_database.dart          # Ouvre la base SQLite + crée les 3 tables
@@ -103,7 +103,7 @@ myportfolio/
 │               └── widgets/
 │                   ├── student_card.dart        # Carte étudiant réutilisable
 │                   ├── student_avatar.dart       # Avatar (photo ou initiales), animé (Hero)
-│                   ├── skill_chip.dart          # Puce de compétence (tappable)
+│                   ├── skill_chip.dart          # (supprimé le 19 nov. 2026, remplacé par les barres)
 │                   ├── project_card.dart        # Carte de projet (tappable)
 │                   ├── skill_form_dialog.dart   # Formulaire ajout/modif d'une compétence
 │                   ├── project_form_dialog.dart # Formulaire ajout/modif d'un projet
@@ -136,14 +136,14 @@ myportfolio/
 | `lib/app/app.dart` | Widget racine : crée le `MaterialApp` et applique le thème. |
 | `lib/app/theme/app_colors.dart` | Toutes les couleurs de l'app, à un seul endroit. |
 | `lib/app/theme/app_theme.dart` | Le `ThemeData` : relie couleurs, police et styles de composants. |
-| `lib/app/theme/theme_showcase_page.dart` | Ancienne vitrine du thème (plus utilisée). |
+| `lib/app/theme/theme_showcase_page.dart` | Ancienne vitrine du thème — **supprimée le 19 nov. 2026**. |
 | `lib/shared/models/*.dart` | Les modèles de données : `Student`, `Skill`, `Project`. |
 | `lib/features/portfolio/data/sample_portfolio_data.dart` | Données d'exemple (placeholder `TODO`). |
 | `lib/features/portfolio/providers/portfolio_provider.dart` | État : la liste des étudiants (`ChangeNotifier`). |
 | `lib/features/portfolio/presentation/pages/home_page.dart` | Écran d'accueil (liste des 2 portfolios). |
 | `lib/features/portfolio/presentation/widgets/student_card.dart` | Carte étudiant réutilisable. |
 | `lib/features/portfolio/presentation/pages/profile_page.dart` | Écran profil détaillé d'un étudiant. |
-| `lib/features/portfolio/presentation/widgets/skill_chip.dart` | Puce d'une compétence. |
+| `lib/features/portfolio/presentation/widgets/skill_chip.dart` | Puce d'une compétence — **supprimée le 19 nov. 2026**. |
 | `lib/features/portfolio/presentation/widgets/project_card.dart` | Carte d'un projet. |
 | `lib/core/database/app_database.dart` | Ouvre la base SQLite et crée les 3 tables. |
 | `lib/features/portfolio/data/portfolio_repository.dart` | Lecture, CRUD SQL et seed de la base. |
@@ -1047,5 +1047,21 @@ identiques ; en remplaçant volontairement la bonne couleur par la mauvaise, il 
 
 ---
 
-*Dernière mise à jour (19 novembre 2026) : PDF aux couleurs de l'app, indépendant du thème.
-91 tests, analyse sans erreur.*
+### Ménage du projet (19 novembre 2026)
+
+#### Concept — Deux sortes de « fichiers inutiles »
+1. **Les fichiers de compilation** (`build/`, `.dart_tool/`) : 5,1 Go sur 5,2 Go ! C'est la
+   « vaisselle sale » de chaque compilation : on peut tout jeter avec `flutter clean`, Flutter la
+   refait au prochain build (plus lent une fois). Ils ne sont jamais dans git (`.gitignore`).
+2. **Le code mort** : du code que plus rien n'utilise. Trouvé en cherchant les fichiers qu'aucun
+   autre fichier n'importe : la vitrine du thème de l'étape 1 (marquée « temporaire ») et
+   l'ancienne puce `SkillChip`, que **seul son propre test** gardait en vie. Un test qui protège
+   du code inutilisé donne une fausse impression de sécurité : on a supprimé les deux ensemble.
+   Même idée pour le paquet `cupertino_icons`, ajouté par le modèle Flutter et jamais utilisé.
+
+Rien n'est perdu : le code supprimé reste dans l'historique git.
+
+---
+
+*Dernière mise à jour (19 novembre 2026) : ménage (code mort, paquet inutilisé, fichiers de
+compilation). 88 tests, analyse sans erreur.*

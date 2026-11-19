@@ -98,7 +98,7 @@ section *Dépôts GitHub* charge les dépôts publics.
 
 ```bash
 flutter analyze          # 0 erreur attendu
-flutter test             # 91 tests
+flutter test             # 88 tests
 flutter test --coverage  # génère coverage/lcov.info
 ```
 
