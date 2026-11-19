@@ -952,4 +952,22 @@ export/import testés de bout en bout sur simulateur · rendu contrôlé en thè
 
 ---
 
-*Dernière mise à jour (18 novembre 2026) : refonte du design (indigo/violet, tableau de bord, nav flottante), technologies par projet, écran détail, sauvegarde JSON export/import, formulaires en feuilles. 64 tests, analyse sans erreur.*
+### Retrait de la sauvegarde JSON (19 novembre 2026)
+
+À la demande de l'utilisateur, l'**export / import JSON** a été retiré (écran Réglages, sérialisation,
+méthode d'import du provider, tests associés, et les paquets `share_plus` / `file_picker`).
+Le concept n°6 ci-dessus (« importer, c'est restaurer ») reste une leçon valable, mais **ne
+correspond plus au code**. Conséquence assumée : les données ne vivent plus que sur l'appareil.
+
+**Conservé** : l'interdiction des doublons de nom à la création et au renommage
+(`PortfolioProvider.nameExists`), ainsi que la correction du formulaire (une `ListView` ne validait
+pas les champs sortis de l'écran → `SingleChildScrollView` + `Column`).
+
+**Leçon de méthode** : avant de supprimer une fonctionnalité, cartographier tout ce qui en dépend
+(ici, la normalisation des noms était partagée avec l'anti-doublon, qu'il fallait garder) et vérifier
+chaque bloc retiré, plutôt que couper « à la louche ».
+
+---
+
+*Dernière mise à jour (19 novembre 2026) : sauvegarde JSON retirée ; anti-doublon de nom à la
+création conservé. 62 tests, analyse sans erreur.*

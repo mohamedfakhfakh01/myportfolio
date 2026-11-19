@@ -148,36 +148,6 @@ class PortfolioProvider extends ChangeNotifier {
     await _reloadStudents();
   }
 
-  /// Importe des portfolios issus d'une sauvegarde, **sans créer de doublon**.
-  ///
-  /// Un import est une *restauration* : si un portfolio porte déjà le même nom,
-  /// il est **remplacé** par celui du fichier (et non ajouté une seconde fois).
-  /// On remplace plutôt qu'on ignore, sinon une réinstallation — qui recrée les
-  /// portfolios d'exemple — empêcherait de récupérer ses vraies données.
-  Future<ImportResult> importStudents(List<Student> students) async {
-    int added = 0;
-    int replaced = 0;
-
-    for (final student in students) {
-      final Student? existing = _findByName(student.fullName);
-      if (existing?.id != null) {
-        // La suppression retire aussi compétences, projets et parcours
-        // (clés étrangères ON DELETE CASCADE).
-        await _repository.deleteStudent(existing!.id!);
-        replaced++;
-      } else {
-        added++;
-      }
-      await _insertStudentWithContent(student, projects: student.projects);
-      // On recharge à chaque tour pour que le doublon soit aussi détecté
-      // lorsqu'il se trouve DANS le fichier importé.
-      _students = await _repository.getStudents();
-    }
-
-    notifyListeners();
-    return ImportResult(added: added, replaced: replaced);
-  }
-
   /// Vrai si un portfolio porte déjà ce nom (casse et espaces ignorés).
   ///
   /// [excludeId] écarte un portfolio de la recherche : lors d'une modification,
@@ -189,23 +159,12 @@ class PortfolioProvider extends ChangeNotifier {
     );
   }
 
-  /// Retrouve un portfolio par son nom (casse et espaces ignorés).
-  Student? _findByName(String fullName) {
-    final String key = _normalizeName(fullName);
-    for (final student in _students) {
-      if (_normalizeName(student.fullName) == key) return student;
-    }
-    return null;
-  }
-
   /// Forme canonique d'un nom, pour comparer « Alice Martin » et
-  /// « alice  MARTIN ». Une seule définition, partagée par l'import et la
-  /// création : les deux appliquent exactement la même règle.
+  /// « alice  MARTIN » (casse et espaces multiples ignorés).
   static String _normalizeName(String name) =>
       name.trim().toLowerCase().replaceAll(RegExp(r'\s+'), ' ');
 
-  /// Insère un étudiant puis tout son contenu. Utilisé par la création d'un
-  /// portfolio et par l'import (une seule source de vérité).
+  /// Insère un étudiant puis tout son contenu (création d'un portfolio).
   Future<void> _insertStudentWithContent(
     Student student, {
     required List<Project> projects,
@@ -235,20 +194,6 @@ class PortfolioProvider extends ChangeNotifier {
     _students = await _repository.getStudents();
     notifyListeners();
   }
-}
-
-/// Bilan d'un import : ce qui a été ajouté et ce qui a été remplacé.
-class ImportResult {
-  const ImportResult({required this.added, required this.replaced});
-
-  /// Portfolios qui n'existaient pas encore.
-  final int added;
-
-  /// Portfolios du même nom qui ont été écrasés par ceux du fichier.
-  final int replaced;
-
-  /// Nombre total de portfolios traités.
-  int get total => added + replaced;
 }
 
 /// Levée quand on tente de créer (ou renommer vers) un nom déjà pris.

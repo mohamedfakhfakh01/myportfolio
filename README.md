@@ -4,8 +4,8 @@
 
 Application mobile **Flutter** de portfolio étudiant, réalisée dans le cadre du module
 *Développement Mobile*. Elle permet de créer et consulter plusieurs portfolios — profil,
-compétences, projets, parcours et contact — avec **persistance locale**, **sauvegarde des
-données**, **export PDF** et intégration de l'**API GitHub**.
+compétences, projets, parcours et contact — avec **persistance locale**, **export PDF** et
+intégration de l'**API GitHub**.
 
 > 📘 Pour l'explication détaillée du code et la préparation à l'oral, voir **[`apprentissage.md`](apprentissage.md)**.
 
@@ -26,10 +26,8 @@ données**, **export PDF** et intégration de l'**API GitHub**.
 - **Créer, modifier, supprimer** un portfolio, ses compétences, projets et entrées de parcours.
 - **Photo de profil** et **capture d'écran** par projet (galerie ou appareil photo).
 
-**Sortie et sauvegarde**
+**Sortie**
 - **Export PDF** du portfolio (partage iOS).
-- **Export / import JSON** de toutes les données : un import est une *restauration*, un portfolio
-  du même nom est **remplacé** et jamais dupliqué.
 
 **Confort**
 - Thème **clair** (par défaut) ou **sombre**, mémorisé entre les lancements.
@@ -43,7 +41,6 @@ données**, **export PDF** et intégration de l'**API GitHub**.
 - `http` — appels à l'API REST GitHub
 - `google_fonts` — typographie (**Plus Jakarta Sans** pour les titres, **Inter** pour le corps)
 - `pdf` + `printing` — génération et partage du PDF
-- `share_plus` + `file_picker` — export et import de la sauvegarde
 - `image_picker` + `path_provider` — photos et stockage local
 - `url_launcher` — ouverture des liens (mailto, tel, web)
 
@@ -96,24 +93,15 @@ Dans un profil, appuyer sur **✏️**, renseigner un **pseudo GitHub** public, 
 section *Dépôts GitHub* charge les dépôts publics.
 *(Connexion internet requise ; l'API publique est limitée à 60 requêtes/heure sans authentification.)*
 
-## Sauvegarder ses données
-
-*Réglages ▸ Sauvegarde* :
-- **Exporter mes données** écrit un fichier JSON daté et ouvre le partage iOS (Fichiers, mail, AirDrop).
-- **Importer une sauvegarde** relit un `.json` ; un portfolio du même nom est remplacé.
-
-> Les **photos ne sont pas incluses** dans le fichier : elles sont référencées par leur chemin local
-> et ne suivent donc pas la sauvegarde sur un autre appareil.
-
 ## Vérifications et tests
 
 ```bash
 flutter analyze          # 0 erreur attendu
-flutter test             # 73 tests
+flutter test             # 62 tests
 flutter test --coverage  # génère coverage/lcov.info
 ```
 
-Ce qui est couvert : modèles et sérialisation, calcul de complétion, sauvegarde JSON, CRUD du
+Ce qui est couvert : modèles et sérialisation, calcul de complétion, CRUD du
 provider (dont l'interdiction des doublons de nom), service GitHub (délai dépassé / hors-ligne),
 le formulaire de création, quelques widgets, et surtout les
 **migrations de la base** (via `sqflite_common_ffi`, pour garantir qu'une mise à jour ne perde
@@ -132,7 +120,7 @@ lib/
 └── features/
     ├── portfolio/
     │   ├── data/              # Repository + données d'exemple
-    │   ├── domain/            # Complétion du profil, sauvegarde JSON
+    │   ├── domain/            # Complétion du profil
     │   ├── providers/         # État (Provider)
     │   ├── presentation/      # Écrans et widgets
     │   └── services/          # Génération du PDF
@@ -141,9 +129,8 @@ lib/
 
 ## Limites connues / améliorations possibles
 
-- Pas d'authentification ni de synchronisation en ligne : les données vivent sur l'appareil
-  (d'où l'export/import JSON).
-- Les **photos** ne sont pas incluses dans la sauvegarde JSON.
+- **Aucune sauvegarde** : pas de synchronisation en ligne ni d'export des données. Elles vivent
+  uniquement sur l'appareil ; supprimer l'app ou changer de téléphone les efface.
 - **Android** : l'APK release compile, mais n'a pas encore été testé sur un appareil ou un
   émulateur. Il est signé avec la **clé de debug** (installable, mais refusé par le Play Store).
 - Couverture de tests ≈ 21 % : le cœur logique est couvert, les écrans le sont peu.

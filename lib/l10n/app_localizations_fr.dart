@@ -330,37 +330,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get criterionEducation => 'Au moins une formation';
 
   @override
-  String get backupSection => 'Sauvegarde';
-
-  @override
-  String get exportData => 'Exporter mes données';
-
-  @override
-  String get exportDataSubtitle =>
-      'Un fichier JSON à conserver (les photos ne sont pas incluses)';
-
-  @override
-  String get importData => 'Importer une sauvegarde';
-
-  @override
-  String get importDataSubtitle =>
-      'Un portfolio du même nom est remplacé, jamais dupliqué';
-
-  @override
-  String get exportError => 'Impossible d\'exporter les données.';
-
-  @override
-  String get importInvalid => 'Fichier de sauvegarde invalide.';
-
-  @override
-  String get importError => 'Impossible d\'importer le fichier.';
-
-  @override
-  String importSuccess(int added, int replaced) {
-    return 'Import terminé : $added ajouté(s), $replaced remplacé(s).';
-  }
-
-  @override
   String get nameAlreadyExists => 'Un portfolio porte déjà ce nom.';
 
   @override

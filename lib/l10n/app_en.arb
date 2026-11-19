@@ -122,21 +122,6 @@
   "criterionProjects": "At least one project",
   "criterionExperience": "At least one experience",
   "criterionEducation": "At least one education entry",
-  "backupSection": "Backup",
-  "exportData": "Export my data",
-  "exportDataSubtitle": "A JSON file to keep (photos are not included)",
-  "importData": "Import a backup",
-  "importDataSubtitle": "A portfolio with the same name is replaced, never duplicated",
-  "exportError": "Could not export the data.",
-  "importInvalid": "Invalid backup file.",
-  "importError": "Could not import the file.",
-  "importSuccess": "Import done: {added} added, {replaced} replaced.",
-  "@importSuccess": {
-    "placeholders": {
-      "added": { "type": "int" },
-      "replaced": { "type": "int" }
-    }
-  },
   "nameAlreadyExists": "A portfolio with this name already exists.",
   "quickActions": "Quick actions",
   "journey": "Journey",

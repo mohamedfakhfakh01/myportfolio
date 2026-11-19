@@ -12,7 +12,7 @@
 **Objectif :** permettre à un étudiant de constituer son portfolio (profil, compétences, projets,
 parcours) et de le montrer à un recruteur, hors ligne, depuis son téléphone.
 **Périmètre réel :** plusieurs portfolios, CRUD complet, tableau de bord avec score de complétion,
-export PDF, sauvegarde JSON, dépôts GitHub, thèmes clair/sombre, FR/EN.
+export PDF, dépôts GitHub, thèmes clair/sombre, FR/EN. **Pas de sauvegarde** des données.
 **Stack :** Flutter 3.47 / Dart 3.13 · Material 3 · Provider · sqflite · API GitHub.
 **Cible testée :** **iOS** (simulateur + iPhone physique). Android : **compile** (APK release),
 mais jamais lancé sur appareil ni émulateur.
@@ -50,7 +50,7 @@ export PATH="$HOME/flutter/bin:$PATH"      # Flutter n'est PAS dans le PATH
 export LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 # obligatoire avant tout build iOS
 
 flutter analyze                             # 0 erreur attendu
-flutter test                                # 73 tests
+flutter test                                # 62 tests
 flutter gen-l10n                            # APRÈS toute modif des .arb
 flutter run -d 87E626E0-E743-44A6-8A48-AA716FD7851B --debug   # simulateur iPhone 18 Pro Max
 flutter build ios --release                 # puis: flutter install -d <udid> --release
@@ -75,8 +75,10 @@ iPhone physique « iPhone de fakh » `00008120-000664510C70201E`.
 4. **`LinearProgressIndicator` n'accepte pas de dégradé** : barre custom (piste + `LinearGradient`).
 5. **`flutter install` ne recompile pas toujours** : vérifier la date de
    `build/ios/iphoneos/Runner.app`, sinon forcer `flutter build ios --release` avant.
-6. **Réinstaller l'app efface sa base** (« Uninstalling old version… ») : prévenir l'utilisateur,
-   ou utiliser l'export JSON avant.
+6. **Réinstaller l'app efface sa base** (« Uninstalling old version… ») et il n'existe **aucune
+   sauvegarde**. Pour mettre à jour l'iPhone, toujours installer **par-dessus** :
+   `xcrun devicectl device install app --device <udid> build/ios/iphoneos/Runner.app`
+   (jamais `flutter install`, qui désinstalle d'abord).
 7. **`flutter run` peut échouer** sur `The log reader failed unexpectedly` : l'app Simulator
    (interface) n'est pas installée dans cet Xcode. **Relancer** suffit en général.
 8. **Toute modif des `.arb` exige `flutter gen-l10n`**, sinon le getter n'existe pas.
@@ -119,7 +121,7 @@ Les dégradés vont systématiquement **primaire → violet**.
 ```
 lib/
 ├── main.dart
-├── app/                     # racine, thème, nav flottante, À propos, Réglages (+ sauvegarde)
+├── app/                     # racine, thème, nav flottante, À propos, Réglages
 ├── core/                    # database/ (schéma + migrations), widgets/ (transitions)
 ├── shared/
 │   ├── models/              # Student, Skill, Project, ExperienceEntry
@@ -127,7 +129,7 @@ lib/
 └── features/
     ├── portfolio/
     │   ├── data/            # PortfolioRepository + données d'amorçage
-    │   ├── domain/          # profile_completion.dart, portfolio_backup.dart (logique pure)
+    │   ├── domain/          # profile_completion.dart (logique pure)
     │   ├── providers/       # PortfolioProvider (ChangeNotifier)
     │   ├── presentation/    # pages/ et widgets/
     │   └── services/        # portfolio_pdf.dart
@@ -136,7 +138,7 @@ lib/
 
 **Décisions structurantes :**
 - Architecture **feature-first** ; `domain/` contient la logique **pure et testable**
-  (complétion, sauvegarde) séparée de l'interface.
+  (complétion du profil) séparée de l'interface.
 - Le `PortfolioProvider` **recharge depuis la base** après chaque écriture : l'UI ne devine jamais
   l'état, elle le relit.
 - Le repository est **injectable** dans le provider → tests avec un faux dépôt en mémoire.
@@ -148,16 +150,13 @@ lib/
 
 **Créer un portfolio** : accueil → « Ajouter un CV » → formulaire (profil, contact, compétences,
 projets, parcours saisis en feuilles) → `addStudent` insère l'étudiant puis son contenu → retour liste.
-**Aucun doublon de nom** (création, renommage, import ; casse et espaces ignorés) : le formulaire
+**Aucun doublon de nom** (création et renommage ; casse et espaces ignorés) : le formulaire
 affiche l'erreur sous le champ, et le provider refuse aussi (`DuplicatePortfolioNameException`)
 pour qu'aucun chemin ne contourne la règle.
 
 **Complétion du profil** : `profileCompletion(student)` évalue **11 critères** (photo, bio, e-mail,
 téléphone, LinkedIn, localisation, GitHub, ≥1 compétence, ≥1 projet, ≥1 expérience, ≥1 formation)
 → anneau + liste des manquants au toucher.
-
-**Sauvegarde** : Réglages → export JSON (partage iOS) / import. L'import **remplace** un portfolio
-de même nom (comparaison insensible casse/espaces), y compris si le doublon est dans le fichier.
 
 ---
 
@@ -167,8 +166,8 @@ Application **100 % locale** : pas de serveur, pas d'authentification, pas de se
 validation côté serveur ne s'appliquent pas ici.
 
 - ✅ Données persistées localement, migrations testées (aucune perte à la mise à jour).
-- ✅ Sauvegarde/restauration utilisateur (export JSON).
-- ⚠️ **Photos non incluses** dans la sauvegarde (chemins locaux uniquement).
+- ⚠️ **Aucune sauvegarde** : l'export/import JSON a été **retiré le 19 nov. 2026** à la demande
+  de l'utilisateur. Les données ne vivent que sur l'appareil (récupérable via git : `638721f`).
 - ⚠️ **Android compilé mais jamais exécuté** ; APK signé avec la **clé de debug**
   (`android/app/build.gradle.kts`), donc non publiable sur le Play Store.
 - ⚠️ Couverture de tests ≈ 21 % : cœur logique couvert, écrans peu testés.
@@ -214,6 +213,7 @@ Aucune : l'application ne contacte que l'API GitHub publique, sans clé.
 | Enrichissement | nov. 2026 | Contact, parcours, images de projet, CI, icône/splash |
 | Design | nov. 2026 | Typographie, palette indigo/violet, thème clair, nav flottante, tableau de bord |
 | Données | 18 nov. 2026 | Technologies par projet (v7), écran détail, filtre, sauvegarde JSON |
+| Retrait | 19 nov. 2026 | Sauvegarde JSON retirée (à la demande) ; anti-doublon à la création conservé |
 
 ---
 
