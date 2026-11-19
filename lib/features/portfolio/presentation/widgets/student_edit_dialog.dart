@@ -419,6 +419,10 @@ class _StudentFormPageState extends State<StudentFormPage> {
                       const SizedBox(height: 8),
                       TextButton.icon(
                         onPressed: _chooseSource,
+                        // Indigo lisible aussi en thème sombre.
+                        style: TextButton.styleFrom(
+                          foregroundColor: AppColors.primaryText,
+                        ),
                         icon: const Icon(Icons.add_a_photo_outlined),
                         label: Text(_hasPhoto ? l.changePhoto : l.addPhoto),
                       ),
@@ -1060,10 +1064,7 @@ class _GithubPreview extends StatelessWidget {
     if (found == null) return const SizedBox.shrink();
 
     final int more = found.length - _shown;
-    // Indigo foncé illisible sur le fond sombre : indigo clair en thème sombre.
-    final Color accent = Theme.of(context).brightness == Brightness.dark
-        ? AppColors.primaryLight
-        : AppColors.primary;
+    final Color accent = AppColors.primaryText; // lisible dans les 2 thèmes
     return Container(
       margin: const EdgeInsets.only(top: 10),
       padding: const EdgeInsets.all(12),

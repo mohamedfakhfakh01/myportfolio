@@ -54,7 +54,7 @@ export PATH="$HOME/flutter/bin:$PATH"      # Flutter n'est PAS dans le PATH
 export LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 # obligatoire avant tout build iOS
 
 flutter analyze                             # 0 erreur attendu
-flutter test                                # 174 tests
+flutter test                                # 176 tests
 flutter gen-l10n                            # APRÈS toute modif des .arb
 flutter run -d 87E626E0-E743-44A6-8A48-AA716FD7851B --debug   # simulateur iPhone 18 Pro Max
 flutter build ios --release                 # puis: flutter install -d <udid> --release
@@ -157,6 +157,7 @@ iPhone physique « iPhone de fakh » `00008120-000664510C70201E`.
 | Token | Valeur | Usage |
 |---|---|---|
 | Primaire | `#4F46E5` | boutons, icônes, onglet actif |
+| Indigo « texte » | `#4F46E5` / `#A5B4FC` | `AppColors.primaryText` : lien ou titre indigo posé sur le fond (contraste ≥ 4,5:1 dans les 2 thèmes) |
 | Violet | `#7C3AED` | fin des dégradés |
 | Fond clair / sombre | `#F7F8FC` / `#0F172A` | |
 | Surface | `#FFFFFF` / `#1E293B` | cartes |
@@ -285,6 +286,7 @@ Aucune : l'application ne contacte que l'API GitHub publique, sans clé.
 | Compte GitHub | 19 nov. 2026 | À la création / modification d'un CV, l'app vérifie auprès de GitHub que le compte existe (159 tests, ≈ 78 %) |
 | Aperçu GitHub | 19 nov. 2026 | Pendant la saisie du pseudo, les derniers dépôts publics s'affichent sous le champ ; vérifié sur simulateur avec le vrai GitHub (170 tests, ≈ 78 %) |
 | Icône & démarrage | 19 nov. 2026 | Icône en dégradé indigo → violet, écran de démarrage indigo (fin de l'ancien bleu) ; couleurs gardées par un test (174 tests) |
+| Lien photo | 20 nov. 2026 | « Ajouter une photo » lisible en thème sombre (contraste 2,8 → 9:1) via `AppColors.primaryText` (176 tests) |
 
 ---
 

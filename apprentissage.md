@@ -1226,5 +1226,19 @@ suffi. Réflexe : quand l'écran contredit le fichier, vérifier le fichier lui-
 
 ---
 
-*Dernière mise à jour (19 novembre 2026) : icône et écran de démarrage indigo/violet.
-174 tests, analyse sans erreur.*
+### Lien « Ajouter une photo » lisible en thème sombre (20 novembre 2026)
+
+#### Concept — Le contraste se mesure, il ne se devine pas
+« Peu lisible » est une impression ; le **rapport de contraste** (norme WCAG) est un chiffre : de 1
+(aucune différence) à 21 (noir sur blanc). Pour un texte, le minimum recommandé est **4,5:1**.
+L'indigo foncé `#4F46E5` sur le fond sombre `#0F172A` donnait **2,84:1** ; l'indigo clair `#A5B4FC`
+donne **8,96:1** (et l'indigo foncé reste à 5,92:1 sur le fond clair). Le test calcule ce rapport
+sur la couleur *réellement dessinée* à l'écran, dans les deux thèmes.
+
+La règle « indigo foncé en clair, indigo clair en sombre » vit à un seul endroit :
+`AppColors.primaryText`, utilisée par le lien photo et par l'aperçu GitHub.
+
+---
+
+*Dernière mise à jour (20 novembre 2026) : lien photo lisible en thème sombre.
+176 tests, analyse sans erreur.*

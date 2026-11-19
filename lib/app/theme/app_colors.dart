@@ -55,6 +55,11 @@ class AppColors {
   /// Fond cyan doux (puces d'accent).
   static Color accentSoft = _accentSoftDark;
 
+  /// Indigo **lisible comme texte** sur le fond de l'écran : [primary] en
+  /// thème clair, [primaryLight] en thème sombre (l'indigo foncé n'y offre
+  /// qu'un contraste d'environ 3:1, sous le minimum de 4,5:1).
+  static Color primaryText = primaryLight;
+
   // Valeurs du thème SOMBRE.
   static const Color _backgroundDark = Color(0xFF0F172A);
   static const Color _surfaceDark = Color(0xFF1E293B);
@@ -85,5 +90,6 @@ class AppColors {
     border = dark ? _borderDark : borderLight;
     primarySoft = dark ? _primarySoftDark : primarySoftLight;
     accentSoft = dark ? _accentSoftDark : accentSoftLight;
+    primaryText = dark ? primaryLight : primary;
   }
 }

@@ -3,6 +3,7 @@
 // d'autre. (Les tests anti-doublon de nom sont dans student_form_test.dart.)
 
 import 'dart:convert';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -10,6 +11,8 @@ import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:provider/provider.dart';
 
+import 'package:myportfolio/app/theme/app_colors.dart';
+import 'package:myportfolio/app/theme/app_theme.dart';
 import 'package:myportfolio/features/github/data/github_service.dart';
 
 import 'package:myportfolio/features/portfolio/presentation/widgets/student_edit_dialog.dart';
@@ -577,5 +580,52 @@ void main() {
       expect(a.experiences.map((e) => e.title), ['Stage']);
       await _flushSnackBar(tester);
     });
+  });
+
+  // Le lien « Ajouter une photo » était indigo foncé sur fond sombre
+  // (contraste ≈ 3:1, illisible en plein jour).
+  group('Lisibilité du lien « Ajouter une photo »', () {
+    /// Contraste WCAG entre deux couleurs (1 = aucun, 21 = noir sur blanc).
+    double contrast(Color a, Color b) {
+      final double la = a.computeLuminance(), lb = b.computeLuminance();
+      return (math.max(la, lb) + 0.05) / (math.min(la, lb) + 0.05);
+    }
+
+    for (final brightness in Brightness.values) {
+      testWidgets('thème ${brightness.name} : contraste d\'au moins 4,5:1',
+          (tester) async {
+        // La palette est globale : on la remet en sombre (défaut) après.
+        AppColors.applyBrightness(brightness);
+        addTearDown(() => AppColors.applyBrightness(Brightness.dark));
+        tester.view.physicalSize = const Size(1080, 2400);
+        tester.view.devicePixelRatio = 3;
+        addTearDown(tester.view.reset);
+
+        await tester.pumpWidget(
+          ChangeNotifierProvider<PortfolioProvider>.value(
+            value: PortfolioProvider(repository: FakePortfolioRepository([])),
+            child: MaterialApp(
+              theme: AppTheme.themeFor(brightness),
+              locale: const Locale('fr'),
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              home: const StudentFormPage(),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Couleur réellement dessinée pour le texte du lien.
+        final RichText label = tester.widget<RichText>(find.descendant(
+          of: find.text('Ajouter une photo'),
+          matching: find.byType(RichText),
+        ));
+        final Color color = label.text.style!.color!;
+        final Color fond = AppTheme.themeFor(brightness).scaffoldBackgroundColor;
+
+        expect(contrast(color, fond), greaterThanOrEqualTo(4.5),
+            reason: 'texte $color sur fond $fond');
+      });
+    }
   });
 }
