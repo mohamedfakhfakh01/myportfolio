@@ -15,16 +15,19 @@ import 'github_repo_card.dart';
 /// C'est un [StatefulWidget] pour **créer la requête une seule fois**
 /// (dans `initState`) et éviter de rappeler l'API à chaque reconstruction.
 class GithubReposSection extends StatefulWidget {
-  const GithubReposSection({super.key, required this.username});
+  const GithubReposSection({super.key, required this.username, this.service});
 
   final String username;
+
+  /// Injectable pour les tests (faux client HTTP) ; sinon le vrai service.
+  final GithubService? service;
 
   @override
   State<GithubReposSection> createState() => _GithubReposSectionState();
 }
 
 class _GithubReposSectionState extends State<GithubReposSection> {
-  final GithubService _service = GithubService();
+  late final GithubService _service = widget.service ?? GithubService();
   late Future<List<GithubRepo>> _future;
 
   @override
@@ -43,7 +46,32 @@ class _GithubReposSectionState extends State<GithubReposSection> {
   }
 
   void _retry() {
-    setState(() => _future = _service.fetchRepos(widget.username));
+    // Accolades, pas `=>` : avec une flèche, la fonction RENVOIE la Future
+    // affectée, et Flutter refuse un setState qui renvoie une Future (le
+    // bouton « Réessayer » plantait en mode debug).
+    setState(() {
+      _future = _service.fetchRepos(widget.username);
+    });
+  }
+
+  /// Message traduit pour une erreur du service (le service, lui, ne
+  /// fabrique aucun texte affiché).
+  static String _errorMessage(AppLocalizations l, Object? error) {
+    final GithubErrorKind kind = error is GithubException
+        ? error.kind
+        : GithubErrorKind.unexpected;
+    switch (kind) {
+      case GithubErrorKind.notFound:
+        return l.githubErrorNotFound;
+      case GithubErrorKind.rateLimited:
+        return l.githubErrorRateLimited;
+      case GithubErrorKind.timeout:
+        return l.githubErrorTimeout;
+      case GithubErrorKind.offline:
+        return l.githubErrorOffline;
+      case GithubErrorKind.unexpected:
+        return l.githubErrorUnexpected;
+    }
   }
 
   @override
@@ -68,7 +96,7 @@ class _GithubReposSectionState extends State<GithubReposSection> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '${snapshot.error}',
+                _errorMessage(l, snapshot.error),
                 style:
                     text.bodyMedium?.copyWith(color: AppColors.textSecondary),
               ),

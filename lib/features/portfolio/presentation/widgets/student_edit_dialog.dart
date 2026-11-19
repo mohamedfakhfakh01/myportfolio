@@ -419,10 +419,6 @@ class _StudentFormPageState extends State<StudentFormPage> {
                       const SizedBox(height: 8),
                       TextButton.icon(
                         onPressed: _chooseSource,
-                        // Indigo lisible aussi en thème sombre.
-                        style: TextButton.styleFrom(
-                          foregroundColor: AppColors.primaryText,
-                        ),
                         icon: const Icon(Icons.add_a_photo_outlined),
                         label: Text(_hasPhoto ? l.changePhoto : l.addPhoto),
                       ),

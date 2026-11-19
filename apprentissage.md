@@ -1240,5 +1240,29 @@ La règle « indigo foncé en clair, indigo clair en sombre » vit à un seul en
 
 ---
 
-*Dernière mise à jour (20 novembre 2026) : lien photo lisible en thème sombre.
-176 tests, analyse sans erreur.*
+### Finitions : erreurs traduites, « Réessayer », boutons lisibles (20 novembre 2026)
+
+#### Concept 1 — Le service dit *quoi*, l'écran dit *comment*
+Le service GitHub écrivait ses erreurs en français (« Utilisateur GitHub introuvable. »), donc
+l'app en anglais les affichait… en français. Le service ne connaît pas la langue de l'utilisateur :
+il renvoie maintenant un **type** d'erreur (`notFound`, `offline`, `timeout`…), et l'écran choisit
+la phrase dans les fichiers de traduction. Analogie : le mécanicien note « pneu crevé » sur sa fiche ;
+c'est l'accueil qui l'explique au client dans sa langue.
+
+#### Concept 2 — La flèche `=>` renvoie une valeur
+`setState(() => _future = fetch())` ne fait pas que modifier `_future` : la flèche **renvoie** le
+résultat de l'affectation, ici une `Future`. Flutter l'interdit (une mise à jour d'écran doit être
+immédiate) et lève une erreur en mode debug : le bouton « Réessayer » plantait. Avec des accolades
+`{ _future = fetch(); }`, rien n'est renvoyé. Ce bug existait depuis longtemps ; c'est le premier
+test du bouton qui l'a trouvé.
+
+#### Concept 3 — Corriger à la source plutôt qu'au cas par cas
+Les 25 boutons texte de l'app avaient le même défaut que « Ajouter une photo » (2,3 à 2,8:1 en thème
+sombre). Plutôt que de les corriger un par un, le **thème** leur donne `AppColors.primaryText` : une
+ligne, et tous suivent — y compris les boutons futurs. Un test mesure le contraste réel des boutons
+texte et contour, sur le fond et sur les cartes, dans les deux thèmes.
+
+---
+
+*Dernière mise à jour (20 novembre 2026) : erreurs GitHub traduites, boutons lisibles en sombre.
+191 tests, analyse sans erreur.*

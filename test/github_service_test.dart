@@ -139,4 +139,44 @@ void main() {
       expect(calls, isEmpty);
     });
   });
+
+  // Le service ne fabrique aucun texte : il indique le TYPE d'erreur, et
+  // l'écran choisit le message traduit.
+  group('type d\'erreur', () {
+    Future<void> expectKind(GithubService service, GithubErrorKind kind) =>
+        expectLater(
+          service.fetchRepos('x'),
+          throwsA(isA<GithubException>().having((e) => e.kind, 'kind', kind)),
+        );
+
+    test('404 → notFound, 403 → rateLimited, 500 → unexpected', () async {
+      for (final (code, kind) in [
+        (404, GithubErrorKind.notFound),
+        (403, GithubErrorKind.rateLimited),
+        (500, GithubErrorKind.unexpected),
+      ]) {
+        await expectKind(
+          GithubService(client: MockClient((_) async => http.Response('', code))),
+          kind,
+        );
+      }
+    });
+
+    test('hors ligne → offline ; délai → timeout', () async {
+      await expectKind(
+        GithubService(client: MockClient((_) async => throw Exception('x'))),
+        GithubErrorKind.offline,
+      );
+      await expectKind(
+        GithubService(
+          client: MockClient((_) async {
+            await Future<void>.delayed(const Duration(milliseconds: 200));
+            return http.Response('[]', 200);
+          }),
+          timeout: const Duration(milliseconds: 20),
+        ),
+        GithubErrorKind.timeout,
+      );
+    });
+  });
 }

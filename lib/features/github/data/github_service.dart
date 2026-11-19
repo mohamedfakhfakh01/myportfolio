@@ -6,17 +6,36 @@ import 'package:http/http.dart' as http;
 import '../../../shared/utils/github.dart';
 import 'github_repo.dart';
 
-/// Erreur « métier » du service GitHub, avec un message lisible pour l'UI.
-class GithubException implements Exception {
-  GithubException(this.message, {this.notFound = false});
-  final String message;
+/// Ce qui a empêché d'obtenir les dépôts.
+enum GithubErrorKind {
+  /// GitHub répond que ce compte n'existe pas (404).
+  notFound,
 
-  /// Vrai si GitHub a répondu que ce compte n'existe pas (404) : l'écran peut
-  /// alors afficher son propre message traduit.
-  final bool notFound;
+  /// Limite de requêtes atteinte (403 ; 60 par heure sans authentification).
+  rateLimited,
+
+  /// GitHub n'a pas répondu à temps.
+  timeout,
+
+  /// Impossible de joindre GitHub (hors ligne…).
+  offline,
+
+  /// Réponse inattendue (autre code, contenu illisible).
+  unexpected,
+}
+
+/// Erreur du service GitHub. Elle ne contient **pas de texte affiché** : le
+/// service ne connaît pas la langue de l'utilisateur. L'écran choisit le
+/// message traduit selon [kind] (piège n°19 du CLAUDE.md).
+class GithubException implements Exception {
+  GithubException(this.kind);
+  final GithubErrorKind kind;
+
+  /// Raccourci : GitHub a répondu que ce compte n'existe pas.
+  bool get notFound => kind == GithubErrorKind.notFound;
 
   @override
-  String toString() => message;
+  String toString() => 'GithubException(${kind.name})'; // journaux seulement
 }
 
 /// Réponse de GitHub à « ce compte existe-t-il ? ».
@@ -68,9 +87,9 @@ class GithubService {
           .get(uri, headers: {'Accept': 'application/vnd.github+json'})
           .timeout(timeout);
     } on TimeoutException {
-      throw GithubException('Délai dépassé. Vérifie ta connexion et réessaie.');
+      throw GithubException(GithubErrorKind.timeout);
     } catch (_) {
-      throw GithubException('Impossible de contacter GitHub (connexion ?).');
+      throw GithubException(GithubErrorKind.offline);
     }
 
     switch (response.statusCode) {
@@ -83,16 +102,14 @@ class GithubService {
               .map((item) => GithubRepo.fromJson(item as Map<String, dynamic>))
               .toList();
         } catch (_) {
-          throw GithubException('Réponse GitHub illisible.');
+          throw GithubException(GithubErrorKind.unexpected);
         }
       case 404:
-        throw GithubException('Utilisateur GitHub introuvable.', notFound: true);
+        throw GithubException(GithubErrorKind.notFound);
       case 403:
-        throw GithubException(
-          'Limite de requêtes GitHub atteinte. Réessaie dans un moment.',
-        );
+        throw GithubException(GithubErrorKind.rateLimited);
       default:
-        throw GithubException('Erreur GitHub (code ${response.statusCode}).');
+        throw GithubException(GithubErrorKind.unexpected);
     }
   }
 

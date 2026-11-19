@@ -127,6 +127,25 @@ class AppLocalizationsFr extends AppLocalizations {
   String get githubNoRepos => 'Aucun dépôt public trouvé.';
 
   @override
+  String get githubErrorNotFound => 'Utilisateur GitHub introuvable.';
+
+  @override
+  String get githubErrorRateLimited =>
+      'Limite de requêtes GitHub atteinte. Réessaie dans un moment.';
+
+  @override
+  String get githubErrorTimeout =>
+      'Délai dépassé. Vérifie ta connexion et réessaie.';
+
+  @override
+  String get githubErrorOffline =>
+      'Impossible de contacter GitHub (connexion ?).';
+
+  @override
+  String get githubErrorUnexpected =>
+      'GitHub a renvoyé une réponse inattendue. Réessaie plus tard.';
+
+  @override
   String githubSummary(int count, int stars) {
     return '$count dépôts · $stars étoiles';
   }

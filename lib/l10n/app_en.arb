@@ -43,6 +43,11 @@
 
   "githubRepos": "GitHub repositories",
   "githubNoRepos": "No public repository found.",
+  "githubErrorNotFound": "GitHub user not found.",
+  "githubErrorRateLimited": "GitHub request limit reached. Try again in a moment.",
+  "githubErrorTimeout": "Request timed out. Check your connection and try again.",
+  "githubErrorOffline": "Couldn't reach GitHub (connection?).",
+  "githubErrorUnexpected": "GitHub sent an unexpected response. Try again later.",
   "githubSummary": "{count} repos · {stars} stars",
   "githubMainLanguage": "Main language: {language}",
   "githubLastUpdate": "Last update: {date}",

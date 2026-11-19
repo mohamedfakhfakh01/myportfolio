@@ -326,6 +326,36 @@ abstract class AppLocalizations {
   /// **'Aucun dépôt public trouvé.'**
   String get githubNoRepos;
 
+  /// No description provided for @githubErrorNotFound.
+  ///
+  /// In fr, this message translates to:
+  /// **'Utilisateur GitHub introuvable.'**
+  String get githubErrorNotFound;
+
+  /// No description provided for @githubErrorRateLimited.
+  ///
+  /// In fr, this message translates to:
+  /// **'Limite de requêtes GitHub atteinte. Réessaie dans un moment.'**
+  String get githubErrorRateLimited;
+
+  /// No description provided for @githubErrorTimeout.
+  ///
+  /// In fr, this message translates to:
+  /// **'Délai dépassé. Vérifie ta connexion et réessaie.'**
+  String get githubErrorTimeout;
+
+  /// No description provided for @githubErrorOffline.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible de contacter GitHub (connexion ?).'**
+  String get githubErrorOffline;
+
+  /// No description provided for @githubErrorUnexpected.
+  ///
+  /// In fr, this message translates to:
+  /// **'GitHub a renvoyé une réponse inattendue. Réessaie plus tard.'**
+  String get githubErrorUnexpected;
+
   /// No description provided for @githubSummary.
   ///
   /// In fr, this message translates to:

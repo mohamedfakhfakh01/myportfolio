@@ -126,6 +126,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get githubNoRepos => 'No public repository found.';
 
   @override
+  String get githubErrorNotFound => 'GitHub user not found.';
+
+  @override
+  String get githubErrorRateLimited =>
+      'GitHub request limit reached. Try again in a moment.';
+
+  @override
+  String get githubErrorTimeout =>
+      'Request timed out. Check your connection and try again.';
+
+  @override
+  String get githubErrorOffline => 'Couldn\'t reach GitHub (connection?).';
+
+  @override
+  String get githubErrorUnexpected =>
+      'GitHub sent an unexpected response. Try again later.';
+
+  @override
   String githubSummary(int count, int stars) {
     return '$count repos · $stars stars';
   }

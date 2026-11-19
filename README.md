@@ -102,7 +102,7 @@ publics du compte (preuve que c'est le bon). À l'enregistrement, l'app **vérif
 
 ```bash
 flutter analyze          # 0 erreur attendu
-flutter test             # 176 tests
+flutter test             # 191 tests
 flutter test --coverage  # génère coverage/lcov.info
 ```
 

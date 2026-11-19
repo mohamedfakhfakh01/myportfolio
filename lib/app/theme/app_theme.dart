@@ -101,12 +101,20 @@ class AppTheme {
         ),
       ),
 
-      // Boutons contour (action secondaire) : texte et bordure violets.
+      // Boutons texte (« Annuler », « Ajouter une photo »…) : indigo LISIBLE
+      // sur le fond. L'indigo foncé n'offre que 2,3 à 2,8:1 en thème sombre
+      // (minimum 4,5:1) : primaryText passe à l'indigo clair.
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(foregroundColor: AppColors.primaryText),
+      ),
+
+      // Boutons contour (action secondaire) : texte et bordure indigo, lisibles
+      // dans les deux thèmes (même raison).
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.primary,
+          foregroundColor: AppColors.primaryText,
           minimumSize: const Size.fromHeight(52),
-          side: const BorderSide(color: AppColors.primary),
+          side: BorderSide(color: AppColors.primaryText),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(_radius),
           ),

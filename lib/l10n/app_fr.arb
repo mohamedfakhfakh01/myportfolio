@@ -46,6 +46,11 @@
 
   "githubRepos": "Dépôts GitHub",
   "githubNoRepos": "Aucun dépôt public trouvé.",
+  "githubErrorNotFound": "Utilisateur GitHub introuvable.",
+  "githubErrorRateLimited": "Limite de requêtes GitHub atteinte. Réessaie dans un moment.",
+  "githubErrorTimeout": "Délai dépassé. Vérifie ta connexion et réessaie.",
+  "githubErrorOffline": "Impossible de contacter GitHub (connexion ?).",
+  "githubErrorUnexpected": "GitHub a renvoyé une réponse inattendue. Réessaie plus tard.",
   "githubSummary": "{count} dépôts · {stars} étoiles",
   "@githubSummary": {
     "placeholders": {
