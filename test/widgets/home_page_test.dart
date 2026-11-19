@@ -29,9 +29,6 @@ class _FakeRepo extends PortfolioRepository {
   Future<void> seedIfEmpty() async {}
 
   @override
-  Future<void> ensureDemoStudent() async {}
-
-  @override
   Future<List<Student>> getStudents() async {
     if (gate != null) await gate!.future;
     if (failuresLeft > 0) {

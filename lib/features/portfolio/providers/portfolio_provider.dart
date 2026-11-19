@@ -45,8 +45,6 @@ class PortfolioProvider extends ChangeNotifier {
     notifyListeners();
     try {
       await _repository.seedIfEmpty();
-      // Ajoute le profil de démonstration s'il manque (idempotent).
-      await _repository.ensureDemoStudent();
       _students = await _repository.getStudents();
     } catch (e) {
       _hasError = true;

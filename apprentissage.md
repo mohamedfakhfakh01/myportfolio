@@ -1117,5 +1117,15 @@ Réflexe : avant de « corriger » le code, vérifier que le test décrit bien l
 
 ---
 
-*Dernière mise à jour (19 novembre 2026) : tests du détail projet et des formulaires ; double
-appui, technologies en double et boutons de feuille corrigés. 123 tests, analyse sans erreur.*
+### Retrait du portfolio Démo (19 novembre 2026)
+
+#### Concept — Supprimer une donnée que le code recrée
+Le Démo ne pouvait pas être supprimé pour de bon : à **chaque démarrage**, `ensureDemoStudent()`
+vérifiait s'il manquait… et le recréait. Analogie : jeter un objet que quelqu'un remet sur l'étagère
+chaque matin — il faut d'abord arrêter la personne. On a donc retiré **le code** (la recréation et
+les données du Démo), puis supprimé le Démo dans l'app : après relance, il ne revient plus.
+Le code retiré reste dans l'historique git si on voulait un jour le remettre.
+
+---
+
+*Dernière mise à jour (19 novembre 2026) : portfolio Démo retiré. 123 tests, analyse sans erreur.*

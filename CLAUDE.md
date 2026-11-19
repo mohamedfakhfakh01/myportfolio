@@ -33,7 +33,9 @@ mais jamais lancé sur appareil ni émulateur.
 et de Houssain sont **fictifs** — l'utilisateur les a demandés ainsi pour la démonstration. Ne pas
 les présenter comme des données réelles, et ne pas « corriger » leur présence.
 
-Le portfolio **« Portfolio Démo »** est entièrement fictif et assumé comme tel (sa bio le dit).
+Le portfolio fictif **« Portfolio Démo »** a été **retiré le 19 nov. 2026** (à la demande) : il n'est
+plus créé ni recréé au démarrage (`ensureDemoStudent` supprimé). Une base existante qui le contient
+encore le garde jusqu'à ce que l'utilisateur le supprime (corbeille) ; il ne revient plus ensuite.
 
 **Sources uniques de vérité dans le code :**
 - `lib/app/theme/app_colors.dart` → toutes les couleurs, **y compris celles du PDF**
@@ -259,6 +261,7 @@ Aucune : l'application ne contacte que l'API GitHub publique, sans clé.
 | Ménage | 19 nov. 2026 | Code mort retiré (vitrine du thème, `SkillChip`), paquet `cupertino_icons` inutilisé retiré ; `flutter clean` : 5,2 Go → 150 Mo (88 tests) |
 | Tests accueil | 19 nov. 2026 | 12 tests (recherche, suppression, états) ; message d'erreur traduit (il était en dur en français) ; en-têtes du formulaire de création qui débordaient (100 tests, ≈ 56 %) |
 | Tests formulaires | 19 nov. 2026 | Détail projet + feuilles : double appui (doublons, dont 2 portfolios du même nom), technos en double, boutons qui débordent — corrigés (123 tests, ≈ 70 %) |
+| Retrait Démo | 19 nov. 2026 | Portfolio Démo retiré du code : il était recréé à chaque démarrage, donc impossible à supprimer |
 
 ---
 
