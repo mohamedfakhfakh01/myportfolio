@@ -987,8 +987,12 @@ Couverture : page profil 0 % → 82 %, PDF 0 % → 97 %, projet ≈ 50 %.
    l'alphabet « Latin-1 » : les accents oui, mais pas le tiret long « — ». La bibliothèque `pdf`
    **saute** le caractère sans erreur (le message n'apparaît qu'en mode debug). Résultat :
    « Licence Informatique — IIT Sfax » devient « Licence Informatique  IIT Sfax » dans le CV.
-   Pas encore corrigé : il faut choisir entre embarquer une police complète et remplacer ces
-   caractères par des équivalents simples.
+   **Corrigé** (choix : remplacer plutôt qu'embarquer une police, pour garder l'app légère) par
+   `pdfSafeText` : « — » → « - », « ’ » → « ' », « … » → « ... », « œ » → « oe ». On nettoie les
+   données **une seule fois, à l'entrée** de `buildPortfolioPdf`, plutôt qu'à chacun des 11
+   endroits qui écrivent du texte : un futur ajout ne peut pas « oublier » la protection.
+   **Contrôle positif** : en désactivant la correction, le test échoue ; en la remettant, il passe.
+   Un test qui ne peut pas échouer ne prouve rien.
 
 #### Concept 2 — Tester sur la taille d'un vrai téléphone
 Par défaut, un test de widget dessine dans une fenêtre de 800×600 (format paysage). Un bug de
@@ -1003,4 +1007,4 @@ quand il y a beaucoup de projets, et qu'une photo absente ou corrompue ne fait p
 ---
 
 *Dernière mise à jour (19 novembre 2026) : tests de la page profil et du PDF, feuille de
-complétion corrigée. 78 tests, analyse sans erreur.*
+complétion corrigée, caractères du PDF remplacés. 81 tests, analyse sans erreur.*

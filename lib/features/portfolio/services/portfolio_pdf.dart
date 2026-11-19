@@ -5,6 +5,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
 import '../../../l10n/app_localizations.dart';
+import '../../../shared/models/project.dart';
 import '../../../shared/models/skill.dart';
 import '../../../shared/models/student.dart';
 
@@ -25,7 +26,10 @@ final PdfColor _chipBg = PdfColor.fromInt(0xFFDBEAFE); // fond des puces
 ///
 /// Ne contient que des données **réelles** de l'étudiant : les champs absents
 /// (bio vide, niveau non renseigné…) sont simplement omis, rien n'est inventé.
-Future<Uint8List> buildPortfolioPdf(Student student, AppLocalizations l) async {
+Future<Uint8List> buildPortfolioPdf(Student source, AppLocalizations l) async {
+  // Texte rendu « dessinable » une fois pour toutes, avant toute mise en page
+  // (voir [pdfSafeText]) : aucun caractère ne disparaît en silence.
+  final Student student = _pdfSafeStudent(source);
   final doc = pw.Document();
 
   // Photo de profil (optionnelle) : seulement si le fichier existe vraiment.
@@ -174,7 +178,7 @@ pw.Widget _sectionTitle(String title) {
             pw.Container(width: 10, height: 10, color: _primary),
             pw.SizedBox(width: 8),
             pw.Text(
-              title.toUpperCase(),
+              pdfSafeText(title.toUpperCase()),
               style: pw.TextStyle(
                 fontSize: 13,
                 fontWeight: pw.FontWeight.bold,
@@ -348,3 +352,73 @@ pw.Widget _footer(pw.Context context) {
 
 /// Formate un nombre sur 2 chiffres (ex : 3 → « 03 ») pour la date.
 String _two(int n) => n.toString().padLeft(2, '0');
+
+// --- Caractères compatibles avec la police du PDF ---
+
+/// Équivalents Latin-1 des caractères typographiques courants.
+///
+/// La police standard du PDF (Helvetica) ne sait dessiner que l'alphabet
+/// **Latin-1** (codes 0 à 255 : lettres accentuées françaises comprises). La
+/// bibliothèque `pdf` **saute sans erreur** tout autre caractère : sans ce
+/// remplacement, « Informatique — IIT Sfax » devenait « Informatique  IIT Sfax ».
+/// Le clavier iOS en produit beaucoup (apostrophe ’, guillemets “ ”, tiret —).
+const Map<int, String> _latin1Equivalents = {
+  0x2010: '-', 0x2011: '-', 0x2012: '-', 0x2013: '-', 0x2014: '-', // tirets
+  0x2212: '-', // signe moins
+  0x2018: "'", 0x2019: "'", 0x201A: "'", 0x2032: "'", // apostrophes
+  0x201C: '"', 0x201D: '"', 0x201E: '"', 0x2033: '"', // guillemets anglais
+  0x2026: '...', // points de suspension
+  0x2022: '\u00B7', // puce • → point médian ·
+  0x2192: '->', 0x2190: '<-', // flèches
+  0x0153: 'oe', 0x0152: 'OE', // ligatures œ Œ (absentes de Latin-1)
+  0x0178: 'Y', // Ÿ
+  0x20AC: 'EUR', // euro
+  0x2122: 'TM', // marque
+  // Espaces spéciales (l'espace fine insécable précède « ! ? ; » en français).
+  0x202F: '\u00A0', 0x2009: ' ', 0x2002: ' ', 0x2003: ' ', 0x2007: ' ',
+  0x200B: '', // espace de largeur nulle
+};
+
+/// Rend [input] entièrement dessinable par la police du PDF : les caractères
+/// typographiques sont remplacés par leur équivalent, ceux qui n'en ont pas
+/// (émoji, écritures non latines) sont retirés. Les accents sont conservés.
+String pdfSafeText(String input) {
+  final StringBuffer out = StringBuffer();
+  for (final int rune in input.runes) {
+    if (rune <= 0xFF) {
+      out.writeCharCode(rune);
+    } else {
+      out.write(_latin1Equivalents[rune] ?? '');
+    }
+  }
+  return out.toString();
+}
+
+/// Copie de [s] dont tous les textes affichés dans le PDF sont « sûrs ».
+Student _pdfSafeStudent(Student s) => s.copyWith(
+      fullName: pdfSafeText(s.fullName),
+      field: pdfSafeText(s.field),
+      bio: pdfSafeText(s.bio),
+      githubUsername:
+          s.githubUsername == null ? null : pdfSafeText(s.githubUsername!),
+      skills: [
+        for (final k in s.skills)
+          Skill(
+            id: k.id,
+            name: pdfSafeText(k.name),
+            level: k.level,
+            category: k.category,
+          ),
+      ],
+      projects: [
+        for (final p in s.projects)
+          Project(
+            id: p.id,
+            title: pdfSafeText(p.title),
+            description: pdfSafeText(p.description),
+            link: p.link,
+            imagePath: p.imagePath,
+            tags: [for (final t in p.tags) pdfSafeText(t)],
+          ),
+      ],
+    );

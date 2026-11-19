@@ -50,7 +50,7 @@ export PATH="$HOME/flutter/bin:$PATH"      # Flutter n'est PAS dans le PATH
 export LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 # obligatoire avant tout build iOS
 
 flutter analyze                             # 0 erreur attendu
-flutter test                                # 78 tests
+flutter test                                # 81 tests
 flutter gen-l10n                            # APRÈS toute modif des .arb
 flutter run -d 87E626E0-E743-44A6-8A48-AA716FD7851B --debug   # simulateur iPhone 18 Pro Max
 flutter build ios --release                 # puis: flutter install -d <udid> --release
@@ -101,6 +101,9 @@ iPhone physique « iPhone de fakh » `00008120-000664510C70201E`.
     `useSafeArea: true` + contenu dans un `SingleChildScrollView`.
 15. **Tester un écran sur une taille de téléphone** (`tester.view.physicalSize`) : la taille par
     défaut des tests (800×600, paysage) cache les débordements verticaux.
+16. **La police standard du PDF ne dessine que le Latin-1 (codes 0–255)** et la bibliothèque `pdf`
+    **saute sans erreur** tout autre caractère (avertissement en debug seulement). Tout texte
+    utilisateur passe par `pdfSafeText` (fait une fois à l'entrée de `buildPortfolioPdf`).
 
 ---
 
@@ -178,9 +181,9 @@ validation côté serveur ne s'appliquent pas ici.
   (`android/app/build.gradle.kts`), donc non publiable sur le Play Store.
 - ⚠️ Couverture de tests ≈ 50 % (des fichiers chargés par les tests) : logique, page profil (82 %)
   et PDF (97 %) couverts ; accueil, détail projet et formulaires internes encore peu testés.
-- ⚠️ **PDF : la police Helvetica intégrée ignore les caractères hors Latin-1** (« — », « – », « ’ »…) :
-  ils sont **sautés en silence** (`pdf` → `text.dart`, `text.sublist(index + 1)`). Touche les
-  vraies données (filière « … — IIT Sfax », titres de projets). Non corrigé à ce jour.
+- ⚠️ **PDF en Helvetica (Latin-1 seulement)** : la ponctuation typographique est remplacée par
+  `pdfSafeText` (« — » → « - », « ’ » → « ' », « œ » → « oe »…). Les **émoji et écritures non
+  latines (arabe…) sont retirés** du PDF : il faudrait embarquer une police Unicode pour les garder.
 - ⚠️ CocoaPods au lieu de Swift Package Manager (builds plus lents, piège de la locale).
 
 ---
@@ -210,7 +213,6 @@ Aucune : l'application ne contacte que l'API GitHub publique, sans clé.
 - [ ] **Lancer l'APK Android** sur un émulateur ou un appareil (aucun AVD sur cette machine).
 - [ ] Configurer une **signature release** Android avant toute publication.
 - [ ] Monter la couverture de tests sur l'accueil et l'écran détail projet.
-- [ ] Corriger les caractères perdus dans le PDF (police Unicode embarquée ou substitution).
 - [ ] Migrer CocoaPods → Swift Package Manager.
 
 ---
@@ -226,6 +228,7 @@ Aucune : l'application ne contacte que l'API GitHub publique, sans clé.
 | Données | 18 nov. 2026 | Technologies par projet (v7), écran détail, filtre, sauvegarde JSON |
 | Retrait | 19 nov. 2026 | Sauvegarde JSON retirée (à la demande) ; anti-doublon à la création conservé |
 | Tests écrans | 19 nov. 2026 | Tests page profil + PDF (78 tests, ≈ 50 %) ; débordement de la feuille de complétion corrigé ; perte des « — » dans le PDF découverte |
+| PDF | 19 nov. 2026 | `pdfSafeText` : ponctuation typographique remplacée, plus aucun caractère perdu (81 tests) |
 
 ---
 

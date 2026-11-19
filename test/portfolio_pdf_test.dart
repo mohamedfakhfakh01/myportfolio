@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/widgets.dart';
@@ -78,6 +79,61 @@ void main() {
       final int pages =
           RegExp(r'/Type\s*/Page[^s]').allMatches(String.fromCharCodes(bytes)).length;
       expect(pages, greaterThan(1));
+    });
+
+    group('caractères hors Latin-1 (police Helvetica)', () {
+      test('pdfSafeText remplace la ponctuation typographique', () {
+        expect(pdfSafeText('Informatique — IIT Sfax'),
+            'Informatique - IIT Sfax');
+        expect(pdfSafeText('Juin – Juillet 2026'), 'Juin - Juillet 2026');
+        // Apostrophe et guillemets « intelligents » du clavier iOS.
+        expect(pdfSafeText('l’IIT, “Flutter”'), 'l\'IIT, "Flutter"');
+        expect(pdfSafeText('etc…'), 'etc...');
+        expect(pdfSafeText('cœur, Œuvre'), 'coeur, OEuvre');
+        expect(pdfSafeText('• React → Vue'), '· React -> Vue');
+        expect(pdfSafeText('10 €'), '10 EUR');
+        // Espace fine insécable (avant « ! ? ; ») → espace insécable Latin-1.
+        expect(pdfSafeText('Bravo\u202F!'), 'Bravo\u00A0!');
+      });
+
+      test('pdfSafeText garde les accents et retire l\'inaffichable', () {
+        const latin1 = 'Étudiante à Sfax : élève, ça, « citation », Ñ, ß, °, ·';
+        expect(pdfSafeText(latin1), latin1);
+        // Émoji et autres écritures : la police ne peut pas les dessiner.
+        expect(pdfSafeText('Flutter 🚀'), 'Flutter ');
+        expect(pdfSafeText(''), '');
+      });
+
+      test('aucun caractère perdu en silence avec les vraies données',
+          () async {
+        // Données reprises de sample_portfolio_data.dart (« — » et « – »).
+        const s = Student(
+          fullName: 'Mohamed Fakhfakh',
+          field: '3e année Licence Informatique — IIT Sfax',
+          bio: 'Passionné de mobile… l’app « MyPortfolio ».',
+          skills: [Skill(name: 'C# — .NET', level: 70)],
+          projects: [
+            Project(
+              title: 'Al Seniour — Restaurant',
+              description: 'Site – réservation “en ligne”.',
+              tags: ['Laravel — PHP'],
+            ),
+          ],
+        );
+        final List<String> logs = [];
+        final bytes = await runZoned(
+          () => buildPortfolioPdf(s, l),
+          zoneSpecification: ZoneSpecification(
+            print: (self, parent, zone, line) => logs.add(line),
+          ),
+        );
+        _expectValidPdf(bytes);
+        // La bibliothèque `pdf` signale chaque caractère qu'elle saute.
+        expect(
+          logs.where((m) => m.contains('Unable to find a font')),
+          isEmpty,
+        );
+      });
     });
 
     group('photo de profil', () {

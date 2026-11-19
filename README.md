@@ -97,7 +97,7 @@ section *Dépôts GitHub* charge les dépôts publics.
 
 ```bash
 flutter analyze          # 0 erreur attendu
-flutter test             # 78 tests
+flutter test             # 81 tests
 flutter test --coverage  # génère coverage/lcov.info
 ```
 
@@ -135,8 +135,8 @@ lib/
   émulateur. Il est signé avec la **clé de debug** (installable, mais refusé par le Play Store).
 - Couverture de tests ≈ 50 % : logique, page profil et export PDF couverts ; l'accueil et l'écran
   détail projet le sont peu.
-- Export PDF : les caractères hors Latin-1 (tiret long « — », apostrophe typographique…) n'apparaissent
-  pas, la police intégrée ne les connaît pas.
+- Export PDF : la police intégrée ne connaît que le Latin-1. La ponctuation typographique est
+  remplacée (« — » → « - », « ’ » → « ' »), mais les émoji et l'écriture arabe sont retirés.
 - Avec un compte Apple gratuit, le profil de développement iOS expire après ~7 jours
   (relancer depuis Xcode pour le renouveler).
 - Flutter signale que les plugins sont disponibles en **Swift Packages** : migrer depuis CocoaPods
