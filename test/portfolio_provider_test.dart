@@ -261,6 +261,23 @@ void main() {
         expect(provider.students, hasLength(2));
       });
 
+      test('deux ajouts simultanés du même nom : un seul est créé',
+          () async {
+        final provider = await makeProvider();
+        // Lancés sans attendre, comme un double appui sur « Créer ».
+        final first =
+            provider.addStudent(const Student(fullName: 'Carla', field: 'I'));
+        final second = expectLater(
+          provider.addStudent(const Student(fullName: 'carla', field: 'I')),
+          throwsA(isA<DuplicatePortfolioNameException>()),
+        );
+        await first;
+        await second;
+        expect(provider.students.where((s) => s.fullName == 'Carla'),
+            hasLength(1));
+        expect(provider.students, hasLength(3));
+      });
+
       test('updateStudent refuse de renommer vers le nom d\'un autre',
           () async {
         final provider = await makeProvider();

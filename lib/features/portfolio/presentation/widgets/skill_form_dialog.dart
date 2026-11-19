@@ -60,7 +60,21 @@ class _SkillFormDialogState extends State<_SkillFormDialog> {
     super.dispose();
   }
 
+  /// Vrai pendant l'enregistrement : le bouton « Enregistrer » est désactivé,
+  /// sinon un double appui enregistrait deux fois (doublon).
+  bool _saving = false;
+
   Future<void> _save() async {
+    if (_saving) return;
+    setState(() => _saving = true);
+    try {
+      await _doSave();
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
+  }
+
+  Future<void> _doSave() async {
     // validate() déclenche les `validator` de chaque champ.
     if (!_formKey.currentState!.validate()) return;
 
@@ -185,7 +199,7 @@ class _SkillFormDialogState extends State<_SkillFormDialog> {
           child: Text(l.cancel),
         ),
         TextButton(
-          onPressed: _save,
+          onPressed: _saving ? null : _save,
           child: Text(l.save),
         ),
       ],

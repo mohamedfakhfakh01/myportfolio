@@ -175,4 +175,18 @@ void main() {
       expect(repo.language, isNull);
     });
   });
+
+  group('Project.parseTags', () {
+    test('espaces retirés, entrées vides ignorées', () {
+      expect(Project.parseTags(' Flutter , , Dart ,'), ['Flutter', 'Dart']);
+      expect(Project.parseTags(''), isEmpty);
+    });
+
+    test('aucun doublon, casse ignorée, première écriture gardée', () {
+      expect(
+        Project.parseTags('Flutter, Dart, flutter, FLUTTER, dart'),
+        ['Flutter', 'Dart'],
+      );
+    });
+  });
 }

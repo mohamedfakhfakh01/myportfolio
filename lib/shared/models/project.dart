@@ -51,6 +51,18 @@ class Project {
         tags: _decodeTags(map['tags']),
       );
 
+  /// Découpe une saisie « Flutter, Dart, flutter » en technologies : espaces
+  /// retirés, entrées vides ignorées, et **aucun doublon** (casse ignorée, la
+  /// première écriture est gardée) → `['Flutter', 'Dart']`.
+  static List<String> parseTags(String input) {
+    final Set<String> seen = {};
+    return [
+      for (final String raw in input.split(','))
+        if (raw.trim().isNotEmpty && seen.add(raw.trim().toLowerCase()))
+          raw.trim(),
+    ];
+  }
+
   /// Décode la colonne `tags` (JSON) de façon tolérante : null, vide ou valeur
   /// invalide → liste vide (on n'invente rien).
   static List<String> _decodeTags(Object? raw) {

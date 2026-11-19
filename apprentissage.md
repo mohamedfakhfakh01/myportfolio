@@ -1089,5 +1089,33 @@ que la vraie, donc sur un téléphone ordinaire ça tenait ; mais avec le **text
 
 ---
 
-*Dernière mise à jour (19 novembre 2026) : tests de l'accueil, message d'erreur traduit,
-en-têtes du formulaire corrigés. 100 tests, analyse sans erreur.*
+### Tests du détail projet et des formulaires (19 novembre 2026)
+
+23 tests de plus (123 au total, couverture ≈ 70 %). Trois vrais défauts trouvés et corrigés.
+
+#### Concept 1 — Le double appui (« race condition »)
+Enregistrer prend un instant (la base écrit sur le disque). Pendant cet instant, rien n'empêchait
+d'appuyer une 2ᵉ fois : **deux projets identiques** — et, plus grave, **deux portfolios du même
+nom**, car la vérification « ce nom existe-t-il ? » regardait une liste pas encore mise à jour.
+Analogie : deux clients réservent la dernière table au même moment ; chacun voit « libre ».
+Correction en deux couches, comme un restaurant sérieux :
+- le **bouton se grise** pendant l'enregistrement (`_saving`) ;
+- le provider **réserve le nom** dès le début de la création (`_pendingNames`) : un second ajout du
+  même nom est refusé, quel que soit l'écran qui le demande.
+Pour le reproduire en test, le faux dépôt doit **prendre du temps** (`Future.delayed`) : sinon tout
+se termine avant le second appui et le bug reste invisible.
+
+#### Concept 2 — Une règle, un seul endroit
+« Flutter, flutter » donnait deux technologies. La règle de découpage existait **en deux copies**
+(formulaire projet et formulaire de création de CV) : corriger l'une aurait laissé le bug dans
+l'autre. Elle vit maintenant dans `Project.parseTags`, testée seule, utilisée par les deux.
+
+#### Concept 3 — Quand le test se trompe
+Le test « niveau abc refusé » échouait… parce que le champ **filtre déjà** les lettres au clavier :
+« abc » ne peut pas être saisi. Ce n'était pas un bug de l'app mais une hypothèse fausse du test.
+Réflexe : avant de « corriger » le code, vérifier que le test décrit bien le comportement voulu.
+
+---
+
+*Dernière mise à jour (19 novembre 2026) : tests du détail projet et des formulaires ; double
+appui, technologies en double et boutons de feuille corrigés. 123 tests, analyse sans erreur.*

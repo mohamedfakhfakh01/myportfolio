@@ -109,18 +109,28 @@ class _ProjectFormDialogState extends State<_ProjectFormDialog> {
     super.dispose();
   }
 
+  /// Vrai pendant l'enregistrement : le bouton « Enregistrer » est désactivé,
+  /// sinon un double appui enregistrait deux fois (doublon).
+  bool _saving = false;
+
   Future<void> _save() async {
+    if (_saving) return;
+    setState(() => _saving = true);
+    try {
+      await _doSave();
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
+  }
+
+  Future<void> _doSave() async {
     if (!_formKey.currentState!.validate()) return;
 
     final AppLocalizations l = AppLocalizations.of(context);
     final ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
 
     final String link = _linkController.text.trim();
-    final List<String> tags = _tagsController.text
-        .split(',')
-        .map((t) => t.trim())
-        .where((t) => t.isNotEmpty)
-        .toList();
+    final List<String> tags = Project.parseTags(_tagsController.text);
     final Project project = Project(
       id: widget.project?.id,
       title: _titleController.text.trim(),
@@ -254,7 +264,7 @@ class _ProjectFormDialogState extends State<_ProjectFormDialog> {
           onPressed: () => Navigator.of(context).pop(),
           child: Text(l.cancel),
         ),
-        TextButton(onPressed: _save, child: Text(l.save)),
+        TextButton(onPressed: _saving ? null : _save, child: Text(l.save)),
       ],
     );
   }

@@ -28,6 +28,9 @@ class _FakeRepo extends PortfolioRepository {
 
   @override
   Future<int> insertStudent(Student student) async {
+    // Une vraie base prend un peu de temps : permet de reproduire un double
+    // appui pendant l'enregistrement.
+    await Future<void>.delayed(const Duration(milliseconds: 10));
     final int id = _nextId++;
     _students.add(student.copyWith(
       id: id,
@@ -179,6 +182,36 @@ void main() {
 
     expect(find.text(_duplicateError), findsNothing);
     expect(provider.students.single.field, 'Informatique');
+    await tester.pump(const Duration(seconds: 5));
+    await tester.pumpAndSettle();
+  });
+
+  testWidgets('double appui sur « Créer le portfolio » : un seul portfolio',
+      (tester) async {
+    final provider = makeProvider();
+    await _openForm(tester, provider);
+
+    await tester.enterText(
+        find.widgetWithText(TextFormField, _nameLabel), 'Carla Petit');
+    await tester.enterText(
+        find.widgetWithText(TextFormField, _fieldLabel), 'Informatique');
+    FocusManager.instance.primaryFocus?.unfocus();
+    await tester.pumpAndSettle();
+    final Finder button = find.text('Créer le portfolio');
+    await tester.ensureVisible(button);
+    await tester.pumpAndSettle();
+
+    // Deux appuis rapides, avant la fin du premier enregistrement.
+    await tester.tap(button);
+    await tester.tap(button, warnIfMissed: false);
+    await tester.pumpAndSettle();
+
+    expect(
+      provider.students.where((s) => s.fullName == 'Carla Petit'),
+      hasLength(1),
+    );
+    // Une seule fermeture : retour à l'écran de départ, pas au-delà.
+    expect(find.text('ouvrir'), findsOneWidget);
     await tester.pump(const Duration(seconds: 5));
     await tester.pumpAndSettle();
   });

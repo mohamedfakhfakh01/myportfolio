@@ -207,7 +207,21 @@ class _StudentFormPageState extends State<StudentFormPage> {
   /// Renvoie le texte nettoyé, ou null s'il est vide.
   String? _orNull(String s) => s.trim().isEmpty ? null : s.trim();
 
+  /// Vrai pendant l'enregistrement : le bouton « Enregistrer » est désactivé,
+  /// sinon un double appui enregistrait deux fois (doublon).
+  bool _saving = false;
+
   Future<void> _save() async {
+    if (_saving) return;
+    setState(() => _saving = true);
+    try {
+      await _doSave();
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
+  }
+
+  Future<void> _doSave() async {
     if (!_formKey.currentState!.validate()) return;
 
     final AppLocalizations l = AppLocalizations.of(context);
@@ -523,7 +537,7 @@ class _StudentFormPageState extends State<StudentFormPage> {
 
                 // --- Bouton Enregistrer (bien visible) ---
                 ElevatedButton.icon(
-                  onPressed: _save,
+                  onPressed: _saving ? null : _save,
                   icon: const Icon(Icons.check),
                   label: Text(_isCreating ? l.createPortfolio : l.save),
                 ),
@@ -569,11 +583,7 @@ class _ProjectInputDialogState extends State<_ProjectInputDialog> {
   void _submit() {
     if (!_formKey.currentState!.validate()) return;
     final String link = _linkController.text.trim();
-    final List<String> tags = _tagsController.text
-        .split(',')
-        .map((t) => t.trim())
-        .where((t) => t.isNotEmpty)
-        .toList();
+    final List<String> tags = Project.parseTags(_tagsController.text);
     Navigator.of(context).pop(
       Project(
         title: _titleController.text.trim(),

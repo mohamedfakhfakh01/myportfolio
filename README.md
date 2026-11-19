@@ -98,7 +98,7 @@ section *Dépôts GitHub* charge les dépôts publics.
 
 ```bash
 flutter analyze          # 0 erreur attendu
-flutter test             # 100 tests
+flutter test             # 123 tests
 flutter test --coverage  # génère coverage/lcov.info
 ```
 
@@ -134,8 +134,8 @@ lib/
   uniquement sur l'appareil ; supprimer l'app ou changer de téléphone les efface.
 - **Android** : l'APK release compile, mais n'a pas encore été testé sur un appareil ou un
   émulateur. Il est signé avec la **clé de debug** (installable, mais refusé par le Play Store).
-- Couverture de tests ≈ 56 % : logique, accueil, page profil et export PDF couverts ; l'écran
-  détail projet et les formulaires le sont peu.
+- Couverture de tests ≈ 70 % : logique, écrans, export PDF et formulaires couverts ; le formulaire
+  de création de CV l'est moins (42 %).
 - Export PDF : la police intégrée ne connaît que le Latin-1. La ponctuation typographique est
   remplacée (« — » → « - », « ’ » → « ' »), mais les émoji et l'écriture arabe sont retirés.
 - Avec un compte Apple gratuit, le profil de développement iOS expire après ~7 jours

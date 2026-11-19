@@ -51,7 +51,7 @@ export PATH="$HOME/flutter/bin:$PATH"      # Flutter n'est PAS dans le PATH
 export LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 # obligatoire avant tout build iOS
 
 flutter analyze                             # 0 erreur attendu
-flutter test                                # 100 tests
+flutter test                                # 123 tests
 flutter gen-l10n                            # APRÈS toute modif des .arb
 flutter run -d 87E626E0-E743-44A6-8A48-AA716FD7851B --debug   # simulateur iPhone 18 Pro Max
 flutter build ios --release                 # puis: flutter install -d <udid> --release
@@ -116,6 +116,15 @@ iPhone physique « iPhone de fakh » `00008120-000664510C70201E`.
 19. **Le provider ne fabrique pas de texte affiché** : il expose un état (`hasError`), l'écran
     choisit le message dans les `.arb`. Un texte en dur dans la logique échappe à la traduction
     (cas réel : l'erreur de chargement restait en français dans l'app en anglais).
+20. **Un enregistrement asynchrone + double appui = doublon.** Les 4 formulaires créaient deux fois
+    la même chose, et deux portfolios du même nom (l'anti-doublon voyait la liste pas encore à
+    jour). Parades : drapeau `_saving` (bouton désactivé pendant `_doSave`) **et**, côté provider,
+    les noms en cours de création sont « réservés » (`_pendingNames`). Tout nouveau formulaire
+    reprend ce schéma. En test, un faux dépôt **qui prend du temps** est nécessaire pour reproduire.
+21. **Boutons d'une feuille : `OverflowBar`, jamais `Row`.** Trois boutons (Supprimer / Annuler /
+    Enregistrer) débordaient sur 360 px et « Enregistrer » sortait de l'écran.
+22. **Faux dépôt partagé pour les tests d'écrans** : `test/helpers/fake_portfolio_repository.dart`
+    (CRUD complet, écritures lentes, compteur `writes`). Les anciens tests gardent leur propre faux.
 
 ---
 
@@ -192,8 +201,9 @@ validation côté serveur ne s'appliquent pas ici.
   de l'utilisateur. Les données ne vivent que sur l'appareil (récupérable via git : `638721f`).
 - ⚠️ **Android compilé mais jamais exécuté** ; APK signé avec la **clé de debug**
   (`android/app/build.gradle.kts`), donc non publiable sur le Play Store.
-- ⚠️ Couverture de tests ≈ 56 % (des fichiers chargés par les tests) : logique, accueil (98 %),
-  page profil (82 %) et PDF (97 %) couverts ; détail projet et formulaires internes peu testés.
+- ⚠️ Couverture de tests ≈ 70 % (des fichiers chargés par les tests) : logique, accueil (98 %),
+  profil (82 %), PDF (97 %), détail projet (79 %), feuilles de formulaire (75–95 %) couverts ;
+  le formulaire de création de CV reste le moins testé (42 %).
 - ⚠️ **PDF en Helvetica (Latin-1 seulement)** : la ponctuation typographique est remplacée par
   `pdfSafeText` (« — » → « - », « ’ » → « ' », « œ » → « oe »…). Les **émoji et écritures non
   latines (arabe…) sont retirés** du PDF : il faudrait embarquer une police Unicode pour les garder.
@@ -225,7 +235,7 @@ Aucune : l'application ne contacte que l'API GitHub publique, sans clé.
 
 - [ ] **Lancer l'APK Android** sur un émulateur ou un appareil (aucun AVD sur cette machine).
 - [ ] Configurer une **signature release** Android avant toute publication.
-- [ ] Monter la couverture de tests sur l'écran détail projet et les formulaires (feuilles).
+- [ ] Monter la couverture du formulaire de création de CV (`student_edit_dialog.dart`, 42 %).
 - [ ] Migrer CocoaPods → Swift Package Manager.
 - [ ] Écran de démarrage encore en **ancien bleu** `#3B82F6` (`pubspec.yaml` →
       `flutter_native_splash`) : passer à l'indigo puis `dart run flutter_native_splash:create`.
@@ -248,6 +258,7 @@ Aucune : l'application ne contacte que l'API GitHub publique, sans clé.
 | Couleurs PDF | 19 nov. 2026 | PDF aux couleurs de l'app (indigo → violet), lues dans `app_colors.dart`, indépendantes du thème (91 tests) |
 | Ménage | 19 nov. 2026 | Code mort retiré (vitrine du thème, `SkillChip`), paquet `cupertino_icons` inutilisé retiré ; `flutter clean` : 5,2 Go → 150 Mo (88 tests) |
 | Tests accueil | 19 nov. 2026 | 12 tests (recherche, suppression, états) ; message d'erreur traduit (il était en dur en français) ; en-têtes du formulaire de création qui débordaient (100 tests, ≈ 56 %) |
+| Tests formulaires | 19 nov. 2026 | Détail projet + feuilles : double appui (doublons, dont 2 portfolios du même nom), technos en double, boutons qui débordent — corrigés (123 tests, ≈ 70 %) |
 
 ---
 

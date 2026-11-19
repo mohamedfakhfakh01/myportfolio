@@ -73,14 +73,17 @@ class FormSheetBody extends StatelessWidget {
               ),
               if (actions.isNotEmpty) ...[
                 const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    for (int i = 0; i < actions.length; i++) ...[
-                      if (i > 0) const SizedBox(width: 8),
-                      actions[i],
-                    ],
-                  ],
+                // En ligne si les boutons tiennent, empilés sinon (petit
+                // écran, texte agrandi, 3 boutons en modification) : une
+                // `Row` débordait et poussait « Enregistrer » hors de l'écran.
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: OverflowBar(
+                    alignment: MainAxisAlignment.end,
+                    overflowAlignment: OverflowBarAlignment.end,
+                    spacing: 8,
+                    children: actions,
+                  ),
                 ),
               ],
             ],

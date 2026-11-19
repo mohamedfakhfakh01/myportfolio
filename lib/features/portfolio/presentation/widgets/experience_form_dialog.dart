@@ -73,7 +73,21 @@ class _ExperienceFormDialogState extends State<_ExperienceFormDialog> {
 
   String? _orNull(String s) => s.trim().isEmpty ? null : s.trim();
 
+  /// Vrai pendant l'enregistrement : le bouton « Enregistrer » est désactivé,
+  /// sinon un double appui enregistrait deux fois (doublon).
+  bool _saving = false;
+
   Future<void> _save() async {
+    if (_saving) return;
+    setState(() => _saving = true);
+    try {
+      await _doSave();
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
+  }
+
+  Future<void> _doSave() async {
     if (!_formKey.currentState!.validate()) return;
     final AppLocalizations l = AppLocalizations.of(context);
     final ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
@@ -196,7 +210,7 @@ class _ExperienceFormDialogState extends State<_ExperienceFormDialog> {
           child: Text(l.cancel),
         ),
         TextButton(
-          onPressed: _save,
+          onPressed: _saving ? null : _save,
           child: Text(l.save),
         ),
       ],

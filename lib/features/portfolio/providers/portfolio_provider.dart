@@ -145,9 +145,20 @@ class PortfolioProvider extends ChangeNotifier {
     if (nameExists(student.fullName)) {
       throw DuplicatePortfolioNameException(student.fullName);
     }
-    await _insertStudentWithContent(student, projects: projects);
-    await _reloadStudents();
+    // Le nom est « réservé » pendant l'enregistrement : un second ajout lancé
+    // avant la fin du premier (double appui) le voit déjà pris.
+    final String key = _normalizeName(student.fullName);
+    _pendingNames.add(key);
+    try {
+      await _insertStudentWithContent(student, projects: projects);
+      await _reloadStudents();
+    } finally {
+      _pendingNames.remove(key);
+    }
   }
+
+  /// Noms des portfolios en cours de création (pas encore dans la liste).
+  final Set<String> _pendingNames = {};
 
   /// Vrai si un portfolio porte déjà ce nom (casse et espaces ignorés).
   ///
@@ -155,9 +166,10 @@ class PortfolioProvider extends ChangeNotifier {
   /// garder SON propre nom n'est pas un doublon.
   bool nameExists(String fullName, {int? excludeId}) {
     final String key = _normalizeName(fullName);
-    return _students.any(
-      (s) => s.id != excludeId && _normalizeName(s.fullName) == key,
-    );
+    return _pendingNames.contains(key) ||
+        _students.any(
+          (s) => s.id != excludeId && _normalizeName(s.fullName) == key,
+        );
   }
 
   /// Forme canonique d'un nom, pour comparer « Alice Martin » et
