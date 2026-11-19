@@ -43,6 +43,42 @@ class FakePortfolioRepository extends PortfolioRepository {
   @override
   Future<List<Student>> getStudents() async => List<Student>.of(_students);
 
+  // --- Portfolios ---
+
+  @override
+  Future<int> insertStudent(Student student) async {
+    await _write();
+    final int id = _nextId++;
+    // Comme la vraie base : seule la ligne « étudiant » est insérée ; le
+    // contenu (compétences, projets, parcours) est ajouté ensuite.
+    _students.add(student.copyWith(
+      id: id,
+      skills: const [],
+      projects: const [],
+      experiences: const [],
+    ));
+    return id;
+  }
+
+  @override
+  Future<void> updateStudent(Student student) async {
+    await _write();
+    final int i = _indexOf(student.id!);
+    // Remplace les champs du profil (y compris ceux vidés → null), garde
+    // le contenu existant.
+    _students[i] = student.copyWith(
+      skills: _students[i].skills,
+      projects: _students[i].projects,
+      experiences: _students[i].experiences,
+    );
+  }
+
+  @override
+  Future<void> deleteStudent(int id) async {
+    await _write();
+    _students.removeWhere((s) => s.id == id);
+  }
+
   // --- Projets ---
 
   @override

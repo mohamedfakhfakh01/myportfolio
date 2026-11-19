@@ -938,6 +938,12 @@ abstract class AppLocalizations {
   /// **'E-mail (optionnel)'**
   String get emailLabel;
 
+  /// No description provided for @emailInvalid.
+  ///
+  /// In fr, this message translates to:
+  /// **'Adresse e-mail invalide'**
+  String get emailInvalid;
+
   /// No description provided for @phoneLabel.
   ///
   /// In fr, this message translates to:

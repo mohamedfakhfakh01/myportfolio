@@ -165,6 +165,7 @@
   "githubUsernameHelp": "To show your GitHub repositories on the profile",
   "contactTitle": "Contact",
   "emailLabel": "Email (optional)",
+  "emailInvalid": "Invalid email address",
   "phoneLabel": "Phone (optional)",
   "linkedinLabel": "LinkedIn (optional)",
   "linkedinHint": "LinkedIn URL or handle",

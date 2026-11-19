@@ -42,7 +42,8 @@ encore le garde jusqu'à ce que l'utilisateur le supprime (corbeille) ; il ne re
 - `lib/l10n/app_fr.arb` (modèle) + `app_en.arb` → tous les textes affichés
 - `lib/features/portfolio/data/sample_portfolio_data.dart` → données d'amorçage
 - `lib/shared/widgets/` → composants réutilisables (pilules, feuilles de formulaire)
-- `lib/shared/utils/linkedin.dart` → règle LinkedIn → URL (écran **et** PDF)
+- `lib/shared/utils/` → règles de saisie partagées : `linkedin.dart` (pseudo → URL, écran **et**
+  PDF), `github.dart` (adresse collée → pseudo), `email.dart` (forme d'une adresse)
 
 ---
 
@@ -53,7 +54,7 @@ export PATH="$HOME/flutter/bin:$PATH"      # Flutter n'est PAS dans le PATH
 export LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 # obligatoire avant tout build iOS
 
 flutter analyze                             # 0 erreur attendu
-flutter test                                # 123 tests
+flutter test                                # 143 tests
 flutter gen-l10n                            # APRÈS toute modif des .arb
 flutter run -d 87E626E0-E743-44A6-8A48-AA716FD7851B --debug   # simulateur iPhone 18 Pro Max
 flutter build ios --release                 # puis: flutter install -d <udid> --release
@@ -127,6 +128,8 @@ iPhone physique « iPhone de fakh » `00008120-000664510C70201E`.
     Enregistrer) débordaient sur 360 px et « Enregistrer » sortait de l'écran.
 22. **Faux dépôt partagé pour les tests d'écrans** : `test/helpers/fake_portfolio_repository.dart`
     (CRUD complet, écritures lentes, compteur `writes`). Les anciens tests gardent leur propre faux.
+23. **Le pseudo GitHub construit une URL** (`api.github.com/users/<pseudo>/repos`) : une adresse
+    collée en entier la casse. Toute saisie passe par `githubUsernameFrom` avant d'être enregistrée.
 
 ---
 
@@ -157,7 +160,7 @@ lib/
 ├── core/                    # database/ (schéma + migrations), widgets/ (transitions)
 ├── shared/
 │   ├── models/              # Student, Skill, Project, ExperienceEntry
-│   ├── utils/               # linkedin.dart (règle partagée écran + PDF)
+│   ├── utils/               # linkedin, github, email : règles de saisie partagées
 │   └── widgets/             # PillTag, FormSheetBody (composants partagés)
 └── features/
     ├── portfolio/
@@ -203,9 +206,9 @@ validation côté serveur ne s'appliquent pas ici.
   de l'utilisateur. Les données ne vivent que sur l'appareil (récupérable via git : `638721f`).
 - ⚠️ **Android compilé mais jamais exécuté** ; APK signé avec la **clé de debug**
   (`android/app/build.gradle.kts`), donc non publiable sur le Play Store.
-- ⚠️ Couverture de tests ≈ 70 % (des fichiers chargés par les tests) : logique, accueil (98 %),
-  profil (82 %), PDF (97 %), détail projet (79 %), feuilles de formulaire (75–95 %) couverts ;
-  le formulaire de création de CV reste le moins testé (42 %).
+- ⚠️ Couverture de tests ≈ 78 % (des fichiers chargés par les tests) : logique, accueil (98 %),
+  profil (82 %), PDF (97 %), détail projet (79 %), formulaires (75–95 %, création de CV 90 %).
+  Restent hors tests : choix de photo (`image_picker`), ouverture de liens (`url_launcher`).
 - ⚠️ **PDF en Helvetica (Latin-1 seulement)** : la ponctuation typographique est remplacée par
   `pdfSafeText` (« — » → « - », « ’ » → « ' », « œ » → « oe »…). Les **émoji et écritures non
   latines (arabe…) sont retirés** du PDF : il faudrait embarquer une police Unicode pour les garder.
@@ -237,7 +240,6 @@ Aucune : l'application ne contacte que l'API GitHub publique, sans clé.
 
 - [ ] **Lancer l'APK Android** sur un émulateur ou un appareil (aucun AVD sur cette machine).
 - [ ] Configurer une **signature release** Android avant toute publication.
-- [ ] Monter la couverture du formulaire de création de CV (`student_edit_dialog.dart`, 42 %).
 - [ ] Migrer CocoaPods → Swift Package Manager.
 - [ ] Écran de démarrage encore en **ancien bleu** `#3B82F6` (`pubspec.yaml` →
       `flutter_native_splash`) : passer à l'indigo puis `dart run flutter_native_splash:create`.
@@ -262,6 +264,7 @@ Aucune : l'application ne contacte que l'API GitHub publique, sans clé.
 | Tests accueil | 19 nov. 2026 | 12 tests (recherche, suppression, états) ; message d'erreur traduit (il était en dur en français) ; en-têtes du formulaire de création qui débordaient (100 tests, ≈ 56 %) |
 | Tests formulaires | 19 nov. 2026 | Détail projet + feuilles : double appui (doublons, dont 2 portfolios du même nom), technos en double, boutons qui débordent — corrigés (123 tests, ≈ 70 %) |
 | Retrait Démo | 19 nov. 2026 | Portfolio Démo retiré du code : il était recréé à chaque démarrage, donc impossible à supprimer |
+| Tests création CV | 19 nov. 2026 | Formulaire de CV testé (42 → 90 %) ; pseudo GitHub normalisé, e-mail vérifié (143 tests, ≈ 78 %) |
 
 ---
 

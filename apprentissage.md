@@ -1128,4 +1128,23 @@ Le code retiré reste dans l'historique git si on voulait un jour le remettre.
 
 ---
 
-*Dernière mise à jour (19 novembre 2026) : portfolio Démo retiré. 123 tests, analyse sans erreur.*
+### Tests du formulaire de création de CV (19 novembre 2026)
+
+20 tests de plus (143 au total). Le formulaire passe de 42 % à 90 % de couverture : création
+complète (profil, contact, compétences, projets, parcours), retrait avant création, champs
+obligatoires, « Annuler », modification qui efface un champ vidé sans toucher au contenu.
+
+#### Concept — Nettoyer et vérifier la saisie *avant* de l'enregistrer
+Ce que l'utilisateur tape n'est pas toujours ce que l'app doit stocker :
+- **Pseudo GitHub** : beaucoup collent leur adresse complète (`https://github.com/alice`). Or l'app
+  construit avec ce pseudo l'adresse de l'API GitHub : `…/users/https://github.com/alice/repos`
+  ne marche pas. `githubUsernameFrom` ramène toute saisie au pseudo (`alice`).
+- **E-mail** : rien n'était vérifié, « alice@ » finissait dans le CV PDF. `isValidEmail` vérifie la
+  **forme** (`nom@domaine.ext`) ; on ne peut pas savoir hors ligne si la boîte existe.
+Analogie : le guichet qui vérifie un formulaire avant de le classer, plutôt que de découvrir
+l'erreur le jour où on en a besoin. Ces règles sont dans `lib/shared/utils/`, testées seules.
+
+---
+
+*Dernière mise à jour (19 novembre 2026) : formulaire de CV testé ; pseudo GitHub normalisé,
+e-mail vérifié. 143 tests, analyse sans erreur.*

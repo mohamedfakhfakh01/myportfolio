@@ -1,0 +1,282 @@
+// Tests du formulaire « Ajouter un CV » / « Modifier le profil » : ce qui est
+// saisi doit être exactement ce qui est enregistré (contenu compris), et rien
+// d'autre. (Les tests anti-doublon de nom sont dans student_form_test.dart.)
+
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:provider/provider.dart';
+
+import 'package:myportfolio/features/portfolio/presentation/widgets/student_edit_dialog.dart';
+import 'package:myportfolio/features/portfolio/providers/portfolio_provider.dart';
+import 'package:myportfolio/l10n/app_localizations.dart';
+import 'package:myportfolio/shared/models/experience.dart';
+import 'package:myportfolio/shared/models/project.dart';
+import 'package:myportfolio/shared/models/skill.dart';
+import 'package:myportfolio/shared/models/student.dart';
+
+import '../helpers/fake_portfolio_repository.dart';
+
+const Student _alice = Student(
+  id: 1,
+  fullName: 'Alice Martin',
+  field: 'Informatique',
+  bio: 'Bio d\'Alice.',
+  email: 'alice@example.com',
+  phone: '+216 11 222 333',
+  githubUsername: 'alice',
+  skills: [Skill(id: 5, name: 'Dart', level: 70)],
+  projects: [Project(id: 6, title: 'Appli', description: 'D.')],
+  experiences: [ExperienceEntry(id: 7, title: 'Stage')],
+);
+
+late FakePortfolioRepository _repo;
+
+/// Ouvre le formulaire (création si [student] est null) sur un téléphone
+/// 360 × 800, au-dessus d'un écran de départ.
+Future<PortfolioProvider> _openForm(WidgetTester tester, {Student? student}) async {
+  tester.view.physicalSize = const Size(1080, 2400);
+  tester.view.devicePixelRatio = 3;
+  addTearDown(tester.view.reset);
+
+  _repo = FakePortfolioRepository([_alice]);
+  final provider = PortfolioProvider(repository: _repo);
+  await tester.pumpWidget(
+    ChangeNotifierProvider<PortfolioProvider>.value(
+      value: provider,
+      child: MaterialApp(
+        locale: const Locale('fr'),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Builder(
+          builder: (context) => Scaffold(
+            body: Center(
+              child: TextButton(
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => StudentFormPage(student: student),
+                  ),
+                ),
+                child: const Text('ouvrir'),
+              ),
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+  await tester.pumpAndSettle();
+  await tester.tap(find.text('ouvrir'));
+  await tester.pumpAndSettle();
+  return provider;
+}
+
+/// Amène [finder] à l'écran. On retire d'abord le focus : un champ actif
+/// ramènerait la vue vers lui (piège n°12).
+Future<void> _reveal(WidgetTester tester, Finder finder) async {
+  FocusManager.instance.primaryFocus?.unfocus();
+  await tester.pumpAndSettle();
+  await tester.ensureVisible(finder);
+  await tester.pumpAndSettle();
+}
+
+Future<void> _fill(WidgetTester tester, String label, String value) async {
+  final Finder field = find.widgetWithText(TextFormField, label);
+  await _reveal(tester, field);
+  await tester.enterText(field, value);
+}
+
+Future<void> _tap(WidgetTester tester, Finder finder) async {
+  await _reveal(tester, finder);
+  await tester.tap(finder);
+  await tester.pumpAndSettle();
+}
+
+/// Laisse expirer la SnackBar (sinon un minuteur reste en attente).
+Future<void> _flushSnackBar(WidgetTester tester) async {
+  await tester.pump(const Duration(seconds: 5));
+  await tester.pumpAndSettle();
+}
+
+Student _created(PortfolioProvider p, String name) =>
+    p.students.singleWhere((s) => s.fullName == name);
+
+void main() {
+  group('Création d\'un CV', () {
+    testWidgets('tout ce qui est saisi est enregistré, contenu compris',
+        (tester) async {
+      final provider = await _openForm(tester);
+
+      await _fill(tester, 'Nom complet *', '  Carla Petit ');
+      await _fill(tester, 'Filière / niveau *', 'Génie logiciel');
+      await _fill(tester, 'Bio (optionnel)', 'Passionnée.');
+      await _fill(tester, 'E-mail (optionnel)', ' carla@example.com ');
+      await _fill(tester, 'Localisation (optionnel)', 'Sfax');
+
+      // Une compétence, via sa feuille.
+      await _tap(tester, find.byTooltip('Ajouter une compétence'));
+      await tester.enterText(find.widgetWithText(TextFormField, 'Nom *'), 'Flutter');
+      await tester.enterText(
+          find.widgetWithText(TextFormField, 'Niveau 0–100 (optionnel)'), '75');
+      await _tap(tester, find.text('Ajouter'));
+      expect(find.text('Flutter'), findsOneWidget);
+
+      // Un projet, avec des technologies (doublon fusionné).
+      await _tap(tester, find.byTooltip('Ajouter un projet'));
+      await tester.enterText(find.widgetWithText(TextFormField, 'Titre *'), 'Blog');
+      await tester.enterText(
+          find.widgetWithText(TextFormField, 'Description *'), 'Un blog.');
+      await tester.enterText(
+          find.widgetWithText(
+              TextFormField, 'Technologies (séparées par des virgules)'),
+          'Laravel, laravel, PHP');
+      await _tap(tester, find.text('Ajouter'));
+
+      // Une expérience et une formation.
+      await _tap(tester, find.byTooltip('Ajouter une expérience'));
+      await tester.enterText(find.widgetWithText(TextFormField, 'Titre *'), 'Stage');
+      await _tap(tester, find.text('Ajouter'));
+      await _tap(tester, find.byTooltip('Ajouter une formation'));
+      await tester.enterText(find.widgetWithText(TextFormField, 'Titre *'), 'Licence');
+      await _tap(tester, find.text('Ajouter'));
+
+      await _tap(tester, find.text('Créer le portfolio'));
+
+      final Student carla = _created(provider, 'Carla Petit');
+      expect(carla.field, 'Génie logiciel');
+      expect(carla.bio, 'Passionnée.');
+      expect(carla.email, 'carla@example.com');
+      expect(carla.location, 'Sfax');
+      // Champs laissés vides → non renseignés (rien d'inventé).
+      expect(carla.phone, isNull);
+      expect(carla.linkedin, isNull);
+      expect(carla.githubUsername, isNull);
+      expect(carla.skills.map((s) => '${s.name}:${s.level}'), ['Flutter:75']);
+      expect(carla.projects.single.tags, ['Laravel', 'PHP']);
+      expect(
+        carla.experiences.map((e) => '${e.title}:${e.kind.name}'),
+        unorderedEquals(['Stage:experience', 'Licence:education']),
+      );
+      // Retour à l'écran de départ.
+      expect(find.text('ouvrir'), findsOneWidget);
+      await _flushSnackBar(tester);
+    });
+
+    testWidgets('une compétence retirée avant création n\'est pas enregistrée',
+        (tester) async {
+      final provider = await _openForm(tester);
+      await _fill(tester, 'Nom complet *', 'Carla Petit');
+      await _fill(tester, 'Filière / niveau *', 'Info');
+
+      for (final name in ['Java', 'Python']) {
+        await _tap(tester, find.byTooltip('Ajouter une compétence'));
+        await tester.enterText(find.widgetWithText(TextFormField, 'Nom *'), name);
+        await _tap(tester, find.text('Ajouter'));
+      }
+      // Retire « Java » (premier bouton « Retirer »).
+      await _tap(tester, find.byTooltip('Retirer').first);
+      expect(find.text('Java'), findsNothing);
+
+      await _tap(tester, find.text('Créer le portfolio'));
+
+      expect(_created(provider, 'Carla Petit').skills.map((s) => s.name),
+          ['Python']);
+      await _flushSnackBar(tester);
+    });
+
+    testWidgets('filière obligatoire : rien n\'est créé', (tester) async {
+      final provider = await _openForm(tester);
+      await _fill(tester, 'Nom complet *', 'Carla Petit');
+
+      await _tap(tester, find.text('Créer le portfolio'));
+      await _reveal(tester, find.text('La filière est obligatoire'));
+
+      expect(find.text('La filière est obligatoire'), findsOneWidget);
+      expect(provider.students, hasLength(1));
+      expect(_repo.writes, 0);
+    });
+
+    testWidgets('« Annuler » ne crée rien', (tester) async {
+      final provider = await _openForm(tester);
+      await _fill(tester, 'Nom complet *', 'Carla Petit');
+      await _fill(tester, 'Filière / niveau *', 'Info');
+
+      await _tap(tester, find.text('Annuler'));
+
+      expect(find.text('ouvrir'), findsOneWidget);
+      expect(provider.students, hasLength(1));
+      expect(_repo.writes, 0);
+    });
+
+    // Le pseudo sert à construire l'adresse de l'API GitHub et le lien du PDF :
+    // une adresse collée en entier doit être ramenée au pseudo.
+    for (final (saisie, pseudo) in [
+      (' alice ', 'alice'),
+      ('@alice', 'alice'),
+      ('https://github.com/alice', 'alice'),
+      ('github.com/alice/', 'alice'),
+      ('https://www.github.com/alice?tab=repositories', 'alice'),
+    ]) {
+      testWidgets('pseudo GitHub « $saisie » enregistré « $pseudo »',
+          (tester) async {
+        final provider = await _openForm(tester);
+        await _fill(tester, 'Nom complet *', 'Carla Petit');
+        await _fill(tester, 'Filière / niveau *', 'Info');
+        await _fill(tester, 'Pseudo GitHub (optionnel)', saisie);
+
+        await _tap(tester, find.text('Créer le portfolio'));
+
+        expect(_created(provider, 'Carla Petit').githubUsername, pseudo);
+        await _flushSnackBar(tester);
+      });
+    }
+
+    for (final mauvais in ['alice@', 'alice.example.com', 'alice@exemple', 'a b@c.com']) {
+      testWidgets('e-mail « $mauvais » refusé', (tester) async {
+        final provider = await _openForm(tester);
+        await _fill(tester, 'Nom complet *', 'Carla Petit');
+        await _fill(tester, 'Filière / niveau *', 'Info');
+        await _fill(tester, 'E-mail (optionnel)', mauvais);
+
+        await _tap(tester, find.text('Créer le portfolio'));
+        await _reveal(tester, find.text('Adresse e-mail invalide'));
+
+        expect(find.text('Adresse e-mail invalide'), findsOneWidget);
+        expect(provider.students, hasLength(1));
+      });
+    }
+  });
+
+  group('Modification du profil', () {
+    testWidgets('prérempli, sans les sections de contenu', (tester) async {
+      await _openForm(tester, student: _alice);
+
+      expect(find.text('Modifier le profil'), findsOneWidget);
+      expect(find.widgetWithText(TextFormField, 'Alice Martin'), findsOneWidget);
+      expect(
+          find.widgetWithText(TextFormField, 'alice@example.com'), findsOneWidget);
+      // Le contenu se gère depuis la page profil, pas ici.
+      expect(find.byTooltip('Ajouter une compétence'), findsNothing);
+      expect(find.text('Enregistrer'), findsOneWidget);
+    });
+
+    testWidgets('vider un champ l\'efface ; le contenu est conservé',
+        (tester) async {
+      final provider = await _openForm(tester, student: _alice);
+
+      await _fill(tester, 'E-mail (optionnel)', '   ');
+      await _fill(tester, 'Pseudo GitHub (optionnel)', '');
+      await _fill(tester, 'Localisation (optionnel)', 'Tunis');
+      await _tap(tester, find.text('Enregistrer'));
+
+      final Student a = provider.studentById(1);
+      expect(a.email, isNull);
+      expect(a.githubUsername, isNull);
+      expect(a.location, 'Tunis');
+      expect(a.phone, '+216 11 222 333'); // non touché
+      expect(a.skills.map((s) => s.name), ['Dart']);
+      expect(a.projects.map((p) => p.title), ['Appli']);
+      expect(a.experiences.map((e) => e.title), ['Stage']);
+      await _flushSnackBar(tester);
+    });
+  });
+}

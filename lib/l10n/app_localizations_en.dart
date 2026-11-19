@@ -450,6 +450,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get emailLabel => 'Email (optional)';
 
   @override
+  String get emailInvalid => 'Invalid email address';
+
+  @override
   String get phoneLabel => 'Phone (optional)';
 
   @override

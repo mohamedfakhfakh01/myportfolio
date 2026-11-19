@@ -185,6 +185,7 @@
   "githubUsernameHelp": "Pour afficher tes dépôts GitHub sur le profil",
   "contactTitle": "Contact",
   "emailLabel": "E-mail (optionnel)",
+  "emailInvalid": "Adresse e-mail invalide",
   "phoneLabel": "Téléphone (optionnel)",
   "linkedinLabel": "LinkedIn (optionnel)",
   "linkedinHint": "URL ou pseudo LinkedIn",

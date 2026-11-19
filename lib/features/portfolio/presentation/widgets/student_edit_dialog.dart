@@ -14,6 +14,8 @@ import '../../../../shared/models/experience.dart';
 import '../../../../shared/models/project.dart';
 import '../../../../shared/models/skill.dart';
 import '../../../../shared/models/student.dart';
+import '../../../../shared/utils/email.dart';
+import '../../../../shared/utils/github.dart';
 import '../../../../shared/widgets/form_sheet.dart';
 import '../../providers/portfolio_provider.dart';
 import 'skill_category_label.dart';
@@ -227,13 +229,13 @@ class _StudentFormPageState extends State<StudentFormPage> {
     final AppLocalizations l = AppLocalizations.of(context);
     final ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
 
-    final String github = _githubController.text.trim();
     final Student student = Student(
       id: widget.student?.id,
       fullName: _nameController.text.trim(),
       field: _fieldController.text.trim(),
       bio: _bioController.text.trim(),
-      githubUsername: github.isEmpty ? null : github,
+      // Une adresse collée en entier est ramenée au pseudo (API + PDF).
+      githubUsername: githubUsernameFrom(_githubController.text),
       photoPath: _photoPath,
       email: _orNull(_emailController.text),
       phone: _orNull(_phoneController.text),
@@ -378,6 +380,12 @@ class _StudentFormPageState extends State<StudentFormPage> {
                     labelText: l.emailLabel,
                     prefixIcon: const Icon(Icons.email_outlined),
                   ),
+                  // Optionnel, mais s'il est rempli il doit être valide :
+                  // il finit dans le CV PDF (lien « écrire »).
+                  validator: (value) =>
+                      (value == null || value.trim().isEmpty || isValidEmail(value))
+                          ? null
+                          : l.emailInvalid,
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
