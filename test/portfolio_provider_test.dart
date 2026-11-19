@@ -140,7 +140,7 @@ void main() {
       await pumpEventQueue();
 
       expect(provider.isLoading, isFalse);
-      expect(provider.error, isNull);
+      expect(provider.hasError, isFalse);
       expect(provider.students, hasLength(2));
       expect(provider.studentById(1).fullName, 'Alice Martin');
     });

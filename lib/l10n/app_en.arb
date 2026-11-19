@@ -6,6 +6,7 @@
   "delete": "Delete",
   "add": "Add",
   "retry": "Retry",
+  "loadError": "Could not load the data.",
   "remove": "Remove",
 
   "navHome": "Home",

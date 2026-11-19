@@ -6,6 +6,7 @@
   "delete": "Supprimer",
   "add": "Ajouter",
   "retry": "Réessayer",
+  "loadError": "Impossible de charger les données.",
   "remove": "Retirer",
 
   "navHome": "Accueil",

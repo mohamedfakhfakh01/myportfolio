@@ -11,7 +11,7 @@ import '../data/portfolio_repository.dart';
 ///
 /// Gère trois états visibles par l'interface :
 /// - `isLoading` : chargement en cours (on affiche un indicateur) ;
-/// - `error` : un problème est survenu (on affiche un message) ;
+/// - `hasError` : un problème est survenu (l'écran affiche un message traduit) ;
 /// - sinon : la liste `students` est prête.
 class PortfolioProvider extends ChangeNotifier {
   /// Le repository est injectable (pratique pour les tests) ; par défaut on
@@ -25,7 +25,7 @@ class PortfolioProvider extends ChangeNotifier {
 
   List<Student> _students = [];
   bool _isLoading = true;
-  String? _error;
+  bool _hasError = false;
 
   /// Liste des étudiants (lecture seule).
   List<Student> get students => List.unmodifiable(_students);
@@ -33,14 +33,15 @@ class PortfolioProvider extends ChangeNotifier {
   /// Vrai tant que les données ne sont pas chargées.
   bool get isLoading => _isLoading;
 
-  /// Message d'erreur éventuel (null si tout va bien).
-  String? get error => _error;
+  /// Vrai si le dernier chargement a échoué. Le provider ne fabrique pas de
+  /// texte : c'est l'écran qui choisit le message, dans la langue de l'app.
+  bool get hasError => _hasError;
 
   /// Charge les étudiants depuis la base. Au tout premier lancement, remplit
   /// d'abord la base (seed). Gère les erreurs pour ne jamais planter l'app.
   Future<void> load() async {
     _isLoading = true;
-    _error = null;
+    _hasError = false;
     notifyListeners();
     try {
       await _repository.seedIfEmpty();
@@ -48,7 +49,7 @@ class PortfolioProvider extends ChangeNotifier {
       await _repository.ensureDemoStudent();
       _students = await _repository.getStudents();
     } catch (e) {
-      _error = 'Impossible de charger les données.';
+      _hasError = true;
       _students = [];
       debugPrint('Erreur de chargement des portfolios : $e');
     } finally {

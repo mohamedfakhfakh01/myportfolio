@@ -128,6 +128,12 @@ abstract class AppLocalizations {
   /// **'Réessayer'**
   String get retry;
 
+  /// No description provided for @loadError.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible de charger les données.'**
+  String get loadError;
+
   /// No description provided for @remove.
   ///
   /// In fr, this message translates to:

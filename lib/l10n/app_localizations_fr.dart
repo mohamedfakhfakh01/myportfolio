@@ -25,6 +25,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get retry => 'Réessayer';
 
   @override
+  String get loadError => 'Impossible de charger les données.';
+
+  @override
   String get remove => 'Retirer';
 
   @override

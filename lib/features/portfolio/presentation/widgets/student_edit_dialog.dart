@@ -190,9 +190,11 @@ class _StudentFormPageState extends State<StudentFormPage> {
   Widget _sectionHeader(String title, String addTooltip, VoidCallback onAdd) {
     final TextTheme text = Theme.of(context).textTheme;
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(title, style: text.titleMedium),
+        // Le titre prend la place restante et passe à la ligne si besoin
+        // (texte agrandi en accessibilité) au lieu de pousser le « + » hors
+        // de l'écran.
+        Expanded(child: Text(title, style: text.titleMedium)),
         IconButton(
           icon: const Icon(Icons.add_circle, color: AppColors.primary),
           tooltip: addTooltip,

@@ -93,7 +93,7 @@ class _HomePageState extends State<HomePage> {
     }
 
     // 2) Erreur : message clair + bouton réessayer.
-    if (provider.error != null) {
+    if (provider.hasError) {
       return Scaffold(
         appBar: AppBar(
           title: const Text('MyPortfolio'),
@@ -111,7 +111,7 @@ class _HomePageState extends State<HomePage> {
                   color: AppColors.textSecondary,
                 ),
                 const SizedBox(height: 16),
-                Text(provider.error!, textAlign: TextAlign.center),
+                Text(l.loadError, textAlign: TextAlign.center),
                 const SizedBox(height: 16),
                 OutlinedButton(
                   onPressed: provider.load,

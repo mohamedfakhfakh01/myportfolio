@@ -1063,5 +1063,31 @@ Rien n'est perdu : le code supprimé reste dans l'historique git.
 
 ---
 
-*Dernière mise à jour (19 novembre 2026) : ménage (code mort, paquet inutilisé, fichiers de
-compilation). 88 tests, analyse sans erreur.*
+### Tests de l'écran d'accueil (19 novembre 2026)
+
+12 tests (`test/widgets/home_page_test.dart`) : liste, recherche (casse, espaces, accents),
+« aucun résultat » puis « Effacer », suppression (annuler / confirmer), ouverture d'un profil,
+bouton « Ajouter un CV », et les trois états **chargement**, **vide**, **erreur + Réessayer**.
+Couverture de l'accueil : 98 %. **100 tests** au total.
+
+#### Concept 1 — Tester les états « rares »
+Un écran a plusieurs états, pas seulement « tout va bien ». Pour voir le **chargement**, le faux
+dépôt attend une « porte » (`Completer`) qu'on ouvre quand on veut ; pour voir l'**erreur**, il
+échoue volontairement une fois, puis réussit (on teste ainsi « Réessayer »).
+
+#### Concept 2 — La logique ne parle pas, elle signale
+Le test en anglais a montré que le message d'erreur restait **en français** : il était écrit en dur
+dans le provider. Analogie : le voyant du tableau de bord d'une voiture s'allume (état), c'est le
+manuel, dans la langue du conducteur, qui explique (texte). Le provider expose maintenant
+`hasError`, et l'écran affiche `l.loadError` depuis les `.arb`.
+
+#### Concept 3 — La police des tests exagère, mais elle a raison
+Le formulaire « Nouveau portfolio » débordait à droite en test : un titre de section sans limite de
+largeur poussait le bouton « + » hors de l'écran. La police de test (des carrés) est plus large
+que la vraie, donc sur un téléphone ordinaire ça tenait ; mais avec le **texte agrandi**
+(accessibilité iOS), le vrai bug apparaît. Correction : `Expanded` autour du titre.
+
+---
+
+*Dernière mise à jour (19 novembre 2026) : tests de l'accueil, message d'erreur traduit,
+en-têtes du formulaire corrigés. 100 tests, analyse sans erreur.*
