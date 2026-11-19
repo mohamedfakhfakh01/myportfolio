@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
+import '../../../shared/utils/github.dart';
 import 'github_repo.dart';
 
 /// Erreur « métier » du service GitHub, avec un message lisible pour l'UI.
@@ -12,6 +13,18 @@ class GithubException implements Exception {
 
   @override
   String toString() => message;
+}
+
+/// Réponse de GitHub à « ce compte existe-t-il ? ».
+enum GithubUserStatus {
+  /// Le compte existe.
+  exists,
+
+  /// GitHub répond que ce compte n'existe pas (ou le pseudo est mal formé).
+  notFound,
+
+  /// Impossible de savoir : hors ligne, délai dépassé, limite de requêtes…
+  unknown,
 }
 
 /// Service qui interroge l'**API REST publique de GitHub**.
@@ -69,6 +82,34 @@ class GithubService {
         );
       default:
         throw GithubException('Erreur GitHub (code ${response.statusCode}).');
+    }
+  }
+
+  /// Vérifie qu'un compte GitHub **existe** (`GET /users/<pseudo>`).
+  ///
+  /// Ne lève jamais d'erreur : un problème de réseau donne
+  /// [GithubUserStatus.unknown], pour que l'appelant puisse continuer sans
+  /// bloquer l'utilisateur hors ligne.
+  Future<GithubUserStatus> checkUser(String username) async {
+    // Un pseudo mal formé n'existe pas : inutile d'appeler le réseau (et on
+    // n'envoie jamais une adresse cassée à l'API).
+    if (!isValidGithubUsername(username)) return GithubUserStatus.notFound;
+    try {
+      final http.Response response = await _client
+          .get(Uri.https('api.github.com', '/users/$username'),
+              headers: {'Accept': 'application/vnd.github+json'})
+          .timeout(timeout);
+      switch (response.statusCode) {
+        case 200:
+          return GithubUserStatus.exists;
+        case 404:
+          return GithubUserStatus.notFound;
+        default: // 403 (limite de requêtes), 5xx…
+          return GithubUserStatus.unknown;
+      }
+    } catch (_) {
+      // Hors ligne, délai dépassé (TimeoutException)…
+      return GithubUserStatus.unknown;
     }
   }
 }

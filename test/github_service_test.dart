@@ -59,4 +59,63 @@ void main() {
       );
     });
   });
+
+  // Vérification d'existence d'un compte (formulaire « Ajouter un CV »).
+  group('checkUser', () {
+    /// Service dont le faux client répond [status] et note chaque adresse.
+    (GithubService, List<Uri>) serviceAnswering(int status) {
+      final calls = <Uri>[];
+      final client = MockClient((request) async {
+        calls.add(request.url);
+        return http.Response('{}', status);
+      });
+      return (GithubService(client: client), calls);
+    }
+
+    test('200 : le compte existe (et on interroge /users/<pseudo>)', () async {
+      final (service, calls) = serviceAnswering(200);
+      expect(await service.checkUser('alice'), GithubUserStatus.exists);
+      expect(calls.single.toString(), 'https://api.github.com/users/alice');
+    });
+
+    test('404 : le compte n\'existe pas', () async {
+      final (service, _) = serviceAnswering(404);
+      expect(await service.checkUser('alice'), GithubUserStatus.notFound);
+    });
+
+    test('403 (limite de requêtes) ou 500 : impossible de savoir', () async {
+      for (final code in [403, 500]) {
+        final (service, _) = serviceAnswering(code);
+        expect(await service.checkUser('alice'), GithubUserStatus.unknown,
+            reason: '$code');
+      }
+    });
+
+    test('hors ligne : impossible de savoir, sans lever d\'erreur', () async {
+      final client = MockClient((_) async => throw Exception('no network'));
+      expect(await GithubService(client: client).checkUser('alice'),
+          GithubUserStatus.unknown);
+    });
+
+    test('délai dépassé : impossible de savoir', () async {
+      final client = MockClient((_) async {
+        await Future<void>.delayed(const Duration(milliseconds: 200));
+        return http.Response('{}', 200);
+      });
+      final service = GithubService(
+        client: client,
+        timeout: const Duration(milliseconds: 20),
+      );
+      expect(await service.checkUser('alice'), GithubUserStatus.unknown);
+    });
+
+    test('pseudo mal formé : « introuvable » sans appeler le réseau', () async {
+      final (service, calls) = serviceAnswering(200);
+      for (final mauvais in ['alice martin', 'alice/repos', 'élodie', '-alice']) {
+        expect(await service.checkUser(mauvais), GithubUserStatus.notFound,
+            reason: mauvais);
+      }
+      expect(calls, isEmpty);
+    });
+  });
 }

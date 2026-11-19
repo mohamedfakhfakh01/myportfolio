@@ -183,6 +183,8 @@
   "githubUsernameLabel": "Pseudo GitHub (optionnel)",
   "githubUsernameHint": "Ex : mohamedfakhfakh01",
   "githubUsernameHelp": "Pour afficher tes dépôts GitHub sur le profil",
+  "githubUsernameInvalid": "Pseudo GitHub invalide (lettres, chiffres et tirets)",
+  "githubUserNotFound": "Aucun compte GitHub à ce nom",
   "contactTitle": "Contact",
   "emailLabel": "E-mail (optionnel)",
   "emailInvalid": "Adresse e-mail invalide",
@@ -213,5 +215,6 @@
   "projectSaved": "Projet enregistré",
   "projectDeleted": "Projet supprimé",
   "portfolioSaved": "Portfolio enregistré",
+  "portfolioSavedGithubUnchecked": "Portfolio enregistré, mais le pseudo GitHub n'a pas pu être vérifié (GitHub injoignable).",
   "portfolioDeleted": "Portfolio supprimé"
 }

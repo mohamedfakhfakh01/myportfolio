@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/widgets/fade_slide_route.dart';
+import '../../../github/data/github_service.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/experience.dart';
 import '../../../../shared/models/project.dart';
@@ -33,10 +34,14 @@ Future<void> showStudentEditDialog(BuildContext context, {Student? student}) {
 
 /// Formulaire plein écran pour créer ou modifier un portfolio étudiant.
 class StudentFormPage extends StatefulWidget {
-  const StudentFormPage({super.key, this.student});
+  const StudentFormPage({super.key, this.student, this.githubService});
 
   /// L'étudiant à modifier, ou null pour en créer un nouveau.
   final Student? student;
+
+  /// Sert à vérifier que le compte GitHub existe. Injectable pour les tests
+  /// (un faux client HTTP, sans réseau) ; sinon le vrai service.
+  final GithubService? githubService;
 
   @override
   State<StudentFormPage> createState() => _StudentFormPageState();
@@ -64,6 +69,16 @@ class _StudentFormPageState extends State<StudentFormPage> {
   final List<ExperienceEntry> _experiences = [];
 
   bool get _isCreating => widget.student == null;
+
+  late final GithubService _github = widget.githubService ??
+      GithubService(timeout: const Duration(seconds: 6));
+
+  /// Clé du champ GitHub : pour le revalider et l'amener à l'écran.
+  final _githubFieldKey = GlobalKey<FormFieldState<String>>();
+
+  /// Dernier pseudo que GitHub a déclaré inexistant (affiché en erreur sous
+  /// le champ tant qu'il n'est pas modifié).
+  String? _githubNotFound;
 
   bool get _hasPhoto => _photoPath != null && File(_photoPath!).existsSync();
 
@@ -229,13 +244,38 @@ class _StudentFormPageState extends State<StudentFormPage> {
     final AppLocalizations l = AppLocalizations.of(context);
     final ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
 
+    // Une adresse collée en entier est ramenée au pseudo (API + PDF).
+    final String? github = githubUsernameFrom(_githubController.text);
+
+    // Le compte existe-t-il ? On ne demande à GitHub que si le pseudo est
+    // nouveau ou modifié : modifier sa bio hors ligne ne doit pas attendre le
+    // réseau. (GitHub ignore la casse : « Alice » = « alice ».)
+    bool githubUnchecked = false;
+    if (github != null &&
+        github.toLowerCase() !=
+            widget.student?.githubUsername?.toLowerCase()) {
+      final GithubUserStatus status = await _github.checkUser(github);
+      if (!mounted) return;
+      if (status == GithubUserStatus.notFound) {
+        _githubNotFound = github;
+        _githubFieldKey.currentState!.validate();
+        await Scrollable.ensureVisible(
+          _githubFieldKey.currentContext!,
+          alignment: 0.3,
+          duration: const Duration(milliseconds: 300),
+        );
+        return; // Rien n'est enregistré.
+      }
+      // Hors ligne : on ne bloque pas, mais on le dit.
+      githubUnchecked = status == GithubUserStatus.unknown;
+    }
+
     final Student student = Student(
       id: widget.student?.id,
       fullName: _nameController.text.trim(),
       field: _fieldController.text.trim(),
       bio: _bioController.text.trim(),
-      // Une adresse collée en entier est ramenée au pseudo (API + PDF).
-      githubUsername: githubUsernameFrom(_githubController.text),
+      githubUsername: github,
       photoPath: _photoPath,
       email: _orNull(_emailController.text),
       phone: _orNull(_phoneController.text),
@@ -261,7 +301,11 @@ class _StudentFormPageState extends State<StudentFormPage> {
       return;
     }
     if (!mounted) return;
-    messenger.showSnackBar(SnackBar(content: Text(l.portfolioSaved)));
+    messenger.showSnackBar(SnackBar(
+      content: Text(
+        githubUnchecked ? l.portfolioSavedGithubUnchecked : l.portfolioSaved,
+      ),
+    ));
     Navigator.of(context).pop();
   }
 
@@ -360,13 +404,32 @@ class _StudentFormPageState extends State<StudentFormPage> {
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
+                  key: _githubFieldKey,
                   controller: _githubController,
+                  autocorrect: false,
                   decoration: InputDecoration(
                     labelText: l.githubUsernameLabel,
                     hintText: l.githubUsernameHint,
                     helperText: l.githubUsernameHelp,
                     prefixIcon: const Icon(Icons.code),
                   ),
+                  // Dès que le pseudo refusé est corrigé, l'erreur disparaît.
+                  onChanged: (_) {
+                    if (_githubNotFound != null) {
+                      _githubNotFound = null;
+                      _githubFieldKey.currentState!.validate();
+                    }
+                  },
+                  validator: (value) {
+                    final String? pseudo = githubUsernameFrom(value ?? '');
+                    if (pseudo == null) return null; // champ facultatif
+                    if (!isValidGithubUsername(pseudo)) {
+                      return l.githubUsernameInvalid;
+                    }
+                    return pseudo == _githubNotFound
+                        ? l.githubUserNotFound
+                        : null;
+                  },
                 ),
                 const SizedBox(height: 20),
 
@@ -546,7 +609,13 @@ class _StudentFormPageState extends State<StudentFormPage> {
                 // --- Bouton Enregistrer (bien visible) ---
                 ElevatedButton.icon(
                   onPressed: _saving ? null : _save,
-                  icon: const Icon(Icons.check),
+                  // Pendant la vérification GitHub et l'enregistrement : roue.
+                  icon: _saving
+                      ? const SizedBox.square(
+                          dimension: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.check),
                   label: Text(_isCreating ? l.createPortfolio : l.save),
                 ),
                 const SizedBox(height: 8),

@@ -446,6 +446,13 @@ class AppLocalizationsFr extends AppLocalizations {
       'Pour afficher tes dépôts GitHub sur le profil';
 
   @override
+  String get githubUsernameInvalid =>
+      'Pseudo GitHub invalide (lettres, chiffres et tirets)';
+
+  @override
+  String get githubUserNotFound => 'Aucun compte GitHub à ce nom';
+
+  @override
   String get contactTitle => 'Contact';
 
   @override
@@ -519,6 +526,10 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get portfolioSaved => 'Portfolio enregistré';
+
+  @override
+  String get portfolioSavedGithubUnchecked =>
+      'Portfolio enregistré, mais le pseudo GitHub n\'a pas pu être vérifié (GitHub injoignable).';
 
   @override
   String get portfolioDeleted => 'Portfolio supprimé';

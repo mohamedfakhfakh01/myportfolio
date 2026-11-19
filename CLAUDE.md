@@ -54,7 +54,7 @@ export PATH="$HOME/flutter/bin:$PATH"      # Flutter n'est PAS dans le PATH
 export LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 # obligatoire avant tout build iOS
 
 flutter analyze                             # 0 erreur attendu
-flutter test                                # 143 tests
+flutter test                                # 159 tests
 flutter gen-l10n                            # APRÈS toute modif des .arb
 flutter run -d 87E626E0-E743-44A6-8A48-AA716FD7851B --debug   # simulateur iPhone 18 Pro Max
 flutter build ios --release                 # puis: flutter install -d <udid> --release
@@ -130,6 +130,12 @@ iPhone physique « iPhone de fakh » `00008120-000664510C70201E`.
     (CRUD complet, écritures lentes, compteur `writes`). Les anciens tests gardent leur propre faux.
 23. **Le pseudo GitHub construit une URL** (`api.github.com/users/<pseudo>/repos`) : une adresse
     collée en entier la casse. Toute saisie passe par `githubUsernameFrom` avant d'être enregistrée.
+24. **Le formulaire de CV appelle GitHub** (`GithubService.checkUser`, `GET /users/<pseudo>`) avant
+    d'enregistrer un pseudo **nouveau ou modifié** : 404 → erreur sous le champ, rien n'est créé ;
+    hors ligne / 403 / délai → enregistré quand même + avertissement. Le service est **injectable**
+    (`StudentFormPage(githubService:)`) : en test, toujours un `MockClient`, jamais le réseau.
+25. **En test, un message d'erreur de champ disparaît en fondu** : après correction, un seul `pump()`
+    le trouve encore ; il faut `pumpAndSettle()`. (Fausse alerte rencontrée, pas un bug.)
 
 ---
 
@@ -265,6 +271,7 @@ Aucune : l'application ne contacte que l'API GitHub publique, sans clé.
 | Tests formulaires | 19 nov. 2026 | Détail projet + feuilles : double appui (doublons, dont 2 portfolios du même nom), technos en double, boutons qui débordent — corrigés (123 tests, ≈ 70 %) |
 | Retrait Démo | 19 nov. 2026 | Portfolio Démo retiré du code : il était recréé à chaque démarrage, donc impossible à supprimer |
 | Tests création CV | 19 nov. 2026 | Formulaire de CV testé (42 → 90 %) ; pseudo GitHub normalisé, e-mail vérifié (143 tests, ≈ 78 %) |
+| Compte GitHub | 19 nov. 2026 | À la création / modification d'un CV, l'app vérifie auprès de GitHub que le compte existe (159 tests, ≈ 78 %) |
 
 ---
 

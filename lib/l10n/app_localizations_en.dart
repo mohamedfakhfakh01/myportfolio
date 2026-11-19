@@ -444,6 +444,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'To show your GitHub repositories on the profile';
 
   @override
+  String get githubUsernameInvalid =>
+      'Invalid GitHub username (letters, numbers and hyphens)';
+
+  @override
+  String get githubUserNotFound => 'No GitHub account with this name';
+
+  @override
   String get contactTitle => 'Contact';
 
   @override
@@ -516,6 +523,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get portfolioSaved => 'Portfolio saved';
+
+  @override
+  String get portfolioSavedGithubUnchecked =>
+      'Portfolio saved, but the GitHub username could not be checked (GitHub unreachable).';
 
   @override
   String get portfolioDeleted => 'Portfolio deleted';

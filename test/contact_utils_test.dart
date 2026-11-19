@@ -28,6 +28,22 @@ void main() {
     });
   });
 
+  group('isValidGithubUsername', () {
+    test('pseudos valides', () {
+      for (final u in ['alice', 'mohamedfakhfakh01', 'Alice-Martin', 'a', 'x' * 39]) {
+        expect(isValidGithubUsername(u), isTrue, reason: u);
+      }
+    });
+
+    test('formes impossibles refusées', () {
+      for (final u in [
+        '', 'alice martin', 'élodie', 'alice_m', 'alice.m', '-alice', 'x' * 40,
+      ]) {
+        expect(isValidGithubUsername(u), isFalse, reason: u);
+      }
+    });
+  });
+
   group('isValidEmail', () {
     test('adresses valides', () {
       for (final e in ['alice@example.com', ' a.b+c@sub.domaine.tn ']) {

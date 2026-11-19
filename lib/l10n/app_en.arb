@@ -163,6 +163,8 @@
   "githubUsernameLabel": "GitHub username (optional)",
   "githubUsernameHint": "e.g. mohamedfakhfakh01",
   "githubUsernameHelp": "To show your GitHub repositories on the profile",
+  "githubUsernameInvalid": "Invalid GitHub username (letters, numbers and hyphens)",
+  "githubUserNotFound": "No GitHub account with this name",
   "contactTitle": "Contact",
   "emailLabel": "Email (optional)",
   "emailInvalid": "Invalid email address",
@@ -193,5 +195,6 @@
   "projectSaved": "Project saved",
   "projectDeleted": "Project deleted",
   "portfolioSaved": "Portfolio saved",
+  "portfolioSavedGithubUnchecked": "Portfolio saved, but the GitHub username could not be checked (GitHub unreachable).",
   "portfolioDeleted": "Portfolio deleted"
 }

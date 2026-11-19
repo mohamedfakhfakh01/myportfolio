@@ -4,7 +4,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 import 'package:provider/provider.dart';
+
+import 'package:myportfolio/features/github/data/github_service.dart';
 
 import 'package:myportfolio/features/portfolio/presentation/widgets/student_edit_dialog.dart';
 import 'package:myportfolio/features/portfolio/providers/portfolio_provider.dart';
@@ -31,14 +35,35 @@ const Student _alice = Student(
 
 late FakePortfolioRepository _repo;
 
+/// Adresses demandées au faux GitHub pendant le test.
+late List<Uri> _githubCalls;
+
 /// Ouvre le formulaire (création si [student] est null) sur un téléphone
 /// 360 × 800, au-dessus d'un écran de départ.
-Future<PortfolioProvider> _openForm(WidgetTester tester, {Student? student}) async {
+///
+/// GitHub est simulé : [githubStatus] est le code renvoyé (200 = le compte
+/// existe, 404 = inconnu) ; [githubOffline] simule l'absence de réseau.
+Future<PortfolioProvider> _openForm(
+  WidgetTester tester, {
+  Student? student,
+  int githubStatus = 200,
+  bool githubOffline = false,
+}) async {
   tester.view.physicalSize = const Size(1080, 2400);
   tester.view.devicePixelRatio = 3;
   addTearDown(tester.view.reset);
 
   _repo = FakePortfolioRepository([_alice]);
+  _githubCalls = [];
+  final github = GithubService(
+    client: MockClient((request) async {
+      _githubCalls.add(request.url);
+      // Comme une vraie requête, la réponse prend un peu de temps.
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      if (githubOffline) throw Exception('pas de réseau');
+      return http.Response('{}', githubStatus);
+    }),
+  );
   final provider = PortfolioProvider(repository: _repo);
   await tester.pumpWidget(
     ChangeNotifierProvider<PortfolioProvider>.value(
@@ -53,7 +78,8 @@ Future<PortfolioProvider> _openForm(WidgetTester tester, {Student? student}) asy
               child: TextButton(
                 onPressed: () => Navigator.of(context).push(
                   MaterialPageRoute<void>(
-                    builder: (_) => StudentFormPage(student: student),
+                    builder: (_) =>
+                        StudentFormPage(student: student, githubService: github),
                   ),
                 ),
                 child: const Text('ouvrir'),
@@ -244,6 +270,135 @@ void main() {
         expect(provider.students, hasLength(1));
       });
     }
+  });
+
+  group('Vérification du compte GitHub', () {
+    Future<void> fillRequired(WidgetTester tester, String github) async {
+      await _fill(tester, 'Nom complet *', 'Carla Petit');
+      await _fill(tester, 'Filière / niveau *', 'Info');
+      await _fill(tester, 'Pseudo GitHub (optionnel)', github);
+    }
+
+    testWidgets('compte existant : CV créé après avoir interrogé GitHub',
+        (tester) async {
+      final provider = await _openForm(tester);
+      await fillRequired(tester, 'https://github.com/carla');
+
+      await _tap(tester, find.text('Créer le portfolio'));
+
+      expect(_githubCalls.single.toString(),
+          'https://api.github.com/users/carla');
+      expect(_created(provider, 'Carla Petit').githubUsername, 'carla');
+      expect(find.text('Portfolio enregistré'), findsOneWidget);
+      await _flushSnackBar(tester);
+    });
+
+    testWidgets('compte inexistant : erreur sous le champ, rien n\'est créé',
+        (tester) async {
+      final provider = await _openForm(tester, githubStatus: 404);
+      await fillRequired(tester, 'carla-inconnue');
+
+      await _tap(tester, find.text('Créer le portfolio'));
+
+      // On reste sur le formulaire, le message est visible à l'écran.
+      expect(find.text('Aucun compte GitHub à ce nom').hitTestable(),
+          findsOneWidget);
+      expect(find.text('ouvrir'), findsNothing);
+      expect(provider.students, hasLength(1));
+      expect(_repo.writes, 0);
+    });
+
+    testWidgets('corriger le pseudo refusé efface l\'erreur', (tester) async {
+      await _openForm(tester, githubStatus: 404);
+      await fillRequired(tester, 'carla-inconnue');
+      await _tap(tester, find.text('Créer le portfolio'));
+      expect(find.text('Aucun compte GitHub à ce nom'), findsOneWidget);
+
+      await tester.enterText(
+          find.widgetWithText(TextFormField, 'Pseudo GitHub (optionnel)'),
+          'carla');
+      await tester.pumpAndSettle(); // le message disparaît en fondu
+
+      expect(find.text('Aucun compte GitHub à ce nom'), findsNothing);
+    });
+
+    testWidgets('hors ligne : CV créé quand même, avec un avertissement',
+        (tester) async {
+      final provider = await _openForm(tester, githubOffline: true);
+      await fillRequired(tester, 'carla');
+
+      await _tap(tester, find.text('Créer le portfolio'));
+
+      expect(_created(provider, 'Carla Petit').githubUsername, 'carla');
+      expect(
+        find.text('Portfolio enregistré, mais le pseudo GitHub n\'a pas pu '
+            'être vérifié (GitHub injoignable).'),
+        findsOneWidget,
+      );
+      await _flushSnackBar(tester);
+    });
+
+    testWidgets('forme impossible : refusée tout de suite, sans réseau',
+        (tester) async {
+      final provider = await _openForm(tester);
+      await fillRequired(tester, 'carla petit');
+
+      await _tap(tester, find.text('Créer le portfolio'));
+      await _reveal(tester,
+          find.text('Pseudo GitHub invalide (lettres, chiffres et tirets)'));
+
+      expect(
+          find.text('Pseudo GitHub invalide (lettres, chiffres et tirets)'),
+          findsOneWidget);
+      expect(_githubCalls, isEmpty);
+      expect(provider.students, hasLength(1));
+    });
+
+    testWidgets('sans pseudo : aucun appel à GitHub', (tester) async {
+      final provider = await _openForm(tester);
+      await _fill(tester, 'Nom complet *', 'Carla Petit');
+      await _fill(tester, 'Filière / niveau *', 'Info');
+
+      await _tap(tester, find.text('Créer le portfolio'));
+
+      expect(_githubCalls, isEmpty);
+      expect(_created(provider, 'Carla Petit').githubUsername, isNull);
+      await _flushSnackBar(tester);
+    });
+
+    testWidgets('pendant la vérification : roue de chargement, bouton bloqué',
+        (tester) async {
+      final provider = await _openForm(tester);
+      await fillRequired(tester, 'carla');
+      final Finder bouton = find.text('Créer le portfolio');
+      await _reveal(tester, bouton);
+
+      await tester.tap(bouton);
+      await tester.pump(); // la requête GitHub (50 ms) est en cours
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      await tester.tap(bouton, warnIfMissed: false); // 2e appui ignoré
+      await tester.pumpAndSettle();
+
+      expect(_githubCalls, hasLength(1));
+      expect(provider.students.where((s) => s.fullName == 'Carla Petit'),
+          hasLength(1));
+      await _flushSnackBar(tester);
+    });
+
+    testWidgets('modification sans changer le pseudo : pas d\'appel GitHub',
+        (tester) async {
+      // Hors ligne exprès : modifier sa bio ne doit ni attendre ni avertir.
+      final provider =
+          await _openForm(tester, student: _alice, githubOffline: true);
+      await _fill(tester, 'Localisation (optionnel)', 'Tunis');
+
+      await _tap(tester, find.text('Enregistrer'));
+
+      expect(_githubCalls, isEmpty);
+      expect(provider.studentById(1).location, 'Tunis');
+      expect(find.text('Portfolio enregistré'), findsOneWidget);
+      await _flushSnackBar(tester);
+    });
   });
 
   group('Modification du profil', () {

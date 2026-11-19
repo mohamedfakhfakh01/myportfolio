@@ -1146,5 +1146,36 @@ l'erreur le jour où on en a besoin. Ces règles sont dans `lib/shared/utils/`, 
 
 ---
 
-*Dernière mise à jour (19 novembre 2026) : formulaire de CV testé ; pseudo GitHub normalisé,
-e-mail vérifié. 143 tests, analyse sans erreur.*
+### Vérifier qu'un compte GitHub existe (19 novembre 2026)
+
+En ajoutant un CV, l'app demande à GitHub si le pseudo saisi existe (`GET /users/<pseudo>`).
+16 tests de plus (159 au total).
+
+#### Concept 1 — Trois réponses, pas deux
+On pourrait croire que la question « le compte existe ? » se répond par oui ou non. En réalité il y a
+**trois** cas : *oui* (code 200), *non* (code 404)… et *je ne sais pas* (pas de réseau, GitHub
+surchargé, limite de 60 requêtes/heure atteinte). D'où l'`enum GithubUserStatus { exists, notFound,
+unknown }`. Confondre « je ne sais pas » avec « non » bloquerait quelqu'un dans le métro, sans
+réseau, qui veut juste créer son CV. Analogie : appeler un numéro qui ne répond pas ne prouve pas
+qu'il n'existe pas.
+
+#### Concept 2 — Vérifier sur place d'abord, appeler le réseau ensuite
+Un pseudo avec un espace ou un accent ne peut pas exister sur GitHub : `isValidGithubUsername` le
+refuse **tout de suite**, sans réseau. On n'appelle GitHub que pour une forme valide, et seulement si
+le pseudo est nouveau ou modifié (modifier sa bio ne doit pas attendre internet).
+
+#### Concept 3 — Injecter le service pour tester sans internet
+Le formulaire reçoit son `GithubService` en paramètre. En test, on lui donne un faux client HTTP
+(`MockClient`) qui répond 200, 404 ou « pas de réseau » à la demande. Les tests sont ainsi rapides,
+reproductibles, et ne dépendent pas de GitHub. Analogie : répéter une pièce avec une doublure plutôt
+que d'attendre la vedette.
+
+#### Concept 4 — Un test qui échoue n'est pas toujours un bug
+Le test « corriger le pseudo efface l'erreur » échouait. En affichant ce que faisait le code, on a vu
+que l'erreur était bien effacée : le message disparaît **en fondu**, et le test regardait au milieu
+de l'animation. Correction du **test** (`pumpAndSettle`), pas de l'app.
+
+---
+
+*Dernière mise à jour (19 novembre 2026) : vérification de l'existence du compte GitHub à la
+création d'un CV. 159 tests, analyse sans erreur.*

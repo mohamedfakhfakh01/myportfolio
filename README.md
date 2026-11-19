@@ -92,18 +92,21 @@ choisir une *Team* (Apple ID), lancer une première fois depuis Xcode pour crée
 
 Dans un profil, appuyer sur **✏️**, renseigner un **pseudo GitHub** public, puis enregistrer : la
 section *Dépôts GitHub* charge les dépôts publics.
+
+À l'enregistrement, l'app **vérifie que le compte existe** : un pseudo inconnu de GitHub est refusé
+(message sous le champ). Hors ligne, le CV est enregistré quand même, avec un avertissement.
 *(Connexion internet requise ; l'API publique est limitée à 60 requêtes/heure sans authentification.)*
 
 ## Vérifications et tests
 
 ```bash
 flutter analyze          # 0 erreur attendu
-flutter test             # 143 tests
+flutter test             # 159 tests
 flutter test --coverage  # génère coverage/lcov.info
 ```
 
 Ce qui est couvert : modèles et sérialisation, calcul de complétion, CRUD du
-provider (dont l'interdiction des doublons de nom), service GitHub (délai dépassé / hors-ligne),
+provider (dont l'interdiction des doublons de nom), service GitHub (délai dépassé / hors-ligne, existence d'un compte),
 le formulaire de création, quelques widgets, et surtout les
 **migrations de la base** (via `sqflite_common_ffi`, pour garantir qu'une mise à jour ne perde
 aucune donnée).

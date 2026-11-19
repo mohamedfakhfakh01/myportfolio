@@ -16,3 +16,13 @@ String? githubUsernameFrom(String input) {
   v = v.replaceFirst(RegExp(r'^@+'), '').trim();
   return v.isEmpty ? null : v;
 }
+
+/// Vrai si [username] a la **forme** d'un pseudo GitHub : lettres, chiffres et
+/// tirets, 39 caractères au plus, sans tiret au début.
+///
+/// Règle volontairement un peu souple (GitHub interdit aussi « -- » et le tiret
+/// final, mais de très vieux comptes en ont) : c'est GitHub qui tranche ensuite
+/// si le compte existe. Ce contrôle évite surtout d'envoyer une adresse cassée
+/// (espaces, accents…) à l'API.
+bool isValidGithubUsername(String username) =>
+    RegExp(r'^[A-Za-z0-9][A-Za-z0-9-]{0,38}$').hasMatch(username);

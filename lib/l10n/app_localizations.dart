@@ -926,6 +926,18 @@ abstract class AppLocalizations {
   /// **'Pour afficher tes dépôts GitHub sur le profil'**
   String get githubUsernameHelp;
 
+  /// No description provided for @githubUsernameInvalid.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pseudo GitHub invalide (lettres, chiffres et tirets)'**
+  String get githubUsernameInvalid;
+
+  /// No description provided for @githubUserNotFound.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun compte GitHub à ce nom'**
+  String get githubUserNotFound;
+
   /// No description provided for @contactTitle.
   ///
   /// In fr, this message translates to:
@@ -1069,6 +1081,12 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Portfolio enregistré'**
   String get portfolioSaved;
+
+  /// No description provided for @portfolioSavedGithubUnchecked.
+  ///
+  /// In fr, this message translates to:
+  /// **'Portfolio enregistré, mais le pseudo GitHub n\'a pas pu être vérifié (GitHub injoignable).'**
+  String get portfolioSavedGithubUnchecked;
 
   /// No description provided for @portfolioDeleted.
   ///
