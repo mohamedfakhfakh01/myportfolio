@@ -453,6 +453,33 @@ class AppLocalizationsFr extends AppLocalizations {
   String get githubUserNotFound => 'Aucun compte GitHub à ce nom';
 
   @override
+  String get githubPreviewLoading => 'Recherche du compte GitHub…';
+
+  @override
+  String get githubPreviewFound => 'Compte GitHub trouvé';
+
+  @override
+  String get githubPreviewNoRepos => 'Aucun dépôt public pour l\'instant';
+
+  @override
+  String githubPreviewMore(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '+ $count autres dépôts',
+      one: '+ 1 autre dépôt',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get githubPreviewManyMore => '+ de nombreux autres dépôts';
+
+  @override
+  String get githubPreviewUnknown =>
+      'Impossible de vérifier le compte pour l\'instant (connexion ?)';
+
+  @override
   String get contactTitle => 'Contact';
 
   @override

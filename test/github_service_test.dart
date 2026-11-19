@@ -60,6 +60,27 @@ void main() {
     });
   });
 
+  test('réponse 200 illisible : GithubException (pas de plantage)', () async {
+    final client = MockClient((_) async => http.Response('{}', 200));
+    await expectLater(
+      GithubService(client: client).fetchRepos('x'),
+      throwsA(isA<GithubException>()),
+    );
+  });
+
+  test('404 : l\'erreur indique « introuvable » ; demande perPage', () async {
+    Uri? url;
+    final client = MockClient((request) async {
+      url = request.url;
+      return http.Response('', 404);
+    });
+    await expectLater(
+      GithubService(client: client).fetchRepos('x', perPage: 100),
+      throwsA(isA<GithubException>().having((e) => e.notFound, 'notFound', true)),
+    );
+    expect(url!.queryParameters['per_page'], '100');
+  });
+
   // Vérification d'existence d'un compte (formulaire « Ajouter un CV »).
   group('checkUser', () {
     /// Service dont le faux client répond [status] et note chaque adresse.

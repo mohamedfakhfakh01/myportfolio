@@ -93,7 +93,8 @@ choisir une *Team* (Apple ID), lancer une première fois depuis Xcode pour crée
 Dans un profil, appuyer sur **✏️**, renseigner un **pseudo GitHub** public, puis enregistrer : la
 section *Dépôts GitHub* charge les dépôts publics.
 
-À l'enregistrement, l'app **vérifie que le compte existe** : un pseudo inconnu de GitHub est refusé
+Dans le formulaire, **pendant la saisie du pseudo**, l'app affiche sous le champ les derniers dépôts
+publics du compte (preuve que c'est le bon). À l'enregistrement, l'app **vérifie que le compte existe** : un pseudo inconnu de GitHub est refusé
 (message sous le champ). Hors ligne, le CV est enregistré quand même, avec un avertissement.
 *(Connexion internet requise ; l'API publique est limitée à 60 requêtes/heure sans authentification.)*
 
@@ -101,7 +102,7 @@ section *Dépôts GitHub* charge les dépôts publics.
 
 ```bash
 flutter analyze          # 0 erreur attendu
-flutter test             # 159 tests
+flutter test             # 170 tests
 flutter test --coverage  # génère coverage/lcov.info
 ```
 

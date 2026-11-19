@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -9,6 +10,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/widgets/fade_slide_route.dart';
+import '../../../github/data/github_repo.dart';
 import '../../../github/data/github_service.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/experience.dart';
@@ -80,6 +82,23 @@ class _StudentFormPageState extends State<StudentFormPage> {
   /// le champ tant qu'il n'est pas modifié).
   String? _githubNotFound;
 
+  // --- Aperçu des dépôts pendant la saisie du pseudo ---
+
+  /// Attente après la dernière touche avant d'interroger GitHub : on ne lance
+  /// pas une requête par lettre tapée (limite de 60 requêtes/heure).
+  static const Duration _previewDelay = Duration(milliseconds: 700);
+  Timer? _previewTimer;
+
+  /// Pseudo pour lequel l'aperçu est affiché (ou en cours de chargement).
+  String? _previewUser;
+  bool _previewLoading = false;
+
+  /// Dépôts trouvés pour [_previewUser] (null : pas encore, ou échec).
+  List<GithubRepo>? _previewRepos;
+
+  /// Vrai si GitHub n'a pas pu répondre (hors ligne, limite atteinte…).
+  bool _previewUnknown = false;
+
   bool get _hasPhoto => _photoPath != null && File(_photoPath!).existsSync();
 
   @override
@@ -105,6 +124,7 @@ class _StudentFormPageState extends State<StudentFormPage> {
     _nameController.dispose();
     _fieldController.dispose();
     _bioController.dispose();
+    _previewTimer?.cancel();
     _githubController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
@@ -221,6 +241,54 @@ class _StudentFormPageState extends State<StudentFormPage> {
     );
   }
 
+  /// Appelé à chaque frappe dans le champ GitHub : efface l'ancien aperçu et
+  /// programme une recherche une fois que l'utilisateur a fini de taper.
+  void _onGithubChanged(String value) {
+    _previewTimer?.cancel();
+    if (_githubNotFound != null) {
+      _githubNotFound = null;
+      _githubFieldKey.currentState!.validate();
+    }
+    final String? pseudo = githubUsernameFrom(value);
+    setState(() {
+      _previewUser = null;
+      _previewLoading = false;
+      _previewRepos = null;
+      _previewUnknown = false;
+    });
+    // Champ vide ou forme impossible : rien à demander à GitHub (le
+    // validateur expliquera le problème à l'enregistrement).
+    if (pseudo == null || !isValidGithubUsername(pseudo)) return;
+    _previewTimer = Timer(_previewDelay, () => _loadPreview(pseudo));
+  }
+
+  Future<void> _loadPreview(String pseudo) async {
+    setState(() {
+      _previewUser = pseudo;
+      _previewLoading = true;
+    });
+    List<GithubRepo>? repos;
+    bool notFound = false;
+    try {
+      repos = await _github.fetchRepos(pseudo, perPage: 100);
+    } on GithubException catch (e) {
+      notFound = e.notFound;
+    }
+    // Entre-temps, l'utilisateur a pu modifier le pseudo, ou quitter l'écran :
+    // une réponse dépassée est ignorée.
+    if (!mounted || _previewUser != pseudo) return;
+    setState(() {
+      _previewLoading = false;
+      _previewRepos = repos;
+      _previewUnknown = repos == null && !notFound;
+    });
+    if (notFound) {
+      // Même message que lors de l'enregistrement, directement sous le champ.
+      _githubNotFound = pseudo;
+      _githubFieldKey.currentState!.validate();
+    }
+  }
+
   /// Renvoie le texte nettoyé, ou null s'il est vide.
   String? _orNull(String s) => s.trim().isEmpty ? null : s.trim();
 
@@ -243,6 +311,7 @@ class _StudentFormPageState extends State<StudentFormPage> {
 
     final AppLocalizations l = AppLocalizations.of(context);
     final ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
+    _previewTimer?.cancel(); // l'enregistrement fait sa propre vérification
 
     // Une adresse collée en entier est ramenée au pseudo (API + PDF).
     final String? github = githubUsernameFrom(_githubController.text);
@@ -250,8 +319,11 @@ class _StudentFormPageState extends State<StudentFormPage> {
     // Le compte existe-t-il ? On ne demande à GitHub que si le pseudo est
     // nouveau ou modifié : modifier sa bio hors ligne ne doit pas attendre le
     // réseau. (GitHub ignore la casse : « Alice » = « alice ».)
+    // Si l'aperçu vient de trouver ce compte, inutile de redemander.
     bool githubUnchecked = false;
+    final bool alreadyFound = _previewRepos != null && _previewUser == github;
     if (github != null &&
+        !alreadyFound &&
         github.toLowerCase() !=
             widget.student?.githubUsername?.toLowerCase()) {
       final GithubUserStatus status = await _github.checkUser(github);
@@ -413,13 +485,8 @@ class _StudentFormPageState extends State<StudentFormPage> {
                     helperText: l.githubUsernameHelp,
                     prefixIcon: const Icon(Icons.code),
                   ),
-                  // Dès que le pseudo refusé est corrigé, l'erreur disparaît.
-                  onChanged: (_) {
-                    if (_githubNotFound != null) {
-                      _githubNotFound = null;
-                      _githubFieldKey.currentState!.validate();
-                    }
-                  },
+                  // Efface l'erreur éventuelle et relance l'aperçu des dépôts.
+                  onChanged: _onGithubChanged,
                   validator: (value) {
                     final String? pseudo = githubUsernameFrom(value ?? '');
                     if (pseudo == null) return null; // champ facultatif
@@ -430,6 +497,11 @@ class _StudentFormPageState extends State<StudentFormPage> {
                         ? l.githubUserNotFound
                         : null;
                   },
+                ),
+                _GithubPreview(
+                  loading: _previewLoading,
+                  repos: _previewRepos,
+                  unknown: _previewUnknown,
                 ),
                 const SizedBox(height: 20),
 
@@ -925,6 +997,132 @@ class _ExperienceInputDialogState extends State<_ExperienceInputDialog> {
           child: Text(l.add),
         ),
       ],
+    );
+  }
+}
+
+/// Aperçu sous le champ GitHub : la preuve que c'est le bon compte, avec ses
+/// derniers dépôts publics (les plus récemment mis à jour d'abord).
+class _GithubPreview extends StatelessWidget {
+  const _GithubPreview({
+    required this.loading,
+    required this.repos,
+    required this.unknown,
+  });
+
+  final bool loading;
+  final List<GithubRepo>? repos;
+  final bool unknown;
+
+  /// Nombre de dépôts listés ; les autres sont résumés en « + N autres ».
+  static const int _shown = 5;
+
+  /// Nombre maximal demandé à GitHub ; au-delà, on ne connaît pas le total.
+  static const int _fetched = 100;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppLocalizations l = AppLocalizations.of(context);
+    final TextTheme text = Theme.of(context).textTheme;
+    final ColorScheme colors = Theme.of(context).colorScheme;
+
+    Widget line(Widget icon, String label, {Color? color}) => Padding(
+          padding: const EdgeInsets.only(top: 8, left: 12),
+          child: Row(
+            children: [
+              icon,
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(label,
+                    style: text.bodySmall?.copyWith(color: color)),
+              ),
+            ],
+          ),
+        );
+
+    if (loading) {
+      return line(
+        const SizedBox.square(
+          dimension: 14,
+          child: CircularProgressIndicator(strokeWidth: 2),
+        ),
+        l.githubPreviewLoading,
+      );
+    }
+    if (unknown) {
+      return line(
+        Icon(Icons.cloud_off_outlined, size: 16, color: colors.outline),
+        l.githubPreviewUnknown,
+        color: colors.outline,
+      );
+    }
+    final List<GithubRepo>? found = repos;
+    if (found == null) return const SizedBox.shrink();
+
+    final int more = found.length - _shown;
+    // Indigo foncé illisible sur le fond sombre : indigo clair en thème sombre.
+    final Color accent = Theme.of(context).brightness == Brightness.dark
+        ? AppColors.primaryLight
+        : AppColors.primary;
+    return Container(
+      margin: const EdgeInsets.only(top: 10),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppColors.primarySoft,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.check_circle, size: 18, color: accent),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(l.githubPreviewFound,
+                    style: text.labelLarge?.copyWith(color: accent)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          if (found.isEmpty)
+            Text(l.githubPreviewNoRepos, style: text.bodySmall)
+          else ...[
+            for (final GithubRepo repo in found.take(_shown))
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Row(
+                  children: [
+                    const Icon(Icons.book_outlined, size: 16),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        repo.name,
+                        style: text.bodyMedium,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    if (repo.language != null) ...[
+                      const SizedBox(width: 8),
+                      Text(repo.language!, style: text.bodySmall),
+                    ],
+                  ],
+                ),
+              ),
+            if (more > 0)
+              Padding(
+                padding: const EdgeInsets.only(top: 6),
+                child: Text(
+                  // 100 dépôts reçus = la limite : le vrai total est inconnu.
+                  found.length >= _fetched
+                      ? l.githubPreviewManyMore
+                      : l.githubPreviewMore(more),
+                  style: text.bodySmall,
+                ),
+              ),
+          ],
+        ],
+      ),
     );
   }
 }

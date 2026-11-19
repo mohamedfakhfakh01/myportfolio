@@ -938,6 +938,42 @@ abstract class AppLocalizations {
   /// **'Aucun compte GitHub à ce nom'**
   String get githubUserNotFound;
 
+  /// No description provided for @githubPreviewLoading.
+  ///
+  /// In fr, this message translates to:
+  /// **'Recherche du compte GitHub…'**
+  String get githubPreviewLoading;
+
+  /// No description provided for @githubPreviewFound.
+  ///
+  /// In fr, this message translates to:
+  /// **'Compte GitHub trouvé'**
+  String get githubPreviewFound;
+
+  /// No description provided for @githubPreviewNoRepos.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun dépôt public pour l\'instant'**
+  String get githubPreviewNoRepos;
+
+  /// No description provided for @githubPreviewMore.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count, plural, =1{+ 1 autre dépôt} other{+ {count} autres dépôts}}'**
+  String githubPreviewMore(int count);
+
+  /// No description provided for @githubPreviewManyMore.
+  ///
+  /// In fr, this message translates to:
+  /// **'+ de nombreux autres dépôts'**
+  String get githubPreviewManyMore;
+
+  /// No description provided for @githubPreviewUnknown.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible de vérifier le compte pour l\'instant (connexion ?)'**
+  String get githubPreviewUnknown;
+
   /// No description provided for @contactTitle.
   ///
   /// In fr, this message translates to:

@@ -451,6 +451,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get githubUserNotFound => 'No GitHub account with this name';
 
   @override
+  String get githubPreviewLoading => 'Looking up the GitHub account…';
+
+  @override
+  String get githubPreviewFound => 'GitHub account found';
+
+  @override
+  String get githubPreviewNoRepos => 'No public repositories yet';
+
+  @override
+  String githubPreviewMore(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '+ $count more repositories',
+      one: '+ 1 more repository',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get githubPreviewManyMore => '+ many more repositories';
+
+  @override
+  String get githubPreviewUnknown =>
+      'Can\'t check the account right now (connection?)';
+
+  @override
   String get contactTitle => 'Contact';
 
   @override

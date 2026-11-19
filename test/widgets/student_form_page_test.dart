@@ -2,6 +2,8 @@
 // saisi doit être exactement ce qui est enregistré (contenu compris), et rien
 // d'autre. (Les tests anti-doublon de nom sont dans student_form_test.dart.)
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
@@ -42,12 +44,14 @@ late List<Uri> _githubCalls;
 /// 360 × 800, au-dessus d'un écran de départ.
 ///
 /// GitHub est simulé : [githubStatus] est le code renvoyé (200 = le compte
-/// existe, 404 = inconnu) ; [githubOffline] simule l'absence de réseau.
+/// existe, 404 = inconnu) ; [githubOffline] simule l'absence de réseau ;
+/// [repos] donne, par pseudo, les noms de ses dépôts publics.
 Future<PortfolioProvider> _openForm(
   WidgetTester tester, {
   Student? student,
   int githubStatus = 200,
   bool githubOffline = false,
+  Map<String, List<String>> repos = const {},
 }) async {
   tester.view.physicalSize = const Size(1080, 2400);
   tester.view.devicePixelRatio = 3;
@@ -61,6 +65,17 @@ Future<PortfolioProvider> _openForm(
       // Comme une vraie requête, la réponse prend un peu de temps.
       await Future<void>.delayed(const Duration(milliseconds: 50));
       if (githubOffline) throw Exception('pas de réseau');
+      final List<String> segments = request.url.pathSegments; // users/<p>/…
+      if (githubStatus == 200 && segments.last == 'repos') {
+        final names = repos[segments[1]] ?? const <String>[];
+        return http.Response(
+          jsonEncode([
+            for (final n in names)
+              {'name': n, 'html_url': 'https://github.com/x/$n', 'language': 'Dart'},
+          ]),
+          200,
+        );
+      }
       return http.Response('{}', githubStatus);
     }),
   );
@@ -397,6 +412,135 @@ void main() {
       expect(_githubCalls, isEmpty);
       expect(provider.studentById(1).location, 'Tunis');
       expect(find.text('Portfolio enregistré'), findsOneWidget);
+      await _flushSnackBar(tester);
+    });
+  });
+
+  // Pendant la saisie du pseudo, les dépôts publics apparaissent sous le champ.
+  group('Aperçu des dépôts pendant la saisie', () {
+    final Finder champ =
+        find.widgetWithText(TextFormField, 'Pseudo GitHub (optionnel)');
+
+    /// Tape [pseudo] puis laisse passer le délai d'attente et la réponse.
+    Future<void> typeAndWait(WidgetTester tester, String pseudo) async {
+      await _reveal(tester, champ);
+      await tester.enterText(champ, pseudo);
+      await tester.pump(const Duration(milliseconds: 700)); // fin de frappe
+      await tester.pumpAndSettle(); // réponse de GitHub
+    }
+
+    testWidgets('compte trouvé : ses 5 derniers dépôts, puis « + 2 autres »',
+        (tester) async {
+      await _openForm(tester, repos: {
+        'carla': ['r1', 'r2', 'r3', 'r4', 'r5', 'r6', 'r7'],
+      });
+      await typeAndWait(tester, 'https://github.com/carla');
+
+      expect(find.text('Compte GitHub trouvé'), findsOneWidget);
+      for (final n in ['r1', 'r2', 'r3', 'r4', 'r5']) {
+        expect(find.text(n), findsOneWidget, reason: n);
+      }
+      expect(find.text('r6'), findsNothing);
+      expect(find.text('+ 2 autres dépôts'), findsOneWidget);
+      expect(_githubCalls.single.path, '/users/carla/repos');
+    });
+
+    testWidgets('pendant la recherche : message de chargement', (tester) async {
+      await _openForm(tester, repos: {'carla': ['r1']});
+      await _reveal(tester, champ);
+      await tester.enterText(champ, 'carla');
+      await tester.pump(const Duration(milliseconds: 700));
+      await tester.pump(); // requête partie, réponse pas encore arrivée
+
+      expect(find.text('Recherche du compte GitHub…'), findsOneWidget);
+      await tester.pumpAndSettle();
+      expect(find.text('Compte GitHub trouvé'), findsOneWidget);
+    });
+
+    testWidgets('compte sans dépôt public : dit qu\'il n\'y en a pas',
+        (tester) async {
+      await _openForm(tester);
+      await typeAndWait(tester, 'carla');
+
+      expect(find.text('Compte GitHub trouvé'), findsOneWidget);
+      expect(find.text('Aucun dépôt public pour l\'instant'), findsOneWidget);
+    });
+
+    testWidgets('compte inexistant : erreur sous le champ sans rien valider',
+        (tester) async {
+      await _openForm(tester, githubStatus: 404);
+      await typeAndWait(tester, 'carla-inconnue');
+
+      expect(find.text('Aucun compte GitHub à ce nom'), findsOneWidget);
+      expect(find.text('Compte GitHub trouvé'), findsNothing);
+    });
+
+    testWidgets('hors ligne : le dit, sans bloquer', (tester) async {
+      await _openForm(tester, githubOffline: true);
+      await typeAndWait(tester, 'carla');
+
+      expect(
+        find.text('Impossible de vérifier le compte pour l\'instant '
+            '(connexion ?)'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('frappe lettre par lettre : une seule requête, à la fin',
+        (tester) async {
+      await _openForm(tester, repos: {'carla': ['r1']});
+      await _reveal(tester, champ);
+      for (final debut in ['c', 'ca', 'car', 'carl', 'carla']) {
+        await tester.enterText(champ, debut);
+        await tester.pump(const Duration(milliseconds: 200));
+      }
+      await tester.pump(const Duration(milliseconds: 700));
+      await tester.pumpAndSettle();
+
+      expect(_githubCalls.map((u) => u.path), ['/users/carla/repos']);
+    });
+
+    testWidgets('réponse dépassée ignorée : seul le dernier pseudo s\'affiche',
+        (tester) async {
+      await _openForm(tester, repos: {
+        'alice': ['depot-alice'],
+        'bob': ['depot-bob'],
+      });
+      await _reveal(tester, champ);
+      await tester.enterText(champ, 'alice');
+      await tester.pump(const Duration(milliseconds: 700)); // requête alice
+      await tester.enterText(champ, 'bob'); // avant la réponse (50 ms)
+      // La réponse pour alice arrive maintenant : elle ne doit pas s'afficher
+      // sous « bob », même un instant.
+      await tester.pump(const Duration(milliseconds: 100));
+      expect(find.text('depot-alice'), findsNothing);
+      await tester.pump(const Duration(milliseconds: 600)); // requête bob
+      await tester.pumpAndSettle();
+
+      expect(find.text('depot-bob'), findsOneWidget);
+      expect(find.text('depot-alice'), findsNothing);
+    });
+
+    testWidgets('forme impossible : aucun appel pendant la saisie',
+        (tester) async {
+      await _openForm(tester);
+      await typeAndWait(tester, 'carla petit');
+
+      expect(_githubCalls, isEmpty);
+      expect(find.text('Compte GitHub trouvé'), findsNothing);
+    });
+
+    testWidgets('compte déjà trouvé : la création ne redemande pas à GitHub',
+        (tester) async {
+      final provider = await _openForm(tester, repos: {'carla': ['r1']});
+      await _fill(tester, 'Nom complet *', 'Carla Petit');
+      await _fill(tester, 'Filière / niveau *', 'Info');
+      await typeAndWait(tester, 'carla');
+
+      await _tap(tester, find.text('Créer le portfolio'));
+
+      expect(_githubCalls, hasLength(1)); // celle de l'aperçu seulement
+      expect(_created(provider, 'Carla Petit').githubUsername, 'carla');
       await _flushSnackBar(tester);
     });
   });

@@ -8,8 +8,12 @@ import 'github_repo.dart';
 
 /// Erreur « métier » du service GitHub, avec un message lisible pour l'UI.
 class GithubException implements Exception {
-  GithubException(this.message);
+  GithubException(this.message, {this.notFound = false});
   final String message;
+
+  /// Vrai si GitHub a répondu que ce compte n'existe pas (404) : l'écran peut
+  /// alors afficher son propre message traduit.
+  final bool notFound;
 
   @override
   String toString() => message;
@@ -49,9 +53,11 @@ class GithubService {
   ///
   /// Étapes : construire l'URL → envoyer la requête `GET` → selon le **code de
   /// réponse** HTTP, lire le JSON (200) ou lever une erreur claire (404/403…).
-  Future<List<GithubRepo>> fetchRepos(String username) async {
+  ///
+  /// [perPage] : nombre maximal de dépôts renvoyés (100 au plus pour GitHub).
+  Future<List<GithubRepo>> fetchRepos(String username, {int perPage = 30}) async {
     final Uri uri = Uri.parse(
-      '$_baseUrl/users/$username/repos?sort=updated&per_page=30',
+      '$_baseUrl/users/$username/repos?sort=updated&per_page=$perPage',
     );
 
     // On borne l'attente par un timeout et on traduit les erreurs réseau
@@ -70,12 +76,17 @@ class GithubService {
     switch (response.statusCode) {
       case 200:
         // Le corps est un tableau JSON ; on convertit chaque élément en objet.
-        final List<dynamic> data = jsonDecode(response.body) as List<dynamic>;
-        return data
-            .map((item) => GithubRepo.fromJson(item as Map<String, dynamic>))
-            .toList();
+        // Une réponse inattendue devient une erreur lisible, pas un plantage.
+        try {
+          final List<dynamic> data = jsonDecode(response.body) as List<dynamic>;
+          return data
+              .map((item) => GithubRepo.fromJson(item as Map<String, dynamic>))
+              .toList();
+        } catch (_) {
+          throw GithubException('Réponse GitHub illisible.');
+        }
       case 404:
-        throw GithubException('Utilisateur GitHub introuvable.');
+        throw GithubException('Utilisateur GitHub introuvable.', notFound: true);
       case 403:
         throw GithubException(
           'Limite de requêtes GitHub atteinte. Réessaie dans un moment.',

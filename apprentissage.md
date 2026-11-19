@@ -1177,5 +1177,29 @@ de l'animation. Correction du **test** (`pumpAndSettle`), pas de l'app.
 
 ---
 
-*Dernière mise à jour (19 novembre 2026) : vérification de l'existence du compte GitHub à la
-création d'un CV. 159 tests, analyse sans erreur.*
+### Aperçu des dépôts pendant la saisie du pseudo (19 novembre 2026)
+
+Pendant qu'on tape son pseudo GitHub, l'app affiche « Compte GitHub trouvé » et les 5 derniers
+dépôts publics. 11 tests de plus (170 au total), et vérifié à l'écran avec le vrai GitHub.
+
+#### Concept 1 — Attendre la fin de la frappe (« debounce »)
+Interroger GitHub à chaque lettre (`m`, `mo`, `moh`…) gaspillerait la limite de 60 requêtes/heure et
+afficherait des comptes au hasard. On lance un **minuteur** de 700 ms à chaque touche, en annulant le
+précédent : la requête ne part que lorsque l'utilisateur s'arrête. Analogie : l'ascenseur qui attend
+quelques secondes que tout le monde soit monté avant de fermer les portes.
+
+#### Concept 2 — Ignorer une réponse dépassée
+Réseau oblige, la réponse pour « alice » peut arriver **après** qu'on a déjà tapé « bob ». Sans
+précaution, on afficherait les dépôts d'alice sous le pseudo bob. Chaque réponse est donc comparée au
+pseudo actuel et jetée si elle ne correspond plus. Le test le vérifie *au moment précis* où la vieille
+réponse arrive, pas seulement à la fin.
+
+#### Concept 3 — Vérifier sur le vrai écran
+Les tests utilisent un faux GitHub. Sur le simulateur, avec le vrai : 5 dépôts + « 14 autres », et
+GitHub annonce bien 19 dépôts publics. Cette vérification a révélé un défaut que les tests ne voient
+pas : en thème sombre, le titre indigo sur fond indigo était peu lisible (corrigé : indigo clair).
+
+---
+
+*Dernière mise à jour (19 novembre 2026) : aperçu des dépôts GitHub pendant la saisie du pseudo.
+170 tests, analyse sans erreur.*
