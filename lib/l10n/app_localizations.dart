@@ -467,7 +467,7 @@ abstract class AppLocalizations {
   /// No description provided for @aboutFooter.
   ///
   /// In fr, this message translates to:
-  /// **'Projet réalisé en 2ᵉ année d\'informatique.'**
+  /// **'Projet réalisé en 3ᵉ année d\'informatique.'**
   String get aboutFooter;
 
   /// No description provided for @skillDeleteTitle.

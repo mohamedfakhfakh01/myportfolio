@@ -201,7 +201,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aboutTech3 => 'Public GitHub API';
 
   @override
-  String get aboutFooter => 'Project made in the 2nd year of computer science.';
+  String get aboutFooter => 'Project made in the 3rd year of computer science.';
 
   @override
   String get skillDeleteTitle => 'Delete skill?';

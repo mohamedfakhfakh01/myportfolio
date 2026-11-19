@@ -70,7 +70,7 @@
   "aboutTech1": "Flutter & Material 3",
   "aboutTech2": "Local SQLite database (sqflite)",
   "aboutTech3": "Public GitHub API",
-  "aboutFooter": "Project made in the 2nd year of computer science.",
+  "aboutFooter": "Project made in the 3rd year of computer science.",
 
   "skillDeleteTitle": "Delete skill?",
   "skillDeleteBody": "“{name}” will be permanently deleted.",

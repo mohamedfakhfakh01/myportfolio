@@ -202,7 +202,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get aboutTech3 => 'API publique GitHub';
 
   @override
-  String get aboutFooter => 'Projet réalisé en 2ᵉ année d\'informatique.';
+  String get aboutFooter => 'Projet réalisé en 3ᵉ année d\'informatique.';
 
   @override
   String get skillDeleteTitle => 'Supprimer la compétence ?';
