@@ -54,7 +54,7 @@ export PATH="$HOME/flutter/bin:$PATH"      # Flutter n'est PAS dans le PATH
 export LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 # obligatoire avant tout build iOS
 
 flutter analyze                             # 0 erreur attendu
-flutter test                                # 170 tests
+flutter test                                # 174 tests
 flutter gen-l10n                            # APRÈS toute modif des .arb
 flutter run -d 87E626E0-E743-44A6-8A48-AA716FD7851B --debug   # simulateur iPhone 18 Pro Max
 flutter build ios --release                 # puis: flutter install -d <udid> --release
@@ -141,6 +141,14 @@ iPhone physique « iPhone de fakh » `00008120-000664510C70201E`.
     après un changement de pseudo est **ignorée** (`_previewUser != pseudo`). En test :
     `pump(700 ms)` puis `pumpAndSettle()`. Un compte trouvé par l'aperçu n'est pas revérifié à
     l'enregistrement.
+27. **Icône et écran de démarrage = fichiers générés**, hors de l'app : `dart run
+    tool/generate_icon.dart` → `dart run flutter_launcher_icons` → `dart run
+    flutter_native_splash:create`. Le script et le `pubspec` recopient les couleurs de
+    `app_colors.dart` (le script ne peut pas l'importer : pas de Flutter sous `dart run`) ;
+    `test/brand_colors_test.dart` vérifie qu'ils restent identiques. `flutter_native_splash`
+    **réindente `ios/Runner/Info.plist`** sans rien changer : `git checkout` ce fichier.
+28. **iOS garde l'ancienne icône en cache** après une mise à jour : le simulateur a montré l'icône
+    bleue jusqu'au redémarrage (`simctl shutdown` + `boot`). Sur iPhone : redémarrer le téléphone.
 
 ---
 
@@ -252,8 +260,6 @@ Aucune : l'application ne contacte que l'API GitHub publique, sans clé.
 - [ ] **Lancer l'APK Android** sur un émulateur ou un appareil (aucun AVD sur cette machine).
 - [ ] Configurer une **signature release** Android avant toute publication.
 - [ ] Migrer CocoaPods → Swift Package Manager.
-- [ ] Écran de démarrage encore en **ancien bleu** `#3B82F6` (`pubspec.yaml` →
-      `flutter_native_splash`) : passer à l'indigo puis `dart run flutter_native_splash:create`.
 
 ---
 
@@ -278,6 +284,7 @@ Aucune : l'application ne contacte que l'API GitHub publique, sans clé.
 | Tests création CV | 19 nov. 2026 | Formulaire de CV testé (42 → 90 %) ; pseudo GitHub normalisé, e-mail vérifié (143 tests, ≈ 78 %) |
 | Compte GitHub | 19 nov. 2026 | À la création / modification d'un CV, l'app vérifie auprès de GitHub que le compte existe (159 tests, ≈ 78 %) |
 | Aperçu GitHub | 19 nov. 2026 | Pendant la saisie du pseudo, les derniers dépôts publics s'affichent sous le champ ; vérifié sur simulateur avec le vrai GitHub (170 tests, ≈ 78 %) |
+| Icône & démarrage | 19 nov. 2026 | Icône en dégradé indigo → violet, écran de démarrage indigo (fin de l'ancien bleu) ; couleurs gardées par un test (174 tests) |
 
 ---
 

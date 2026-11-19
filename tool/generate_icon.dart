@@ -1,17 +1,27 @@
 // Génère l'icône de l'app et le logo du splash, sans outil externe.
 //
 // Lancer : `dart run tool/generate_icon.dart`
-// Produit : assets/icon/icon.png (1024, dégradé bleu + carte de profil)
+// Produit : assets/icon/icon.png (1024, dégradé indigo → violet + carte de profil)
 //           assets/icon/splash_logo.png (512, carte blanche sur fond transparent)
+// Ensuite : `dart run flutter_launcher_icons` et `dart run flutter_native_splash:create`.
 //
 // Motif choisi : une « carte de profil » (avatar + lignes de texte) = portfolio.
 import 'dart:io';
 
 import 'package:image/image.dart' as img;
 
-// Couleurs de l'app (voir lib/app/theme/app_colors.dart).
-final _blue = img.ColorRgb8(0x3B, 0x82, 0xF6);
-final _blueDark = img.ColorRgb8(0x25, 0x63, 0xEB);
+// Couleurs de l'app, recopiées de lib/app/theme/app_colors.dart : ce script
+// tourne avec `dart run`, sans Flutter, et ne peut donc pas importer ce
+// fichier. Le test test/brand_colors_test.dart vérifie qu'elles sont
+// identiques (et que le pubspec et les images générées le sont aussi).
+const int iconGradientStart = 0xFF4F46E5; // AppColors.primary (indigo)
+const int iconGradientEnd = 0xFF7C3AED; // AppColors.violet
+
+img.ColorRgb8 _rgb(int argb) =>
+    img.ColorRgb8((argb >> 16) & 0xFF, (argb >> 8) & 0xFF, argb & 0xFF);
+
+final _start = _rgb(iconGradientStart);
+final _end = _rgb(iconGradientEnd);
 final _white = img.ColorRgb8(255, 255, 255);
 final _gray = img.ColorRgb8(0xCB, 0xD5, 0xE1);
 
@@ -30,7 +40,7 @@ void _drawCard(img.Image image, int s) {
       x: (s / 2).round(),
       y: p(0.39).round(),
       radius: p(0.093).round(),
-      color: _blue);
+      color: _start);
   img.fillRect(image,
       x1: p(0.345).round(),
       y1: p(0.535).round(),
@@ -57,18 +67,17 @@ void _drawCard(img.Image image, int s) {
 void main() {
   Directory('assets/icon').createSync(recursive: true);
 
-  // --- Icône : dégradé bleu plein + carte de profil ---
+  // --- Icône : dégradé en diagonale (haut-gauche indigo → bas-droite
+  // violet), comme les dégradés de l'app, + carte de profil ---
   const size = 1024;
   final icon = img.Image(width: size, height: size);
   for (int y = 0; y < size; y++) {
-    final t = y / size;
-    int mix(num a, num b) => (a + (b - a) * t).round();
-    final c = img.ColorRgb8(
-      mix(_blue.r, _blueDark.r),
-      mix(_blue.g, _blueDark.g),
-      mix(_blue.b, _blueDark.b),
-    );
-    img.drawLine(icon, x1: 0, y1: y, x2: size - 1, y2: y, color: c);
+    for (int x = 0; x < size; x++) {
+      final t = (x + y) / (2 * (size - 1));
+      int mix(num a, num b) => (a + (b - a) * t).round();
+      icon.setPixelRgb(
+          x, y, mix(_start.r, _end.r), mix(_start.g, _end.g), mix(_start.b, _end.b));
+    }
   }
   _drawCard(icon, size);
   File('assets/icon/icon.png').writeAsBytesSync(img.encodePng(icon));

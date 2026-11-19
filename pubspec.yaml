@@ -114,9 +114,10 @@ flutter_launcher_icons:
   remove_alpha_ios: true
 
 # Écran de démarrage (généré par `dart run flutter_native_splash:create`).
+# Couleur = AppColors.primary (vérifié par test/brand_colors_test.dart).
 flutter_native_splash:
-  color: "#3B82F6"
+  color: "#4F46E5"
   image: assets/icon/splash_logo.png
   android_12:
-    color: "#3B82F6"
+    color: "#4F46E5"
     image: assets/icon/splash_logo.png

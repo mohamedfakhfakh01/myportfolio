@@ -1201,5 +1201,30 @@ pas : en thème sombre, le titre indigo sur fond indigo était peu lisible (corr
 
 ---
 
-*Dernière mise à jour (19 novembre 2026) : aperçu des dépôts GitHub pendant la saisie du pseudo.
-170 tests, analyse sans erreur.*
+### Icône et écran de démarrage aux couleurs de l'app (19 novembre 2026)
+
+L'icône (dégradé indigo → violet) et l'écran de démarrage (indigo) ont rattrapé le reste de l'app,
+qui avait quitté le bleu `#3B82F6` depuis longtemps.
+
+#### Concept 1 — Les fichiers générés échappent à la « source unique »
+L'app lit ses couleurs dans `app_colors.dart`. Mais l'icône et l'écran de démarrage sont des **images
+fabriquées une fois** par des outils, avant même que l'app démarre : ils ne lisent pas ce fichier.
+C'est pour ça qu'ils étaient restés bleus quand l'app est passée à l'indigo. Analogie : changer le
+logo d'une entreprise, mais oublier les cartes de visite déjà imprimées.
+
+#### Concept 2 — Un test comme garde-fou
+Le script qui dessine l'icône ne peut pas importer `app_colors.dart` (il tourne sans Flutter). On
+recopie donc les deux couleurs… et un test (`brand_colors_test.dart`) vérifie qu'elles sont égales à
+celles de l'app, ainsi que la couleur du `pubspec` et les pixels des images générées. Si quelqu'un
+change l'indigo sans régénérer, le test échoue au lieu de laisser l'erreur passer inaperçue.
+
+#### Concept 3 — Les caches mentent
+Après installation, l'écran d'accueil du simulateur montrait **encore l'icône bleue**, alors que
+l'app installée contenait la nouvelle. iOS gardait l'ancienne image en mémoire ; un redémarrage a
+suffi. Réflexe : quand l'écran contredit le fichier, vérifier le fichier lui-même (ici l'image dans
+`Runner.app`) avant de « corriger » un code qui est juste.
+
+---
+
+*Dernière mise à jour (19 novembre 2026) : icône et écran de démarrage indigo/violet.
+174 tests, analyse sans erreur.*
