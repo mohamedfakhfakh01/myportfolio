@@ -262,7 +262,9 @@ Aucune : l'application ne contacte que l'API GitHub publique, sans clé.
 
 ## 11. À faire
 
-- [ ] **Lancer l'APK Android** sur un émulateur ou un appareil (aucun AVD sur cette machine).
+- ~~Lancer l'APK sur un émulateur~~ : **écarté le 20 nov. 2026** (choix de l'utilisateur). État de la
+      machine : émulateur installé, mais dossiers `system-images/android-35` et `android-37.2` **vides**
+      (téléchargement inachevé) → il faudrait retélécharger une image (~1,5 Go) avant de créer un AVD.
 - [ ] Configurer une **signature release** Android avant toute publication.
 - [ ] Migrer CocoaPods → Swift Package Manager.
 
