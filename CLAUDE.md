@@ -50,7 +50,7 @@ export PATH="$HOME/flutter/bin:$PATH"      # Flutter n'est PAS dans le PATH
 export LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 # obligatoire avant tout build iOS
 
 flutter analyze                             # 0 erreur attendu
-flutter test                                # 62 tests
+flutter test                                # 78 tests
 flutter gen-l10n                            # APRÈS toute modif des .arb
 flutter run -d 87E626E0-E743-44A6-8A48-AA716FD7851B --debug   # simulateur iPhone 18 Pro Max
 flutter build ios --release                 # puis: flutter install -d <udid> --release
@@ -95,6 +95,12 @@ iPhone physique « iPhone de fakh » `00008120-000664510C70201E`.
     `ensureVisible` : appeler `FocusManager.instance.primaryFocus?.unfocus()` avant de défiler.
 13. **Ne pas lancer `dart format` sur tout un fichier** pour corriger une indentation locale : le
     projet n'est pas formaté partout, le diff devient illisible.
+14. **`showModalBottomSheet` est bloqué par défaut à 9/16 de l'écran** : un contenu de longueur
+    variable dans une `Column` fixe **déborde** (cas réel : feuille de complétion d'un portfolio
+    neuf, 11 critères : 167 px coupés, mesurés en test à la taille 440×956 de l'iPhone 18 Pro Max). → `isScrollControlled: true` +
+    `useSafeArea: true` + contenu dans un `SingleChildScrollView`.
+15. **Tester un écran sur une taille de téléphone** (`tester.view.physicalSize`) : la taille par
+    défaut des tests (800×600, paysage) cache les débordements verticaux.
 
 ---
 
@@ -170,7 +176,11 @@ validation côté serveur ne s'appliquent pas ici.
   de l'utilisateur. Les données ne vivent que sur l'appareil (récupérable via git : `638721f`).
 - ⚠️ **Android compilé mais jamais exécuté** ; APK signé avec la **clé de debug**
   (`android/app/build.gradle.kts`), donc non publiable sur le Play Store.
-- ⚠️ Couverture de tests ≈ 21 % : cœur logique couvert, écrans peu testés.
+- ⚠️ Couverture de tests ≈ 50 % (des fichiers chargés par les tests) : logique, page profil (82 %)
+  et PDF (97 %) couverts ; accueil, détail projet et formulaires internes encore peu testés.
+- ⚠️ **PDF : la police Helvetica intégrée ignore les caractères hors Latin-1** (« — », « – », « ’ »…) :
+  ils sont **sautés en silence** (`pdf` → `text.dart`, `text.sublist(index + 1)`). Touche les
+  vraies données (filière « … — IIT Sfax », titres de projets). Non corrigé à ce jour.
 - ⚠️ CocoaPods au lieu de Swift Package Manager (builds plus lents, piège de la locale).
 
 ---
@@ -199,7 +209,8 @@ Aucune : l'application ne contacte que l'API GitHub publique, sans clé.
 
 - [ ] **Lancer l'APK Android** sur un émulateur ou un appareil (aucun AVD sur cette machine).
 - [ ] Configurer une **signature release** Android avant toute publication.
-- [ ] Monter la couverture de tests sur les écrans (profil, accueil) et l'export PDF.
+- [ ] Monter la couverture de tests sur l'accueil et l'écran détail projet.
+- [ ] Corriger les caractères perdus dans le PDF (police Unicode embarquée ou substitution).
 - [ ] Migrer CocoaPods → Swift Package Manager.
 
 ---
@@ -214,6 +225,7 @@ Aucune : l'application ne contacte que l'API GitHub publique, sans clé.
 | Design | nov. 2026 | Typographie, palette indigo/violet, thème clair, nav flottante, tableau de bord |
 | Données | 18 nov. 2026 | Technologies par projet (v7), écran détail, filtre, sauvegarde JSON |
 | Retrait | 19 nov. 2026 | Sauvegarde JSON retirée (à la demande) ; anti-doublon à la création conservé |
+| Tests écrans | 19 nov. 2026 | Tests page profil + PDF (78 tests, ≈ 50 %) ; débordement de la feuille de complétion corrigé ; perte des « — » dans le PDF découverte |
 
 ---
 

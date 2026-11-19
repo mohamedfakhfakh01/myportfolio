@@ -97,7 +97,7 @@ section *Dépôts GitHub* charge les dépôts publics.
 
 ```bash
 flutter analyze          # 0 erreur attendu
-flutter test             # 62 tests
+flutter test             # 78 tests
 flutter test --coverage  # génère coverage/lcov.info
 ```
 
@@ -133,7 +133,10 @@ lib/
   uniquement sur l'appareil ; supprimer l'app ou changer de téléphone les efface.
 - **Android** : l'APK release compile, mais n'a pas encore été testé sur un appareil ou un
   émulateur. Il est signé avec la **clé de debug** (installable, mais refusé par le Play Store).
-- Couverture de tests ≈ 21 % : le cœur logique est couvert, les écrans le sont peu.
+- Couverture de tests ≈ 50 % : logique, page profil et export PDF couverts ; l'accueil et l'écran
+  détail projet le sont peu.
+- Export PDF : les caractères hors Latin-1 (tiret long « — », apostrophe typographique…) n'apparaissent
+  pas, la police intégrée ne les connaît pas.
 - Avec un compte Apple gratuit, le profil de développement iOS expire après ~7 jours
   (relancer depuis Xcode pour le renouveler).
 - Flutter signale que les plugins sont disponibles en **Swift Packages** : migrer depuis CocoaPods

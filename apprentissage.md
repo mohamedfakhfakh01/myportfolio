@@ -969,5 +969,38 @@ chaque bloc retiré, plutôt que couper « à la louche ».
 
 ---
 
-*Dernière mise à jour (19 novembre 2026) : sauvegarde JSON retirée ; anti-doublon de nom à la
-création conservé. 62 tests, analyse sans erreur.*
+### Tests de la page profil et de l'export PDF (19 novembre 2026)
+
+16 tests ajoutés (`test/portfolio_pdf_test.dart`, `test/widgets/profile_page_test.dart`).
+Couverture : page profil 0 % → 82 %, PDF 0 % → 97 %, projet ≈ 50 %.
+
+#### Concept 1 — Un test sert à *trouver* des bugs, pas à confirmer que tout va bien
+Écrire les tests a révélé **deux vrais défauts** dans du code qu'on croyait fini :
+
+1. **La feuille « À compléter pour atteindre 100 % » débordait.** Analogie : une valise rigide
+   (la feuille, limitée par Flutter à 9/16 de l'écran) dans laquelle on range une liste qui
+   s'allonge. Avec 11 critères manquants (un portfolio tout neuf !), les derniers dépassaient et
+   étaient coupés. Correction : la valise devient extensible (`isScrollControlled: true`) et son
+   contenu défile s'il le faut (`SingleChildScrollView`). Le test « profil vide » échouait avant la
+   correction et passe après : c'est la preuve que le test protège vraiment.
+2. **Le PDF perd certains caractères.** La police intégrée au PDF (Helvetica) ne connaît que
+   l'alphabet « Latin-1 » : les accents oui, mais pas le tiret long « — ». La bibliothèque `pdf`
+   **saute** le caractère sans erreur (le message n'apparaît qu'en mode debug). Résultat :
+   « Licence Informatique — IIT Sfax » devient « Licence Informatique  IIT Sfax » dans le CV.
+   Pas encore corrigé : il faut choisir entre embarquer une police complète et remplacer ces
+   caractères par des équivalents simples.
+
+#### Concept 2 — Tester sur la taille d'un vrai téléphone
+Par défaut, un test de widget dessine dans une fenêtre de 800×600 (format paysage). Un bug de
+hauteur ne s'y voit pas. On fixe donc la taille : `tester.view.physicalSize = Size(1080, 2400)`
+avec `devicePixelRatio = 3` → un écran de 360×800 points, comme un petit téléphone.
+
+#### Concept 3 — Tester un PDF sans l'ouvrir
+On ne peut pas « lire » facilement un PDF compressé, mais on peut vérifier ce qui compte :
+la signature `%PDF-` au début, `%%EOF` à la fin (sinon aucun lecteur ne l'ouvre), plusieurs pages
+quand il y a beaucoup de projets, et qu'une photo absente ou corrompue ne fait pas planter l'export.
+
+---
+
+*Dernière mise à jour (19 novembre 2026) : tests de la page profil et du PDF, feuille de
+complétion corrigée. 78 tests, analyse sans erreur.*

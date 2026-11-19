@@ -39,6 +39,10 @@ Future<void> showProfileCompletionSheet(
 ) {
   return showModalBottomSheet<void>(
     context: context,
+    // La feuille grandit avec son contenu (au lieu d'être bloquée à 9/16 de
+    // l'écran), sans passer sous la barre d'état ni l'encoche.
+    isScrollControlled: true,
+    useSafeArea: true,
     backgroundColor: AppColors.surface,
     showDragHandle: true,
     shape: const RoundedRectangleBorder(
@@ -60,7 +64,9 @@ class _ProfileCompletionSheet extends StatelessWidget {
 
     return SafeArea(
       top: false,
-      child: Padding(
+      // Défile si la liste dépasse l'écran : un portfolio tout juste créé a
+      // 11 critères manquants, qui ne tenaient pas tous (contenu coupé).
+      child: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
