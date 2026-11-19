@@ -64,24 +64,26 @@ class AppColors {
   static const Color _primarySoftDark = Color(0xFF1E1B4B);
   static const Color _accentSoftDark = Color(0xFF164E63);
 
-  // Valeurs du thème CLAIR (palette indigo/violet).
-  static const Color _backgroundLight = Color(0xFFF7F8FC);
-  static const Color _surfaceLight = Color(0xFFFFFFFF);
-  static const Color _textPrimaryLight = Color(0xFF0F172A);
-  static const Color _textSecondaryLight = Color(0xFF64748B);
-  static const Color _borderLight = Color(0xFFE2E8F0);
-  static const Color _primarySoftLight = Color(0xFFE0E7FF);
-  static const Color _accentSoftLight = Color(0xFFCFFAFE);
+  // Valeurs du thème CLAIR (palette indigo/violet). Publiques car l'export
+  // PDF les utilise TOUJOURS : un PDF s'imprime sur papier blanc, quel que
+  // soit le thème affiché à l'écran.
+  static const Color backgroundLight = Color(0xFFF7F8FC);
+  static const Color surfaceLight = Color(0xFFFFFFFF);
+  static const Color textPrimaryLight = Color(0xFF0F172A);
+  static const Color textSecondaryLight = Color(0xFF64748B);
+  static const Color borderLight = Color(0xFFE2E8F0);
+  static const Color primarySoftLight = Color(0xFFE0E7FF);
+  static const Color accentSoftLight = Color(0xFFCFFAFE);
 
   /// Bascule toute la palette des surfaces/textes vers le thème choisi.
   static void applyBrightness(Brightness brightness) {
     final bool dark = brightness == Brightness.dark;
-    background = dark ? _backgroundDark : _backgroundLight;
-    surface = dark ? _surfaceDark : _surfaceLight;
-    textPrimary = dark ? _textPrimaryDark : _textPrimaryLight;
-    textSecondary = dark ? _textSecondaryDark : _textSecondaryLight;
-    border = dark ? _borderDark : _borderLight;
-    primarySoft = dark ? _primarySoftDark : _primarySoftLight;
-    accentSoft = dark ? _accentSoftDark : _accentSoftLight;
+    background = dark ? _backgroundDark : backgroundLight;
+    surface = dark ? _surfaceDark : surfaceLight;
+    textPrimary = dark ? _textPrimaryDark : textPrimaryLight;
+    textSecondary = dark ? _textSecondaryDark : textSecondaryLight;
+    border = dark ? _borderDark : borderLight;
+    primarySoft = dark ? _primarySoftDark : primarySoftLight;
+    accentSoft = dark ? _accentSoftDark : accentSoftLight;
   }
 }

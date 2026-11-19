@@ -1031,5 +1031,21 @@ scotché au premier carton pour ne jamais rester seul en bas de page.
 
 ---
 
-*Dernière mise à jour (19 novembre 2026) : CV PDF complet (coordonnées, parcours) et pagination
-corrigée. 89 tests, analyse sans erreur.*
+### Le PDF aux couleurs de l'app (19 novembre 2026)
+
+Le PDF utilisait encore l'ancien bleu (`#3B82F6`), écrit en dur dans son propre fichier : deux
+sources de vérité pour les couleurs, qui avaient divergé lors du passage à l'indigo/violet. Il
+lit désormais `app_colors.dart`, comme tout le reste de l'app.
+
+#### Concept — Une couleur « qui suit le thème » n'est pas une constante
+`AppColors.textPrimary` change quand on passe en thème sombre (texte presque blanc). Parfait pour
+un écran, catastrophique pour un PDF imprimé sur papier blanc : le CV aurait été **blanc sur
+blanc**. Analogie : on ne choisit pas l'encre d'une imprimante selon l'éclairage de la pièce. Le PDF
+lit donc les valeurs fixes du thème clair (`AppColors.textPrimaryLight`…), rendues publiques pour
+l'occasion. Un test génère le PDF en thème clair puis sombre et vérifie que les couleurs sont
+identiques ; en remplaçant volontairement la bonne couleur par la mauvaise, il échoue bien.
+
+---
+
+*Dernière mise à jour (19 novembre 2026) : PDF aux couleurs de l'app, indépendant du thème.
+91 tests, analyse sans erreur.*

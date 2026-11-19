@@ -36,7 +36,7 @@ les présenter comme des données réelles, et ne pas « corriger » leur prése
 Le portfolio **« Portfolio Démo »** est entièrement fictif et assumé comme tel (sa bio le dit).
 
 **Sources uniques de vérité dans le code :**
-- `lib/app/theme/app_colors.dart` → toutes les couleurs
+- `lib/app/theme/app_colors.dart` → toutes les couleurs, **y compris celles du PDF**
 - `lib/l10n/app_fr.arb` (modèle) + `app_en.arb` → tous les textes affichés
 - `lib/features/portfolio/data/sample_portfolio_data.dart` → données d'amorçage
 - `lib/shared/widgets/` → composants réutilisables (pilules, feuilles de formulaire)
@@ -51,7 +51,7 @@ export PATH="$HOME/flutter/bin:$PATH"      # Flutter n'est PAS dans le PATH
 export LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 # obligatoire avant tout build iOS
 
 flutter analyze                             # 0 erreur attendu
-flutter test                                # 89 tests
+flutter test                                # 91 tests
 flutter gen-l10n                            # APRÈS toute modif des .arb
 flutter run -d 87E626E0-E743-44A6-8A48-AA716FD7851B --debug   # simulateur iPhone 18 Pro Max
 flutter build ios --release                 # puis: flutter install -d <udid> --release
@@ -110,6 +110,9 @@ iPhone physique « iPhone de fakh » `00008120-000664510C70201E`.
     moitié vide et titre orphelin. Garder le contenu **à plat** (`_section` : un bloc par élément,
     titre attaché au premier). Tester le texte : `buildPortfolioPdf(..., compress: false)` puis
     lire les `[(mot)]TJ` ; la mise en page, elle, se vérifie à l'œil (PDF → PNG avec `sips`).
+18. **`AppColors.textPrimary`, `border`, `surface`… changent avec le thème** (sombre = texte presque
+    blanc). Le PDF, imprimé sur papier blanc, doit lire les constantes **`…Light`**
+    (`AppColors.textPrimaryLight`…), sinon un export en thème sombre serait blanc sur blanc.
 
 ---
 
@@ -221,6 +224,8 @@ Aucune : l'application ne contacte que l'API GitHub publique, sans clé.
 - [ ] Configurer une **signature release** Android avant toute publication.
 - [ ] Monter la couverture de tests sur l'accueil et l'écran détail projet.
 - [ ] Migrer CocoaPods → Swift Package Manager.
+- [ ] Écran de démarrage encore en **ancien bleu** `#3B82F6` (`pubspec.yaml` →
+      `flutter_native_splash`) : passer à l'indigo puis `dart run flutter_native_splash:create`.
 
 ---
 
@@ -237,6 +242,7 @@ Aucune : l'application ne contacte que l'API GitHub publique, sans clé.
 | Tests écrans | 19 nov. 2026 | Tests page profil + PDF (78 tests, ≈ 50 %) ; débordement de la feuille de complétion corrigé ; perte des « — » dans le PDF découverte |
 | PDF | 19 nov. 2026 | `pdfSafeText` : ponctuation typographique remplacée, plus aucun caractère perdu (81 tests) |
 | CV complet | 19 nov. 2026 | PDF : coordonnées (liens cliquables), expérience, formation ; pagination corrigée (89 tests) |
+| Couleurs PDF | 19 nov. 2026 | PDF aux couleurs de l'app (indigo → violet), lues dans `app_colors.dart`, indépendantes du thème (91 tests) |
 
 ---
 

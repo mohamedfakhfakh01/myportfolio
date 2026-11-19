@@ -1,9 +1,12 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:flutter/painting.dart' show Color;
+
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
+import '../../../app/theme/app_colors.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/models/experience.dart';
 import '../../../shared/models/project.dart';
@@ -11,14 +14,18 @@ import '../../../shared/models/skill.dart';
 import '../../../shared/models/student.dart';
 import '../../../shared/utils/linkedin.dart';
 
-// --- Palette du PDF (reprend les couleurs de l'app) ---
-final PdfColor _primary = PdfColor.fromInt(0xFF3B82F6); // bleu principal
-final PdfColor _primaryDark = PdfColor.fromInt(0xFF2563EB); // bleu foncé
-final PdfColor _ink = PdfColor.fromInt(0xFF0F172A); // texte principal
-final PdfColor _muted = PdfColor.fromInt(0xFF64748B); // texte secondaire
-final PdfColor _track = PdfColor.fromInt(0xFFE2E8F0); // fond des barres
-final PdfColor _cardBg = PdfColor.fromInt(0xFFF8FAFC); // fond des cartes projet
-final PdfColor _chipBg = PdfColor.fromInt(0xFFDBEAFE); // fond des puces
+// --- Palette du PDF : celle de l'app (source unique : app_colors.dart) ---
+// Toujours les valeurs du thème CLAIR : le PDF s'imprime sur papier blanc,
+// même si l'utilisateur a choisi le thème sombre à l'écran.
+PdfColor _pdf(Color c) => PdfColor.fromInt(c.toARGB32());
+final PdfColor _primary = _pdf(AppColors.primary); // indigo
+final PdfColor _primaryDark = _pdf(AppColors.primaryDark); // indigo foncé
+final PdfColor _violet = _pdf(AppColors.violet); // fin des dégradés
+final PdfColor _ink = _pdf(AppColors.textPrimaryLight); // texte principal
+final PdfColor _muted = _pdf(AppColors.textSecondaryLight); // texte secondaire
+final PdfColor _track = _pdf(AppColors.borderLight); // fond des barres
+final PdfColor _cardBg = _pdf(AppColors.backgroundLight); // fond des cartes
+final PdfColor _chipBg = _pdf(AppColors.primarySoftLight); // fond des puces
 
 /// Construit un **CV / portfolio en PDF** moderne à partir d'un [Student].
 ///
@@ -136,7 +143,7 @@ pw.Widget _header(Student student, pw.MemoryImage? photo) {
     padding: const pw.EdgeInsets.all(32),
     decoration: pw.BoxDecoration(
       gradient: pw.LinearGradient(
-        colors: [_primary, _primaryDark],
+        colors: [_primary, _violet],
         begin: pw.Alignment.topLeft,
         end: pw.Alignment.bottomRight,
       ),
@@ -312,8 +319,9 @@ pw.Widget _levelBar(int level) {
           pw.Expanded(
             flex: v,
             child: pw.Container(
+              // Dégradé primaire → violet, comme les barres de l'app.
               decoration: pw.BoxDecoration(
-                color: _primary,
+                gradient: pw.LinearGradient(colors: [_primary, _violet]),
                 borderRadius: pw.BorderRadius.circular(3),
               ),
             ),
@@ -386,7 +394,7 @@ pw.Widget _projectCard(String title, String description, List<String> tags) {
 pw.Widget _contactItem(String label, [String? url]) {
   final pw.Widget text = pw.Text(
     label,
-    style: pw.TextStyle(color: PdfColor.fromInt(0xFFDBEAFE), fontSize: 10),
+    style: pw.TextStyle(color: _chipBg, fontSize: 10),
   );
   return url == null ? text : pw.UrlLink(destination: url, child: text);
 }

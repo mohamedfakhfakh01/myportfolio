@@ -2,9 +2,10 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:image/image.dart' as img;
+import 'package:myportfolio/app/theme/app_colors.dart';
 import 'package:myportfolio/features/portfolio/services/portfolio_pdf.dart';
 import 'package:myportfolio/l10n/app_localizations.dart';
 import 'package:myportfolio/shared/models/experience.dart';
@@ -33,6 +34,22 @@ Future<String> _pdfWords(Student student, AppLocalizations l) async {
             (e) => e.group(1)!,
           ))
       .join(' ');
+}
+
+/// Couleurs de remplissage utilisées dans le PDF, en « #RRGGBB ». Le PDF non
+/// compressé les écrit en clair : `0.05882 0.0902 0.16471 rg` = #0F172A.
+Future<Set<String>> _fillColors(Student student, AppLocalizations l) async {
+  final String raw = latin1.decode(
+    await buildPortfolioPdf(student, l, compress: false),
+  );
+  String hex(String v) =>
+      (double.parse(v) * 255).round().toRadixString(16).padLeft(2, '0');
+  return RegExp(r'([\d.]+) ([\d.]+) ([\d.]+) rg')
+      .allMatches(raw)
+      .map((m) =>
+          '#${hex(m.group(1)!)}${hex(m.group(2)!)}${hex(m.group(3)!)}'
+              .toUpperCase())
+      .toSet();
 }
 
 void main() {
@@ -232,6 +249,30 @@ void main() {
         );
         expect(t, contains('EXPÉRIENCE'));
         expect(t, isNot(contains('FORMATION')));
+      });
+    });
+
+    group('couleurs (identité de l\'app)', () {
+      // Le thème de l'app est un état global : on le remet tel qu'au démarrage.
+      tearDown(() => AppColors.applyBrightness(Brightness.dark));
+
+      test('palette indigo de l\'app, plus l\'ancien bleu', () async {
+        final colors = await _fillColors(complet, l);
+        expect(colors, contains('#4F46E5')); // AppColors.primary
+        expect(colors, contains('#0F172A')); // texte principal (clair)
+        expect(colors, isNot(contains('#3B82F6'))); // ancien bleu
+        expect(colors, isNot(contains('#2563EB'))); // ancien bleu foncé
+      });
+
+      test('même rendu que l\'app soit en thème clair ou sombre', () async {
+        // Un PDF s'imprime sur papier blanc : en thème sombre, il ne doit
+        // surtout pas reprendre le texte presque blanc de l'écran.
+        AppColors.applyBrightness(Brightness.light);
+        final clair = await _fillColors(complet, l);
+        AppColors.applyBrightness(Brightness.dark);
+        final sombre = await _fillColors(complet, l);
+        expect(sombre, clair);
+        expect(sombre, contains('#0F172A')); // texte foncé, même en sombre
       });
     });
 
