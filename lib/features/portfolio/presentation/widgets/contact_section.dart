@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/student.dart';
+import '../../../../shared/utils/linkedin.dart';
 
 /// Section « Contact » du profil : e-mail, téléphone, LinkedIn et localisation.
 ///
@@ -24,14 +25,6 @@ class ContactSection extends StatelessWidget {
     if (!ok) {
       messenger.showSnackBar(SnackBar(content: Text(l.linkError)));
     }
-  }
-
-  /// Normalise un LinkedIn (URL complète, ou pseudo → profil « in/… »).
-  String _linkedinUrl(String value) {
-    final String v = value.trim();
-    if (v.startsWith('http://') || v.startsWith('https://')) return v;
-    if (v.contains('linkedin.com')) return 'https://$v';
-    return 'https://www.linkedin.com/in/${v.replaceAll('@', '')}';
   }
 
   @override
@@ -84,7 +77,7 @@ class ContactSection extends StatelessWidget {
           url: 'tel:${phone.replaceAll(' ', '')}');
     }
     if (linkedin != null && linkedin.isNotEmpty) {
-      addRow(Icons.link, linkedin, url: _linkedinUrl(linkedin));
+      addRow(Icons.link, linkedin, url: linkedinUrl(linkedin));
     }
     if (location != null && location.isNotEmpty) {
       addRow(Icons.place_outlined, location);

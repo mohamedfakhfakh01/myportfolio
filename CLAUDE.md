@@ -40,6 +40,7 @@ Le portfolio **« Portfolio Démo »** est entièrement fictif et assumé comme 
 - `lib/l10n/app_fr.arb` (modèle) + `app_en.arb` → tous les textes affichés
 - `lib/features/portfolio/data/sample_portfolio_data.dart` → données d'amorçage
 - `lib/shared/widgets/` → composants réutilisables (pilules, feuilles de formulaire)
+- `lib/shared/utils/linkedin.dart` → règle LinkedIn → URL (écran **et** PDF)
 
 ---
 
@@ -50,7 +51,7 @@ export PATH="$HOME/flutter/bin:$PATH"      # Flutter n'est PAS dans le PATH
 export LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 # obligatoire avant tout build iOS
 
 flutter analyze                             # 0 erreur attendu
-flutter test                                # 81 tests
+flutter test                                # 89 tests
 flutter gen-l10n                            # APRÈS toute modif des .arb
 flutter run -d 87E626E0-E743-44A6-8A48-AA716FD7851B --debug   # simulateur iPhone 18 Pro Max
 flutter build ios --release                 # puis: flutter install -d <udid> --release
@@ -104,6 +105,11 @@ iPhone physique « iPhone de fakh » `00008120-000664510C70201E`.
 16. **La police standard du PDF ne dessine que le Latin-1 (codes 0–255)** et la bibliothèque `pdf`
     **saute sans erreur** tout autre caractère (avertissement en debug seulement). Tout texte
     utilisateur passe par `pdfSafeText` (fait une fois à l'entrée de `buildPortfolioPdf`).
+17. **`MultiPage` (pdf) ne coupe une page qu'entre deux blocs de premier niveau** : un gros bloc
+    (ex. 20 compétences dans une `Column`) est poussé **en entier** à la page suivante → page à
+    moitié vide et titre orphelin. Garder le contenu **à plat** (`_section` : un bloc par élément,
+    titre attaché au premier). Tester le texte : `buildPortfolioPdf(..., compress: false)` puis
+    lire les `[(mot)]TJ` ; la mise en page, elle, se vérifie à l'œil (PDF → PNG avec `sips`).
 
 ---
 
@@ -134,6 +140,7 @@ lib/
 ├── core/                    # database/ (schéma + migrations), widgets/ (transitions)
 ├── shared/
 │   ├── models/              # Student, Skill, Project, ExperienceEntry
+│   ├── utils/               # linkedin.dart (règle partagée écran + PDF)
 │   └── widgets/             # PillTag, FormSheetBody (composants partagés)
 └── features/
     ├── portfolio/
@@ -229,6 +236,7 @@ Aucune : l'application ne contacte que l'API GitHub publique, sans clé.
 | Retrait | 19 nov. 2026 | Sauvegarde JSON retirée (à la demande) ; anti-doublon à la création conservé |
 | Tests écrans | 19 nov. 2026 | Tests page profil + PDF (78 tests, ≈ 50 %) ; débordement de la feuille de complétion corrigé ; perte des « — » dans le PDF découverte |
 | PDF | 19 nov. 2026 | `pdfSafeText` : ponctuation typographique remplacée, plus aucun caractère perdu (81 tests) |
+| CV complet | 19 nov. 2026 | PDF : coordonnées (liens cliquables), expérience, formation ; pagination corrigée (89 tests) |
 
 ---
 

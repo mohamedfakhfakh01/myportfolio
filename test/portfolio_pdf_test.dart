@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/widgets.dart';
@@ -18,6 +19,20 @@ void _expectValidPdf(List<int> bytes) {
   expect(String.fromCharCodes(bytes.take(5)), '%PDF-');
   final String tail = String.fromCharCodes(bytes.skip(bytes.length - 32));
   expect(tail, contains('%%EOF'));
+}
+
+/// Texte du PDF, mot par mot, dans l'ordre d'écriture. Le PDF est généré
+/// **non compressé** : chaque mot y figure en clair sous la forme `[(mot)]TJ`.
+Future<String> _pdfWords(Student student, AppLocalizations l) async {
+  final bytes = await buildPortfolioPdf(student, l, compress: false);
+  final String raw = latin1.decode(bytes);
+  return RegExp(r'\[\(((?:\\.|[^\\)])*)\)\]TJ')
+      .allMatches(raw)
+      .map((m) => m.group(1)!.replaceAllMapped(
+            RegExp(r'\\(.)'),
+            (e) => e.group(1)!,
+          ))
+      .join(' ');
 }
 
 void main() {
@@ -133,6 +148,90 @@ void main() {
           logs.where((m) => m.contains('Unable to find a font')),
           isEmpty,
         );
+      });
+    });
+
+    group('contenu du CV', () {
+      const Student cv = Student(
+        fullName: 'Alice Martin',
+        field: 'Informatique',
+        email: 'alice@example.com',
+        phone: '+216 11 222 333',
+        linkedin: 'linkedin.com/in/alice',
+        location: 'Sfax, Tunisie',
+        githubUsername: 'alice',
+        skills: [Skill(name: 'Flutter', level: 80)],
+        projects: [Project(title: 'MyPortfolio', description: 'Appli.')],
+        experiences: [
+          ExperienceEntry(
+            title: 'Stagiaire développeur',
+            organization: 'Tekru Technologies',
+            period: 'Juin – Juillet 2026',
+            description: 'Application Laravel.',
+          ),
+          ExperienceEntry(
+            title: 'Licence Informatique',
+            organization: 'IIT Sfax',
+            period: '2024 – 2027',
+            kind: ExperienceKind.education,
+          ),
+        ],
+      );
+
+      test('coordonnées : e-mail, téléphone, ville, LinkedIn, GitHub',
+          () async {
+        final String t = await _pdfWords(cv, l);
+        expect(t, contains('alice@example.com'));
+        expect(t, contains('+216 11 222 333'));
+        expect(t, contains('Sfax, Tunisie'));
+        expect(t, contains('linkedin.com/in/alice'));
+        expect(t, contains('github.com/alice'));
+      });
+
+      test('parcours : expériences et formations, avec détails', () async {
+        final String t = await _pdfWords(cv, l);
+        expect(t, contains('EXPÉRIENCE'));
+        expect(t, contains('Stagiaire développeur'));
+        expect(t, contains('Tekru Technologies'));
+        expect(t, contains('Juin - Juillet 2026')); // « – » remplacé
+        expect(t, contains('Application Laravel.'));
+        expect(t, contains('FORMATION'));
+        expect(t, contains('Licence Informatique'));
+        expect(t, contains('IIT Sfax'));
+        expect(t, contains('2024 - 2027'));
+      });
+
+      test('ordre des sections identique à la page profil', () async {
+        final String t = await _pdfWords(cv, l);
+        final order = ['COMPÉTENCES', 'PROJETS', 'EXPÉRIENCE', 'FORMATION']
+            .map(t.indexOf)
+            .toList();
+        expect(order, everyElement(greaterThanOrEqualTo(0)));
+        expect(order, orderedEquals([...order]..sort()));
+      });
+
+      test('rien d\'inventé : sans données, ni contact ni parcours', () async {
+        final String t = await _pdfWords(
+          const Student(fullName: 'Bob', field: 'Info', email: '   '),
+          l,
+        );
+        expect(t, isNot(contains('@')));
+        expect(t, isNot(contains('EXPÉRIENCE')));
+        expect(t, isNot(contains('FORMATION')));
+        expect(t, isNot(contains('GitHub')));
+      });
+
+      test('expérience seule : pas de section Formation vide', () async {
+        final String t = await _pdfWords(
+          const Student(
+            fullName: 'Bob',
+            field: 'Info',
+            experiences: [ExperienceEntry(title: 'Stage')],
+          ),
+          l,
+        );
+        expect(t, contains('EXPÉRIENCE'));
+        expect(t, isNot(contains('FORMATION')));
       });
     });
 

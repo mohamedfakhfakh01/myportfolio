@@ -27,7 +27,8 @@ intégration de l'**API GitHub**.
 - **Photo de profil** et **capture d'écran** par projet (galerie ou appareil photo).
 
 **Sortie**
-- **Export PDF** du portfolio (partage iOS).
+- **Export PDF** du portfolio (partage iOS) : profil, coordonnées cliquables, compétences, projets,
+  expérience et formation.
 
 **Confort**
 - Thème **clair** (par défaut) ou **sombre**, mémorisé entre les lancements.
@@ -97,7 +98,7 @@ section *Dépôts GitHub* charge les dépôts publics.
 
 ```bash
 flutter analyze          # 0 erreur attendu
-flutter test             # 81 tests
+flutter test             # 89 tests
 flutter test --coverage  # génère coverage/lcov.info
 ```
 

@@ -1006,5 +1006,30 @@ quand il y a beaucoup de projets, et qu'une photo absente ou corrompue ne fait p
 
 ---
 
-*Dernière mise à jour (19 novembre 2026) : tests de la page profil et du PDF, feuille de
-complétion corrigée, caractères du PDF remplacés. 81 tests, analyse sans erreur.*
+### CV PDF complet : coordonnées et parcours (19 novembre 2026)
+
+Le PDF ne contenait ni les coordonnées ni le parcours : pour un recruteur, l'essentiel manquait.
+Ajouts : e-mail, téléphone, ville, LinkedIn, GitHub dans l'en-tête (**cliquables** dans un
+lecteur PDF), puis les sections **Expérience** et **Formation**, dans le même ordre que l'écran.
+
+#### Concept 1 — Une seule source de vérité, même pour une petite règle
+La transformation « pseudo LinkedIn → adresse complète » vivait dans l'écran Contact. Le PDF en
+avait besoin aussi : plutôt que la recopier (deux copies qui finiraient par diverger), elle a été
+déplacée dans `lib/shared/utils/linkedin.dart`, utilisée par les deux, et testée une fois.
+
+#### Concept 2 — Lire un PDF dans un test
+Un PDF est normalement **compressé** (comme un zip) : son texte est illisible. En le générant
+non compressé (`compress: false`), chaque mot apparaît en clair (`[(Stage)]TJ`) : le test peut
+alors vérifier que « Tekru Technologies » ou « 2024 - 2027 » figurent vraiment dans le CV.
+
+#### Concept 3 — Ce que les tests ne voient pas : regarder le résultat
+Tous les tests passaient, mais en convertissant le vrai CV en images, la page 1 montrait un titre
+« COMPÉTENCES » suivi d'une demi-page blanche. Analogie : un déménageur (`MultiPage`) qui ne
+peut pas couper un carton ; les 20 compétences formaient **un seul gros carton**, parti en entier
+dans le camion suivant. Correction : un petit carton par compétence, et le titre de section
+scotché au premier carton pour ne jamais rester seul en bas de page.
+
+---
+
+*Dernière mise à jour (19 novembre 2026) : CV PDF complet (coordonnées, parcours) et pagination
+corrigée. 89 tests, analyse sans erreur.*

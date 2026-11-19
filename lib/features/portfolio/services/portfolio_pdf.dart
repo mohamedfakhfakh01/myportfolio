@@ -5,9 +5,11 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
 import '../../../l10n/app_localizations.dart';
+import '../../../shared/models/experience.dart';
 import '../../../shared/models/project.dart';
 import '../../../shared/models/skill.dart';
 import '../../../shared/models/student.dart';
+import '../../../shared/utils/linkedin.dart';
 
 // --- Palette du PDF (reprend les couleurs de l'app) ---
 final PdfColor _primary = PdfColor.fromInt(0xFF3B82F6); // bleu principal
@@ -26,11 +28,24 @@ final PdfColor _chipBg = PdfColor.fromInt(0xFFDBEAFE); // fond des puces
 ///
 /// Ne contient que des données **réelles** de l'étudiant : les champs absents
 /// (bio vide, niveau non renseigné…) sont simplement omis, rien n'est inventé.
-Future<Uint8List> buildPortfolioPdf(Student source, AppLocalizations l) async {
+///
+/// [compress] à `false` laisse le texte lisible en clair dans le fichier : ne
+/// sert qu'aux tests, qui vérifient ainsi ce que le PDF contient vraiment.
+Future<Uint8List> buildPortfolioPdf(
+  Student source,
+  AppLocalizations l, {
+  bool compress = true,
+}) async {
   // Texte rendu « dessinable » une fois pour toutes, avant toute mise en page
   // (voir [pdfSafeText]) : aucun caractère ne disparaît en silence.
   final Student student = _pdfSafeStudent(source);
-  final doc = pw.Document();
+  final doc = pw.Document(compress: compress);
+  final experiences = student.experiences
+      .where((e) => e.kind == ExperienceKind.experience)
+      .toList();
+  final education = student.experiences
+      .where((e) => e.kind == ExperienceKind.education)
+      .toList();
 
   // Photo de profil (optionnelle) : seulement si le fichier existe vraiment.
   pw.MemoryImage? photo;
@@ -43,45 +58,50 @@ Future<Uint8List> buildPortfolioPdf(Student source, AppLocalizations l) async {
     }
   }
 
+  // Le contenu est une liste **à plat** de petits blocs : `MultiPage` ne coupe
+  // une page qu'entre deux blocs. (Avant, les compétences formaient un seul
+  // gros bloc, poussé en entier à la page suivante → page 1 à moitié vide.)
   doc.addPage(
     pw.MultiPage(
       pageFormat: PdfPageFormat.a4,
       margin: pw.EdgeInsets.zero, // le bandeau coloré va bord à bord
+      // Marge haute des pages suivantes (la 1re commence par le bandeau).
+      header: (context) => pw.SizedBox(height: context.pageNumber == 1 ? 0 : 32),
       footer: (context) => _footer(context),
       build: (context) => [
         _header(student, photo),
-        pw.Padding(
-          padding: const pw.EdgeInsets.fromLTRB(32, 24, 32, 24),
-          child: pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
-            children: [
-              // --- À propos ---
-              if (student.bio.isNotEmpty) ...[
-                _sectionTitle(l.navAbout),
-                pw.Text(
-                  student.bio,
-                  style: pw.TextStyle(fontSize: 11, color: _ink, lineSpacing: 2),
-                ),
-                pw.SizedBox(height: 18),
-              ],
+        pw.SizedBox(height: 12),
 
-              // --- Compétences (barres de niveau, puces sinon) ---
-              if (student.skills.isNotEmpty) ...[
-                _sectionTitle(l.skills),
-                _skillsBlock(student.skills),
-                pw.SizedBox(height: 6),
-              ],
+        // --- À propos ---
+        if (student.bio.isNotEmpty)
+          ..._section(l.navAbout, [
+            pw.Text(
+              student.bio,
+              style: pw.TextStyle(fontSize: 11, color: _ink, lineSpacing: 2),
+            ),
+          ]),
 
-              // --- Projets (en cartes) ---
-              if (student.projects.isNotEmpty) ...[
-                _sectionTitle(l.projects),
-                for (final project in student.projects)
-                  _projectCard(
-                      project.title, project.description, project.tags),
-              ],
-            ],
-          ),
-        ),
+        // --- Compétences (barres de niveau, puces sinon) ---
+        if (student.skills.isNotEmpty)
+          ..._section(l.skills, _skillWidgets(student.skills)),
+
+        // --- Projets (en cartes) ---
+        if (student.projects.isNotEmpty)
+          ..._section(l.projects, [
+            for (final project in student.projects)
+              _projectCard(project.title, project.description, project.tags),
+          ]),
+
+        // --- Parcours : même ordre que la page profil ---
+        if (experiences.isNotEmpty)
+          ..._section(l.experienceTitle, [
+            for (final entry in experiences) _journeyEntry(entry),
+          ]),
+        if (education.isNotEmpty)
+          ..._section(l.educationTitle, [
+            for (final entry in education) _journeyEntry(entry),
+          ]),
+        pw.SizedBox(height: 12),
       ],
     ),
   );
@@ -91,6 +111,26 @@ Future<Uint8List> buildPortfolioPdf(Student source, AppLocalizations l) async {
 
 /// Bandeau d'en-tête coloré : médaillon (photo ou initiales) + identité.
 pw.Widget _header(Student student, pw.MemoryImage? photo) {
+  // Coordonnées réellement renseignées (un champ vide ou blanc est omis).
+  bool filled(String? v) => v != null && v.trim().isNotEmpty;
+  final String? linkedin = student.linkedin;
+  final String? github = student.githubUsername;
+  final List<pw.Widget> contacts = [
+    if (filled(student.email))
+      _contactItem(student.email!.trim(), 'mailto:${student.email!.trim()}'),
+    if (filled(student.phone)) _contactItem(student.phone!.trim()),
+    if (filled(student.location)) _contactItem(student.location!.trim()),
+    if (filled(linkedin))
+      _contactItem(
+        // Adresse lisible à l'impression : sans « https:// » ni « www. ».
+        linkedinUrl(linkedin!).replaceFirst(RegExp(r'^https?://(www\.)?'), ''),
+        linkedinUrl(linkedin),
+      ),
+    if (filled(github))
+      _contactItem('github.com/${github!.trim()}',
+          'https://github.com/${github.trim()}'),
+  ];
+
   return pw.Container(
     width: double.infinity,
     padding: const pw.EdgeInsets.all(32),
@@ -148,14 +188,12 @@ pw.Widget _header(Student student, pw.MemoryImage? photo) {
                   fontSize: 12,
                 ),
               ),
-              if (student.githubUsername != null) ...[
-                pw.SizedBox(height: 6),
-                pw.Text(
-                  'GitHub : github.com/${student.githubUsername}',
-                  style: pw.TextStyle(
-                    color: PdfColor.fromInt(0xFFDBEAFE),
-                    fontSize: 10,
-                  ),
+              if (contacts.isNotEmpty) ...[
+                pw.SizedBox(height: 8),
+                pw.Wrap(
+                  spacing: 14,
+                  runSpacing: 3,
+                  children: contacts,
                 ),
               ],
             ],
@@ -195,27 +233,44 @@ pw.Widget _sectionTitle(String title) {
   );
 }
 
-/// Bloc des compétences : barres de niveau pour celles qui en ont un, puces
-/// pour les autres.
-pw.Widget _skillsBlock(List<Skill> skills) {
+/// Section du PDF : marges latérales, et titre **attaché** au premier bloc
+/// (jamais de titre seul en bas de page, son contenu étant sur la suivante).
+List<pw.Widget> _section(String title, List<pw.Widget> blocks) {
+  pw.Widget padded(pw.Widget child) => pw.Padding(
+        padding: const pw.EdgeInsets.symmetric(horizontal: 32),
+        child: child,
+      );
+  return [
+    padded(
+      pw.Padding(
+        padding: const pw.EdgeInsets.only(top: 14),
+        child: pw.Column(
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          children: [_sectionTitle(title), if (blocks.isNotEmpty) blocks.first],
+        ),
+      ),
+    ),
+    for (final block in blocks.skip(1)) padded(block),
+  ];
+}
+
+/// Compétences : une barre par compétence avec niveau (chacune est un bloc
+/// séparé, donc répartissable sur plusieurs pages), puis les puces des autres.
+List<pw.Widget> _skillWidgets(List<Skill> skills) {
   final withLevel = skills.where((s) => s.level != null).toList();
   final withoutLevel = skills.where((s) => s.level == null).toList();
-
-  return pw.Padding(
-    padding: const pw.EdgeInsets.only(bottom: 6),
-    child: pw.Column(
-      crossAxisAlignment: pw.CrossAxisAlignment.start,
-      children: [
-        for (final skill in withLevel) _skillWithBar(skill),
-        if (withoutLevel.isNotEmpty)
-          pw.Wrap(
-            spacing: 6,
-            runSpacing: 6,
-            children: [for (final s in withoutLevel) _skillChip(s.name)],
-          ),
-      ],
-    ),
-  );
+  return [
+    for (final skill in withLevel) _skillWithBar(skill),
+    if (withoutLevel.isNotEmpty)
+      pw.Padding(
+        padding: const pw.EdgeInsets.only(bottom: 6),
+        child: pw.Wrap(
+          spacing: 6,
+          runSpacing: 6,
+          children: [for (final s in withoutLevel) _skillChip(s.name)],
+        ),
+      ),
+  ];
 }
 
 /// Compétence avec son niveau : nom + pourcentage + barre de progression.
@@ -327,6 +382,70 @@ pw.Widget _projectCard(String title, String description, List<String> tags) {
   );
 }
 
+/// Une coordonnée de l'en-tête ; cliquable dans un lecteur PDF si [url].
+pw.Widget _contactItem(String label, [String? url]) {
+  final pw.Widget text = pw.Text(
+    label,
+    style: pw.TextStyle(color: PdfColor.fromInt(0xFFDBEAFE), fontSize: 10),
+  );
+  return url == null ? text : pw.UrlLink(destination: url, child: text);
+}
+
+/// Une entrée du parcours : intitulé et période, organisation, description,
+/// avec un filet coloré à gauche (comme une frise chronologique).
+pw.Widget _journeyEntry(ExperienceEntry entry) {
+  bool filled(String? v) => v != null && v.trim().isNotEmpty;
+  return pw.Container(
+    width: double.infinity,
+    margin: const pw.EdgeInsets.only(bottom: 10),
+    padding: const pw.EdgeInsets.only(left: 10),
+    decoration: pw.BoxDecoration(
+      border: pw.Border(left: pw.BorderSide(color: _primary, width: 2)),
+    ),
+    child: pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: [
+        pw.Row(
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          children: [
+            pw.Expanded(
+              child: pw.Text(
+                entry.title,
+                style: pw.TextStyle(
+                  fontSize: 11,
+                  fontWeight: pw.FontWeight.bold,
+                  color: _ink,
+                ),
+              ),
+            ),
+            if (filled(entry.period)) ...[
+              pw.SizedBox(width: 8),
+              pw.Text(
+                entry.period!.trim(),
+                style: pw.TextStyle(fontSize: 9, color: _muted),
+              ),
+            ],
+          ],
+        ),
+        if (filled(entry.organization)) ...[
+          pw.SizedBox(height: 2),
+          pw.Text(
+            entry.organization!.trim(),
+            style: pw.TextStyle(fontSize: 10, color: _primaryDark),
+          ),
+        ],
+        if (filled(entry.description)) ...[
+          pw.SizedBox(height: 3),
+          pw.Text(
+            entry.description!.trim(),
+            style: pw.TextStyle(fontSize: 10, color: _ink, lineSpacing: 1.5),
+          ),
+        ],
+      ],
+    ),
+  );
+}
+
 /// Pied de page : date de génération à gauche, numéro de page à droite.
 pw.Widget _footer(pw.Context context) {
   final now = DateTime.now();
@@ -399,8 +518,22 @@ Student _pdfSafeStudent(Student s) => s.copyWith(
       fullName: pdfSafeText(s.fullName),
       field: pdfSafeText(s.field),
       bio: pdfSafeText(s.bio),
-      githubUsername:
-          s.githubUsername == null ? null : pdfSafeText(s.githubUsername!),
+      githubUsername: _safeOrNull(s.githubUsername),
+      email: _safeOrNull(s.email),
+      phone: _safeOrNull(s.phone),
+      linkedin: _safeOrNull(s.linkedin),
+      location: _safeOrNull(s.location),
+      experiences: [
+        for (final e in s.experiences)
+          ExperienceEntry(
+            id: e.id,
+            title: pdfSafeText(e.title),
+            organization: _safeOrNull(e.organization),
+            period: _safeOrNull(e.period),
+            description: _safeOrNull(e.description),
+            kind: e.kind,
+          ),
+      ],
       skills: [
         for (final k in s.skills)
           Skill(
@@ -422,3 +555,5 @@ Student _pdfSafeStudent(Student s) => s.copyWith(
           ),
       ],
     );
+
+String? _safeOrNull(String? v) => v == null ? null : pdfSafeText(v);
