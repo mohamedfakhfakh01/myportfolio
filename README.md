@@ -48,7 +48,8 @@ intégration de l'**API GitHub**.
 ## Prérequis
 
 - **Flutter SDK** installé (`flutter --version`).
-- **Pour iOS** : Xcode, **CocoaPods** (`brew install cocoapods`), et soit un **simulateur iOS**,
+- **Pour iOS** : Xcode (les bibliothèques passent par **Swift Package Manager**, intégré : pas de
+  CocoaPods à installer), et soit un **simulateur iOS**,
   soit un **iPhone** en *Mode développeur* (signature configurée dans Xcode).
 - **Android** : hors cible (l'app est faite pour l'iPhone) ; le dossier `android/` est conservé et
   compile, mais n'est ni testé ni maintenu.
@@ -58,11 +59,6 @@ intégration de l'**API GitHub**.
 > 💡 Sur la machine de développement, Flutter n'est pas dans le `PATH` : utiliser
 > `~/flutter/bin/flutter` à la place de `flutter`.
 
-> ⚠️ **macOS avec Ruby 4.0** : exporter une locale UTF-8 avant tout build iOS, sinon `pod install`
-> échoue (`Unicode Normalization not appropriate for ASCII-8BIT`) :
-> ```bash
-> export LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
-> ```
 
 ## Installation
 
@@ -146,5 +142,3 @@ lib/
   remplacée (« — » → « - », « ’ » → « ' »), mais les émoji et l'écriture arabe sont retirés.
 - Avec un compte Apple gratuit, le profil de développement iOS expire après ~7 jours
   (relancer depuis Xcode pour le renouveler).
-- Flutter signale que les plugins sont disponibles en **Swift Packages** : migrer depuis CocoaPods
-  accélérerait les builds et supprimerait le piège de la locale UTF-8.

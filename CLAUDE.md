@@ -53,7 +53,6 @@ encore le garde jusqu'à ce que l'utilisateur le supprime (corbeille) ; il ne re
 
 ```bash
 export PATH="$HOME/flutter/bin:$PATH"      # Flutter n'est PAS dans le PATH
-export LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 # obligatoire avant tout build iOS
 
 flutter analyze                             # 0 erreur attendu
 flutter test                                # 191 tests
@@ -72,8 +71,10 @@ iPhone physique « iPhone de fakh » `00008120-000664510C70201E`.
 
 > La section la plus rentable du fichier. À compléter à chaque bug non trivial.
 
-1. **`pod install` plante sans locale UTF-8** (Ruby 4.0) :
-   `Unicode Normalization not appropriate for ASCII-8BIT`. Toujours exporter `LANG`/`LC_ALL`.
+1. ~~`pod install` plante sans locale UTF-8~~ — **résolu le 20 nov. 2026** : CocoaPods retiré, les
+   bibliothèques iOS passent par **Swift Package Manager** (paquet généré
+   `ios/Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage`). Plus de `Podfile` : ne pas en
+   recréer. Un plugin sans `Package.swift` ferait revenir CocoaPods → vérifier avant d'en ajouter un.
 2. **Flutter absent du `PATH`** → utiliser `~/flutter/bin/flutter`.
 3. **Le paquet `material_ui` définit son propre `TextTheme`**, incompatible avec celui de Flutter :
    `GoogleFonts.*TextTheme()` ne compile pas. Passer par le **nom de police**
@@ -240,7 +241,6 @@ validation côté serveur ne s'appliquent pas ici.
 - ⚠️ **PDF en Helvetica (Latin-1 seulement)** : la ponctuation typographique est remplacée par
   `pdfSafeText` (« — » → « - », « ’ » → « ' », « œ » → « oe »…). Les **émoji et écritures non
   latines (arabe…) sont retirés** du PDF : il faudrait embarquer une police Unicode pour les garder.
-- ⚠️ CocoaPods au lieu de Swift Package Manager (builds plus lents, piège de la locale).
 
 ---
 
@@ -269,7 +269,7 @@ Aucune : l'application ne contacte que l'API GitHub publique, sans clé.
 - ~~Émulateur Android~~ et ~~signature release Android~~ : **écartés le 20 nov. 2026** (app
       iPhone uniquement). Pour mémoire : émulateur installé, mais `system-images/android-35` et
       `android-37.2` **vides** (téléchargement inachevé, ~1,5 Go à refaire avant un AVD).
-- [ ] Migrer CocoaPods → Swift Package Manager.
+- [x] ~~Migrer CocoaPods → Swift Package Manager~~ (20 nov. 2026).
 
 ---
 
@@ -297,6 +297,7 @@ Aucune : l'application ne contacte que l'API GitHub publique, sans clé.
 | Icône & démarrage | 19 nov. 2026 | Icône en dégradé indigo → violet, écran de démarrage indigo (fin de l'ancien bleu) ; couleurs gardées par un test (174 tests) |
 | Lien photo | 20 nov. 2026 | « Ajouter une photo » lisible en thème sombre (contraste 2,8 → 9:1) via `AppColors.primaryText` (176 tests) |
 | Finitions | 20 nov. 2026 | Erreurs GitHub traduites (le service ne fabrique plus de texte) ; « Réessayer » qui plantait en debug corrigé ; boutons texte/contour lisibles en thème sombre via le thème (191 tests) |
+| Fin de CocoaPods | 20 nov. 2026 | `pod deintegrate`, `Podfile` supprimé : 100 % Swift Package Manager ; build sans locale UTF-8 vérifié, base + PDF testés sur simulateur |
 
 ---
 

@@ -1264,5 +1264,20 @@ texte et contour, sur le fond et sur les cartes, dans les deux thèmes.
 
 ---
 
-*Dernière mise à jour (20 novembre 2026) : erreurs GitHub traduites, boutons lisibles en sombre.
+### Fin de CocoaPods : 100 % Swift Package Manager (20 novembre 2026)
+
+#### Concept — Un gestionnaire de dépendances, c'est le « magasinier » des bibliothèques
+Une app iOS utilise des bibliothèques natives (base SQLite, impression du PDF, photos, liens). Il
+faut un outil pour les télécharger et les brancher au projet Xcode : c'était **CocoaPods** (un outil
+en Ruby, extérieur à Apple), c'est maintenant **Swift Package Manager**, intégré à Xcode.
+En regardant de près, la migration était déjà faite aux trois quarts : Flutter 3.47 passe les
+bibliothèques par SPM tout seul ; CocoaPods ne servait plus qu'à… lui-même. On l'a retiré avec la
+procédure officielle (`pod deintegrate`, suppression du `Podfile`).
+Bénéfice concret : le piège n°1 (Ruby qui plante sans locale UTF-8) **n'existe plus** — vérifié en
+compilant volontairement *sans* cette locale. Et on a testé que les bibliothèques marchent toujours :
+la liste se charge (SQLite) et l'export PDF ouvre la feuille de partage (printing).
+
+---
+
+*Dernière mise à jour (20 novembre 2026) : CocoaPods retiré (Swift Package Manager).
 191 tests, analyse sans erreur.*
