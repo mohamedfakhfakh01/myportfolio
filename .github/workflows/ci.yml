@@ -15,10 +15,15 @@ jobs:
       - name: Récupérer le code
         uses: actions/checkout@v4
 
+      # Version FIGÉE, identique à celle du Mac de développement : la CI doit
+      # tester exactement ce qu'on compile. Avec « la dernière stable », la CI
+      # est passée seule à Flutter 3.50 le 11 nov. 2026 et a échoué pendant que
+      # tout passait en local. Changer cette ligne EN MÊME TEMPS que le Mac.
       - name: Installer Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: stable
+          flutter-version: 3.47.4
 
       - name: Récupérer les dépendances
         run: flutter pub get
