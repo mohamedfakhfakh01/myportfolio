@@ -38,7 +38,7 @@ class StatTile extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Icon(icon, color: AppColors.primary, size: 22),
+          Icon(icon, color: AppColors.primaryText, size: 22),
           const SizedBox(height: 6),
           CountUpText(
             value,

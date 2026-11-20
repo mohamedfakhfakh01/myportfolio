@@ -81,9 +81,9 @@ class ProjectCard extends StatelessWidget {
                             color: AppColors.primarySoft,
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.folder_outlined,
-                            color: AppColors.primary,
+                            color: AppColors.primaryText,
                             size: 22,
                           ),
                         ),

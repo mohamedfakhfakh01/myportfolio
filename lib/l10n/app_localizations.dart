@@ -362,6 +362,12 @@ abstract class AppLocalizations {
   /// **'{count} dépôts · {stars} étoiles'**
   String githubSummary(int count, int stars);
 
+  /// No description provided for @githubSummaryPartial.
+  ///
+  /// In fr, this message translates to:
+  /// **'Plus de {count} dépôts · au moins {stars} étoiles'**
+  String githubSummaryPartial(int count, int stars);
+
   /// No description provided for @githubMainLanguage.
   ///
   /// In fr, this message translates to:

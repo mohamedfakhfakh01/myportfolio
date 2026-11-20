@@ -22,8 +22,8 @@ class GithubRepoCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Icon(Icons.book_outlined,
-                    size: 18, color: AppColors.primary),
+                Icon(Icons.book_outlined,
+                    size: 18, color: AppColors.primaryText),
                 const SizedBox(width: 8),
                 Expanded(child: Text(repo.name, style: text.titleMedium)),
               ],

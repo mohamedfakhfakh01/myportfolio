@@ -55,7 +55,7 @@ encore le garde jusqu'à ce que l'utilisateur le supprime (corbeille) ; il ne re
 export PATH="$HOME/flutter/bin:$PATH"      # Flutter n'est PAS dans le PATH
 
 flutter analyze                             # 0 erreur attendu
-flutter test                                # 198 tests
+flutter test                                # 210 tests
 flutter gen-l10n                            # APRÈS toute modif des .arb
 flutter run -d 87E626E0-E743-44A6-8A48-AA716FD7851B --debug   # simulateur iPhone 18 Pro Max
 flutter build ios --release                 # puis: flutter install -d <udid> --release
@@ -171,7 +171,7 @@ iPhone physique « iPhone de fakh » `00008120-000664510C70201E`.
 | Token | Valeur | Usage |
 |---|---|---|
 | Primaire | `#4F46E5` | boutons, icônes, onglet actif |
-| Indigo « texte » | `#4F46E5` / `#A5B4FC` | `AppColors.primaryText` : boutons texte et contour (via le thème), titres indigo posés sur le fond — contraste ≥ 4,5:1 dans les 2 thèmes, vérifié par `test/app_theme_contrast_test.dart` |
+| Indigo / violet « texte » | `#4F46E5`·`#A5B4FC` / `#7C3AED`·`#C4B5FD` | `AppColors.primaryText` / `violetText` (clair / sombre) : **tout texte ou icône** indigo/violet posé sur le fond ou une carte. `primary`/`violet` bruts = **fonds seulement** (texte blanc dessus). Gardé par `test/dark_mode_readability_test.dart` et `app_theme_contrast_test.dart` |
 | Violet | `#7C3AED` | fin des dégradés |
 | Fond clair / sombre | `#F7F8FC` / `#0F172A` | |
 | Surface | `#FFFFFF` / `#1E293B` | cartes |
@@ -306,6 +306,7 @@ Aucune : l'application ne contacte que l'API GitHub publique, sans clé.
 | Finitions | 20 nov. 2026 | Erreurs GitHub traduites (le service ne fabrique plus de texte) ; « Réessayer » qui plantait en debug corrigé ; boutons texte/contour lisibles en thème sombre via le thème (191 tests) |
 | Fin de CocoaPods | 20 nov. 2026 | `pod deintegrate`, `Podfile` supprimé : 100 % Swift Package Manager ; build sans locale UTF-8 vérifié, base + PDF testés sur simulateur |
 | Animations | 20 nov. 2026 | Cascade d'apparition (accueil, profil), chiffres qui comptent (complétion, tuiles), retour au toucher, transitions de l'aperçu GitHub et de l'icône thème ; « Réduire les animations » respecté partout (198 tests) |
+| Lisibilité & GitHub | 20 nov. 2026 | Plus aucun texte/icône indigo ou violet foncé en thème sombre (audit testé sur profil, À propos, Réglages) ; total GitHub exact (toutes les pages, « Plus de 500 » au-delà) (210 tests) |
 
 ---
 

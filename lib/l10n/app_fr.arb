@@ -58,6 +58,8 @@
       "stars": { "type": "int" }
     }
   },
+  "githubSummaryPartial": "Plus de {count} dépôts · au moins {stars} étoiles",
+  "@githubSummaryPartial": {"placeholders": {"count": {"type": "int"}, "stars": {"type": "int"}}},
   "githubMainLanguage": "Langage principal : {language}",
   "@githubMainLanguage": {
     "placeholders": { "language": { "type": "String" } }

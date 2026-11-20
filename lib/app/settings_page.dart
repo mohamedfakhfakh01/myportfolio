@@ -30,7 +30,7 @@ class SettingsPage extends StatelessWidget {
             onChanged: (_) => context.read<ThemeController>().toggle(),
             secondary: Icon(
               theme.isDark ? Icons.dark_mode : Icons.light_mode,
-              color: AppColors.primary,
+              color: AppColors.primaryText,
             ),
             title: Text(l.darkTheme),
             subtitle: Text(theme.isDark ? l.darkThemeOn : l.darkThemeOff),
@@ -61,7 +61,7 @@ class SettingsPage extends StatelessWidget {
       child: Text(
         title,
         style: Theme.of(context).textTheme.labelLarge?.copyWith(
-              color: AppColors.primary,
+              color: AppColors.primaryText,
               fontWeight: FontWeight.w600,
             ),
       ),

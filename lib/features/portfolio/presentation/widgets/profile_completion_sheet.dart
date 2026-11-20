@@ -79,7 +79,7 @@ class _ProfileCompletionSheet extends StatelessWidget {
                   '${completion.percent}%',
                   style: text.headlineSmall?.copyWith(
                     fontWeight: FontWeight.w700,
-                    color: AppColors.primary,
+                    color: AppColors.primaryText,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -125,8 +125,8 @@ class _ProfileCompletionSheet extends StatelessWidget {
             if (completion.isComplete)
               Row(
                 children: [
-                  const Icon(Icons.check_circle,
-                      color: AppColors.primary, size: 22),
+                  Icon(Icons.check_circle,
+                      color: AppColors.primaryText, size: 22),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(l.completionAllDone, style: text.bodyLarge),

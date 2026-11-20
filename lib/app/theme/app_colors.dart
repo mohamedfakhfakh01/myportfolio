@@ -60,6 +60,11 @@ class AppColors {
   /// qu'un contraste d'environ 3:1, sous le minimum de 4,5:1).
   static Color primaryText = primaryLight;
 
+  /// Violet **lisible comme texte ou icône** : [violet] en thème clair,
+  /// violet clair en thème sombre ([violet] n'y offre que 2,6 à 3,1:1).
+  static Color violetText = _violetLight;
+  static const Color _violetLight = Color(0xFFC4B5FD);
+
   // Valeurs du thème SOMBRE.
   static const Color _backgroundDark = Color(0xFF0F172A);
   static const Color _surfaceDark = Color(0xFF1E293B);
@@ -91,5 +96,6 @@ class AppColors {
     primarySoft = dark ? _primarySoftDark : primarySoftLight;
     accentSoft = dark ? _accentSoftDark : accentSoftLight;
     primaryText = dark ? primaryLight : primary;
+    violetText = dark ? _violetLight : violet;
   }
 }

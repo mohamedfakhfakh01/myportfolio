@@ -28,12 +28,16 @@ class GithubReposSection extends StatefulWidget {
 
 class _GithubReposSectionState extends State<GithubReposSection> {
   late final GithubService _service = widget.service ?? GithubService();
-  late Future<List<GithubRepo>> _future;
+  late Future<({List<GithubRepo> repos, bool complete})> _future;
+
+  /// Cartes affichées au maximum ; les autres dépôts sont résumés en
+  /// « + N autres » (le total et les étoiles comptent, eux, TOUS les dépôts).
+  static const int _maxCards = 30;
 
   @override
   void initState() {
     super.initState();
-    _future = _service.fetchRepos(widget.username);
+    _future = _service.fetchAllRepos(widget.username);
   }
 
   @override
@@ -41,7 +45,7 @@ class _GithubReposSectionState extends State<GithubReposSection> {
     super.didUpdateWidget(oldWidget);
     // Si le pseudo change (après édition du profil), on relance la requête.
     if (oldWidget.username != widget.username) {
-      _future = _service.fetchRepos(widget.username);
+      _future = _service.fetchAllRepos(widget.username);
     }
   }
 
@@ -50,7 +54,7 @@ class _GithubReposSectionState extends State<GithubReposSection> {
     // affectée, et Flutter refuse un setState qui renvoie une Future (le
     // bouton « Réessayer » plantait en mode debug).
     setState(() {
-      _future = _service.fetchRepos(widget.username);
+      _future = _service.fetchAllRepos(widget.username);
     });
   }
 
@@ -79,7 +83,7 @@ class _GithubReposSectionState extends State<GithubReposSection> {
     final TextTheme text = Theme.of(context).textTheme;
     final AppLocalizations l = AppLocalizations.of(context);
 
-    return FutureBuilder<List<GithubRepo>>(
+    return FutureBuilder<({List<GithubRepo> repos, bool complete})>(
       future: _future,
       builder: (context, snapshot) {
         // 1) Requête en cours → indicateur de chargement.
@@ -110,7 +114,9 @@ class _GithubReposSectionState extends State<GithubReposSection> {
         }
 
         // 3) Données prêtes.
-        final List<GithubRepo> repos = snapshot.data ?? [];
+        final List<GithubRepo> repos = snapshot.data?.repos ?? [];
+        // false si GitHub a plus de dépôts que ce qu'on a demandé (> 500).
+        final bool complete = snapshot.data?.complete ?? true;
         if (repos.isEmpty) {
           return Text(
             l.githubNoRepos,
@@ -156,7 +162,9 @@ class _GithubReposSectionState extends State<GithubReposSection> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    l.githubSummary(repos.length, totalStars),
+                    complete
+                        ? l.githubSummary(repos.length, totalStars)
+                        : l.githubSummaryPartial(repos.length, totalStars),
                     style: text.titleMedium,
                   ),
                   if (topLanguage != null) ...[
@@ -179,10 +187,18 @@ class _GithubReposSectionState extends State<GithubReposSection> {
               ),
             ),
             const SizedBox(height: 12),
-            for (final repo in repos) ...[
+            for (final repo in repos.take(_maxCards)) ...[
               GithubRepoCard(repo: repo),
               const SizedBox(height: 12),
             ],
+            if (repos.length > _maxCards)
+              Text(
+                complete
+                    ? l.githubPreviewMore(repos.length - _maxCards)
+                    : l.githubPreviewManyMore,
+                style:
+                    text.bodyMedium?.copyWith(color: AppColors.textSecondary),
+              ),
           ],
         );
       },

@@ -234,7 +234,7 @@ class _StudentFormPageState extends State<StudentFormPage> {
         // de l'écran.
         Expanded(child: Text(title, style: text.titleMedium)),
         IconButton(
-          icon: const Icon(Icons.add_circle, color: AppColors.primary),
+          icon: Icon(Icons.add_circle, color: AppColors.primaryText),
           tooltip: addTooltip,
           onPressed: onAdd,
         ),

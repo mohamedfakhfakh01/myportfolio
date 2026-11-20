@@ -80,7 +80,7 @@ class _ActionButton extends StatelessWidget {
             child: Icon(
               action.icon,
               size: 22,
-              color: highlighted ? Colors.white : AppColors.primary,
+              color: highlighted ? Colors.white : AppColors.primaryText,
             ),
           ),
         ),

@@ -79,9 +79,10 @@ class _Bullet extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.only(top: 6, right: 10),
-            child: Icon(Icons.check_circle, size: 16, color: AppColors.primary),
+          Padding(
+            padding: const EdgeInsets.only(top: 6, right: 10),
+            child: Icon(Icons.check_circle,
+                size: 16, color: AppColors.primaryText),
           ),
           Expanded(child: Text(text, style: t.bodyMedium)),
         ],

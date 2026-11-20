@@ -47,7 +47,7 @@ class ExperienceCard extends StatelessWidget {
                   entry.kind == ExperienceKind.education
                       ? Icons.school_outlined
                       : Icons.work_outline,
-                  color: AppColors.primary,
+                  color: AppColors.primaryText,
                   size: 22,
                 ),
               ),

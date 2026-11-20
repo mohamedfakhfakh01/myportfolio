@@ -49,6 +49,7 @@
   "githubErrorOffline": "Couldn't reach GitHub (connection?).",
   "githubErrorUnexpected": "GitHub sent an unexpected response. Try again later.",
   "githubSummary": "{count} repos · {stars} stars",
+  "githubSummaryPartial": "More than {count} repos · at least {stars} stars",
   "githubMainLanguage": "Main language: {language}",
   "githubLastUpdate": "Last update: {date}",
 

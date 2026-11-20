@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -177,6 +179,62 @@ void main() {
         ),
         GithubErrorKind.timeout,
       );
+    });
+  });
+
+  // Le total affiché sur le profil doit être EXACT : on récupère toutes les
+  // pages (100 dépôts chacune) au lieu des 30 premiers dépôts seulement.
+  group('fetchAllRepos', () {
+    /// Faux GitHub : renvoie pages[n-1] dépôts pour la page n ; note les URL.
+    (GithubService, List<Uri>) github(List<int> pages) {
+      final calls = <Uri>[];
+      final client = MockClient((request) async {
+        calls.add(request.url);
+        final int page = int.parse(request.url.queryParameters['page']!);
+        final int n = page <= pages.length ? pages[page - 1] : 0;
+        return http.Response(
+          jsonEncode([
+            for (int i = 0; i < n; i++)
+              {'name': 'p$page-$i', 'html_url': 'https://github.com/x/$i'},
+          ]),
+          200,
+        );
+      });
+      return (GithubService(client: client), calls);
+    }
+
+    test('19 dépôts : une seule requête de 100, liste complète', () async {
+      final (service, calls) = github([19]);
+      final r = await service.fetchAllRepos('x');
+      expect(r.repos, hasLength(19));
+      expect(r.complete, isTrue);
+      expect(calls.single.queryParameters,
+          containsPair('per_page', '100'));
+    });
+
+    test('120 dépôts : deux pages, total exact', () async {
+      final (service, calls) = github([100, 20]);
+      final r = await service.fetchAllRepos('x');
+      expect(r.repos, hasLength(120));
+      expect(r.complete, isTrue);
+      expect(calls.map((u) => u.queryParameters['page']), ['1', '2']);
+    });
+
+    test('exactement 100 : une page vide confirme la fin', () async {
+      final (service, calls) = github([100]);
+      final r = await service.fetchAllRepos('x');
+      expect(r.repos, hasLength(100));
+      expect(r.complete, isTrue);
+      expect(calls, hasLength(2));
+    });
+
+    test('au-delà de la limite de pages : « incomplet », pas de faux total',
+        () async {
+      final (service, calls) = github([100, 100, 100]);
+      final r = await service.fetchAllRepos('x', maxPages: 2);
+      expect(r.repos, hasLength(200));
+      expect(r.complete, isFalse);
+      expect(calls, hasLength(2)); // s'arrête : ménage la limite GitHub
     });
   });
 }

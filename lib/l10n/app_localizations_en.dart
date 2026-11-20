@@ -149,6 +149,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String githubSummaryPartial(int count, int stars) {
+    return 'More than $count repos · at least $stars stars';
+  }
+
+  @override
   String githubMainLanguage(String language) {
     return 'Main language: $language';
   }

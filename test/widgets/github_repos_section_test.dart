@@ -10,6 +10,7 @@ import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 
 import 'package:myportfolio/features/github/data/github_service.dart';
+import 'package:myportfolio/features/github/presentation/widgets/github_repo_card.dart';
 import 'package:myportfolio/features/github/presentation/widgets/github_repos_section.dart';
 import 'package:myportfolio/l10n/app_localizations.dart';
 
@@ -103,5 +104,52 @@ void main() {
 
     expect(calls, 2);
     expect(find.text('myportfolio'), findsOneWidget);
+  });
+
+  group('Résumé exact (toutes les pages)', () {
+    /// Faux GitHub : [pages] dépôts par page, 1 étoile chacun.
+    Future<http.Response> Function() parPages(List<int> pages) {
+      int appel = 0;
+      return () async {
+        final int n = appel < pages.length ? pages[appel] : 0;
+        appel++;
+        return http.Response(
+          jsonEncode([
+            for (int i = 0; i < n; i++)
+              {
+                'name': 'depot-$appel-$i',
+                'html_url': 'https://github.com/a/$i',
+                'stargazers_count': 1,
+              },
+          ]),
+          200,
+        );
+      };
+    }
+
+    testWidgets('120 dépôts : vrai total, 30 cartes puis « + 90 autres »',
+        (tester) async {
+      await _pump(tester, parPages([100, 20]));
+
+      expect(find.text('120 dépôts · 120 étoiles'), findsOneWidget);
+      expect(find.byType(GithubRepoCard), findsNWidgets(30));
+      expect(find.text('+ 90 autres dépôts'), findsOneWidget);
+    });
+
+    testWidgets('plus de 500 : « Plus de 500 dépôts », pas de faux total',
+        (tester) async {
+      await _pump(tester, parPages([100, 100, 100, 100, 100, 100]));
+
+      expect(find.text('Plus de 500 dépôts · au moins 500 étoiles'),
+          findsOneWidget);
+      expect(find.text('+ de nombreux autres dépôts'), findsOneWidget);
+    });
+
+    testWidgets('anglais : « More than 500 repos »', (tester) async {
+      await _pump(tester, parPages([100, 100, 100, 100, 100, 100]),
+          locale: const Locale('en'));
+      expect(find.text('More than 500 repos · at least 500 stars'),
+          findsOneWidget);
+    });
   });
 }

@@ -43,7 +43,7 @@ class ContactSection extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: Row(
               children: [
-                Icon(icon, size: 20, color: AppColors.primary),
+                Icon(icon, size: 20, color: AppColors.primaryText),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
@@ -51,7 +51,7 @@ class ContactSection extends StatelessWidget {
                     style: text.bodyMedium?.copyWith(
                       color: url == null
                           ? AppColors.textSecondary
-                          : AppColors.primary,
+                          : AppColors.primaryText,
                       fontWeight:
                           url == null ? FontWeight.normal : FontWeight.w500,
                     ),

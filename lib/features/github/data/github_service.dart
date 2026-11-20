@@ -74,9 +74,14 @@ class GithubService {
   /// réponse** HTTP, lire le JSON (200) ou lever une erreur claire (404/403…).
   ///
   /// [perPage] : nombre maximal de dépôts renvoyés (100 au plus pour GitHub).
-  Future<List<GithubRepo>> fetchRepos(String username, {int perPage = 30}) async {
+  /// [page] : numéro de page (GitHub découpe les longues listes).
+  Future<List<GithubRepo>> fetchRepos(
+    String username, {
+    int perPage = 30,
+    int page = 1,
+  }) async {
     final Uri uri = Uri.parse(
-      '$_baseUrl/users/$username/repos?sort=updated&per_page=$perPage',
+      '$_baseUrl/users/$username/repos?sort=updated&per_page=$perPage&page=$page',
     );
 
     // On borne l'attente par un timeout et on traduit les erreurs réseau
@@ -139,5 +144,27 @@ class GithubService {
       // Hors ligne, délai dépassé (TimeoutException)…
       return GithubUserStatus.unknown;
     }
+  }
+
+  /// Récupère **tous** les dépôts publics, page par page (100 par page,
+  /// le maximum de GitHub), pour que le total affiché soit exact.
+  ///
+  /// S'arrête après [maxPages] pages (500 dépôts par défaut) pour ménager la
+  /// limite de 60 requêtes/heure : `complete` vaut alors `false`, et l'écran
+  /// doit dire « plus de… » au lieu d'afficher un faux total.
+  Future<({List<GithubRepo> repos, bool complete})> fetchAllRepos(
+    String username, {
+    int maxPages = 5,
+  }) async {
+    const int perPage = 100;
+    final List<GithubRepo> all = [];
+    for (int page = 1; page <= maxPages; page++) {
+      final List<GithubRepo> batch =
+          await fetchRepos(username, perPage: perPage, page: page);
+      all.addAll(batch);
+      // Page incomplète = c'était la dernière.
+      if (batch.length < perPage) return (repos: all, complete: true);
+    }
+    return (repos: all, complete: false);
   }
 }

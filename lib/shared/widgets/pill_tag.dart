@@ -18,7 +18,8 @@ class PillTag extends StatelessWidget {
   /// Texte affiché dans la pilule.
   final String label;
 
-  /// Couleur d'accent (texte, pastille et teinte du fond). Défaut : bleu.
+  /// Couleur d'accent (texte, pastille et teinte du fond). Défaut : indigo
+  /// lisible dans les deux thèmes ([AppColors.primaryText]).
   final Color? color;
 
   /// Icône optionnelle avant le texte (ex : pastille `Icons.circle`).
@@ -26,7 +27,7 @@ class PillTag extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color c = color ?? AppColors.primary;
+    final Color c = color ?? AppColors.primaryText;
     final TextTheme text = Theme.of(context).textTheme;
 
     return Container(

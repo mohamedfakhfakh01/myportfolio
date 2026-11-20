@@ -1304,5 +1304,28 @@ on y voit les chiffres passer par 59 %, 77 %… avant 82 %.
 
 ---
 
-*Dernière mise à jour (20 novembre 2026) : animations utiles, « Réduire les animations » respecté.
-198 tests, analyse sans erreur.*
+### Audit de lisibilité et total GitHub exact (20 novembre 2026)
+
+#### Concept 1 — Une couleur pour les fonds, une autre pour le texte
+L'indigo foncé `#4F46E5` est parfait comme **fond** (bouton plein avec texte blanc). Mais posé comme
+**texte ou icône** sur le fond sombre, il ne contraste qu'à 2,8:1. Règle désormais : `primary` /
+`violet` pour les fonds, `primaryText` / `violetText` pour ce qui doit être lu. Une vingtaine
+d'endroits corrigés (contact, icônes « + », pilules de catégorie, réglages…).
+
+#### Concept 2 — Un test qui inspecte l'écran entier
+Plutôt qu'un test par élément, un test « audit » affiche la page profil complète en thème sombre et
+parcourt **tous** les textes et icônes dessinés : aucun ne doit être en indigo/violet foncé. Lancé
+sur l'ancien code, il échouait sur les trois pages — preuve qu'il surveille vraiment quelque chose.
+(Piège rencontré : le premier contrôle « sur l'ancien code » ne compilait même pas, car le test
+utilisait une couleur qui n'existait pas encore. Un test qui ne compile pas ne prouve rien.)
+
+#### Concept 3 — La pagination : demander la suite
+GitHub ne renvoie qu'une **page** de résultats à la fois (30 par défaut, 100 au maximum). L'app
+n'en demandait qu'une : un compte de 50 dépôts aurait affiché « 30 dépôts ». Elle demande
+maintenant page après page jusqu'à une page incomplète (= la dernière). Au-delà de 5 pages, elle
+s'arrête et écrit « Plus de 500 dépôts » : mieux vaut un « plus de » honnête qu'un faux total.
+
+---
+
+*Dernière mise à jour (20 novembre 2026) : audit de lisibilité en thème sombre, total GitHub exact.
+210 tests, analyse sans erreur.*

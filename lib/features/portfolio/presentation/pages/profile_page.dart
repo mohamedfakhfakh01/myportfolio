@@ -312,9 +312,9 @@ class _ProfilePageState extends State<ProfilePage> {
                             ],
                           ),
                           IconButton(
-                            icon: const Icon(
+                            icon: Icon(
                               Icons.add_circle,
-                              color: AppColors.primary,
+                              color: AppColors.primaryText,
                             ),
                             tooltip: l.addSkill,
                             onPressed: () => showSkillFormDialog(
@@ -393,9 +393,9 @@ class _ProfilePageState extends State<ProfilePage> {
                             ],
                           ),
                           IconButton(
-                            icon: const Icon(
+                            icon: Icon(
                               Icons.add_circle,
-                              color: AppColors.primary,
+                              color: AppColors.primaryText,
                             ),
                             tooltip: l.addProject,
                             onPressed: () => showProjectFormDialog(
@@ -468,8 +468,8 @@ class _ProfilePageState extends State<ProfilePage> {
                     children: [
                       Text(l.experienceTitle, style: text.titleMedium),
                       IconButton(
-                        icon: const Icon(Icons.add_circle,
-                            color: AppColors.primary),
+                        icon: Icon(Icons.add_circle,
+                            color: AppColors.primaryText),
                         tooltip: l.addExperience,
                         onPressed: () => showExperienceFormDialog(
                           context,
@@ -507,8 +507,8 @@ class _ProfilePageState extends State<ProfilePage> {
                     children: [
                       Text(l.educationTitle, style: text.titleMedium),
                       IconButton(
-                        icon: const Icon(Icons.add_circle,
-                            color: AppColors.primary),
+                        icon: Icon(Icons.add_circle,
+                            color: AppColors.primaryText),
                         tooltip: l.addEducation,
                         onPressed: () => showExperienceFormDialog(
                           context,
