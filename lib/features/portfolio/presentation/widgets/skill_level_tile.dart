@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../shared/models/skill.dart';
+import '../../../../core/widgets/motion.dart';
 
 /// Affiche une compétence avec une **barre de niveau** quand le niveau est
 /// renseigné (sinon, seulement le nom — on n'invente pas de valeur).
@@ -74,7 +75,8 @@ class _GradientLevelBar extends StatelessWidget {
             alignment: Alignment.centerLeft,
             child: TweenAnimationBuilder<double>(
               tween: Tween<double>(begin: 0, end: value),
-              duration: const Duration(milliseconds: 600),
+              duration: motionDuration(
+                  context, const Duration(milliseconds: 600)),
               curve: Curves.easeOutCubic,
               builder: (context, animatedValue, _) => Container(
                 width: maxWidth * animatedValue,

@@ -1279,5 +1279,30 @@ la liste se charge (SQLite) et l'export PDF ouvre la feuille de partage (printin
 
 ---
 
-*Dernière mise à jour (20 novembre 2026) : CocoaPods retiré (Swift Package Manager).
-191 tests, analyse sans erreur.*
+### Animations utiles (20 novembre 2026)
+
+#### Concept 1 — Une animation doit dire quelque chose
+Chaque animation ajoutée a un rôle : la **cascade** montre l'ordre de lecture (complétion, puis
+chiffres, puis actions) ; les **chiffres qui comptent** montrent qu'une valeur se *construit* à partir
+des données ; l'**enfoncement au toucher** confirme « j'ai bien reçu ton appui ». Et la règle
+d'or : l'image finale est toujours la valeur exacte (82 %, 20, 7, 4), jamais un chiffre décoratif.
+
+#### Concept 2 — Respecter « Réduire les animations »
+Certaines personnes ont le vertige ou des nausées avec le mouvement à l'écran : iOS propose un
+réglage pour le réduire. `MediaQuery.disableAnimations` le transmet à l'app ; `motionDuration` met
+alors toutes les durées à zéro — l'écran s'affiche directement dans son état final.
+
+#### Concept 3 — Décaler sans minuteur
+Pour la cascade, on aurait pu écrire « attends 70 ms puis anime ». Mais si l'écran est quitté avant,
+ce minuteur reste en attente (fuite, et échec des tests). À la place : **une seule animation** plus
+longue, dont la première partie ne fait rien (`Interval`). Quitter l'écran l'arrête proprement.
+
+#### Concept 4 — Vérifier ce qui va trop vite pour l'œil
+Une capture d'écran du simulateur prend plus de temps que l'animation elle-même. On a donc filmé
+l'écran (`simctl io recordVideo`) et extrait une image toutes les 40 ms avec un petit script Swift :
+on y voit les chiffres passer par 59 %, 77 %… avant 82 %.
+
+---
+
+*Dernière mise à jour (20 novembre 2026) : animations utiles, « Réduire les animations » respecté.
+198 tests, analyse sans erreur.*

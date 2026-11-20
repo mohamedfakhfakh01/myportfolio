@@ -27,6 +27,7 @@ import '../widgets/stat_tile.dart';
 import '../widgets/skill_form_dialog.dart';
 import '../widgets/student_avatar.dart';
 import '../widgets/student_edit_dialog.dart';
+import '../../../../core/widgets/motion.dart';
 
 /// Écran **profil** : affiche (et permet de modifier) le portfolio d'un étudiant.
 ///
@@ -178,20 +179,28 @@ class _ProfilePageState extends State<ProfilePage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // --- Complétion du portfolio (score calculé, non inventé) ---
-                  ProfileCompletionCard(
-                    completion: completion,
-                    onTap: () =>
-                        showProfileCompletionSheet(context, completion),
+                  // Cascade d'apparition : complétion, chiffres, actions.
+                  EntranceAnimation(
+                    index: 0,
+                    child: PressableScale(
+                      child: ProfileCompletionCard(
+                        completion: completion,
+                        onTap: () =>
+                            showProfileCompletionSheet(context, completion),
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 16),
 
                   // --- Statistiques (compétences, projets, parcours) ---
-                  Row(
+                  EntranceAnimation(
+                    index: 1,
+                    child: Row(
                     children: [
                       Expanded(
                         child: StatTile(
                           label: l.skills,
-                          value: '${student.skills.length}',
+                          value: student.skills.length,
                           icon: Icons.star_outline,
                           highlighted: true,
                         ),
@@ -200,7 +209,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       Expanded(
                         child: StatTile(
                           label: l.projects,
-                          value: '${student.projects.length}',
+                          value: student.projects.length,
                           icon: Icons.folder_outlined,
                         ),
                       ),
@@ -208,15 +217,21 @@ class _ProfilePageState extends State<ProfilePage> {
                       Expanded(
                         child: StatTile(
                           label: l.journey,
-                          value: '${student.experiences.length}',
+                          value: student.experiences.length,
                           icon: Icons.timeline_outlined,
                         ),
                       ),
                     ],
                   ),
+                  ),
                   const SizedBox(height: 24),
 
                   // --- Actions rapides (raccourcis d'ajout) ---
+                  EntranceAnimation(
+                    index: 2,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                   Text(l.quickActions, style: text.titleMedium),
                   const SizedBox(height: 12),
                   QuickActionsRow(
@@ -256,6 +271,9 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       ),
                     ],
+                  ),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 24),
 

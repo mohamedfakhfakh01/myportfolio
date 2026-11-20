@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/profile_completion.dart';
+import '../../../../core/widgets/motion.dart';
 
 /// Carte « Complétion du profil » : grand bandeau en dégradé indigo → violet
 /// avec un anneau de progression, le titre et le détail chiffré.
@@ -49,7 +50,8 @@ class ProfileCompletionCard extends StatelessWidget {
                 SizedBox.expand(
                   child: TweenAnimationBuilder<double>(
                     tween: Tween<double>(begin: 0, end: completion.fraction),
-                    duration: const Duration(milliseconds: 700),
+                    duration: motionDuration(
+                        context, const Duration(milliseconds: 700)),
                     curve: Curves.easeOutCubic,
                     builder: (context, value, _) => CircularProgressIndicator(
                       value: value,
@@ -61,8 +63,11 @@ class ProfileCompletionCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                Text(
-                  '${completion.percent}%',
+                // Compte avec l'anneau (même durée, même courbe) ; finit sur
+                // la valeur exacte.
+                CountUpText(
+                  completion.percent,
+                  suffix: '%',
                   style: text.titleMedium?.copyWith(
                     color: Colors.white,
                     fontWeight: FontWeight.w700,

@@ -7,6 +7,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/project.dart';
 import '../../../../shared/widgets/pill_tag.dart';
+import '../../../../core/widgets/motion.dart';
 
 /// Carte réutilisable affichant un projet (titre, description, lien éventuel).
 class ProjectCard extends StatelessWidget {
@@ -46,7 +47,8 @@ class ProjectCard extends StatelessWidget {
     final bool hasImage =
         project.imagePath != null && File(project.imagePath!).existsSync();
 
-    return Card(
+    return PressableScale(
+      child: Card(
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
@@ -130,6 +132,7 @@ class ProjectCard extends StatelessWidget {
           ],
         ),
       ),
+    ),
     );
   }
 }

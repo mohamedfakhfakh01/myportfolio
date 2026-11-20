@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/widgets/fade_slide_route.dart';
+import '../../../../core/widgets/motion.dart';
 import '../../../github/data/github_repo.dart';
 import '../../../github/data/github_service.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -498,10 +499,26 @@ class _StudentFormPageState extends State<StudentFormPage> {
                         : null;
                   },
                 ),
-                _GithubPreview(
-                  loading: _previewLoading,
-                  repos: _previewRepos,
-                  unknown: _previewUnknown,
+                // Fondu entre les états (recherche → trouvé…) et zone qui
+                // s'agrandit en douceur au lieu de faire sauter la page.
+                AnimatedSize(
+                  duration: motionDuration(
+                      context, const Duration(milliseconds: 250)),
+                  curve: Curves.easeOutCubic,
+                  alignment: Alignment.topCenter,
+                  child: AnimatedSwitcher(
+                    duration: motionDuration(
+                        context, const Duration(milliseconds: 250)),
+                    child: _GithubPreview(
+                      key: ValueKey<String>(
+                        '$_previewUser|$_previewLoading|$_previewUnknown|'
+                        '${_previewRepos?.length}',
+                      ),
+                      loading: _previewLoading,
+                      repos: _previewRepos,
+                      unknown: _previewUnknown,
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 20),
 
@@ -1005,6 +1022,7 @@ class _ExperienceInputDialogState extends State<_ExperienceInputDialog> {
 /// derniers dépôts publics (les plus récemment mis à jour d'abord).
 class _GithubPreview extends StatelessWidget {
   const _GithubPreview({
+    super.key,
     required this.loading,
     required this.repos,
     required this.unknown,

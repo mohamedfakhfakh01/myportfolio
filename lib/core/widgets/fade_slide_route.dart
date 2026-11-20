@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'motion.dart';
 
 /// Crée une **transition de page personnalisée** : la nouvelle page apparaît
 /// en **fondu** avec un **léger glissement vers le haut**.
@@ -11,6 +12,8 @@ Route<T> fadeSlideRoute<T>(Widget page) {
     reverseTransitionDuration: const Duration(milliseconds: 300),
     pageBuilder: (context, animation, secondaryAnimation) => page,
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      // « Réduire les animations » : la page apparaît sans mouvement.
+      if (reduceMotion(context)) return child;
       // Courbe douce qui ralentit à la fin.
       final Animation<double> curved = CurvedAnimation(
         parent: animation,

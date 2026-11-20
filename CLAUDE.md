@@ -55,7 +55,7 @@ encore le garde jusqu'à ce que l'utilisateur le supprime (corbeille) ; il ne re
 export PATH="$HOME/flutter/bin:$PATH"      # Flutter n'est PAS dans le PATH
 
 flutter analyze                             # 0 erreur attendu
-flutter test                                # 191 tests
+flutter test                                # 198 tests
 flutter gen-l10n                            # APRÈS toute modif des .arb
 flutter run -d 87E626E0-E743-44A6-8A48-AA716FD7851B --debug   # simulateur iPhone 18 Pro Max
 flutter build ios --release                 # puis: flutter install -d <udid> --release
@@ -156,6 +156,13 @@ iPhone physique « iPhone de fakh » `00008120-000664510C70201E`.
     affectée ; si c'est une `Future`, Flutter lève une assertion (le bouton « Réessayer » des dépôts
     GitHub plantait). Toujours des accolades quand on affecte une `Future` dans `setState`.
     (Invisible en release : les assertions y sont désactivées.)
+30. **Animations : passer par `lib/core/widgets/motion.dart`** (`EntranceAnimation`, `CountUpText`,
+    `PressableScale`, `motionDuration`). Règles : l'état final affiché = la valeur exacte ; respecter
+    « Réduire les animations » (`motionDuration` → zéro) ; **pas de `Future.delayed`/`Timer` pour
+    décaler** une apparition (un minuteur en attente à la sortie de l'écran fait échouer les tests) →
+    un seul contrôleur + `Interval`. Vérifier à l'écran : `simctl io recordVideo` puis extraire des
+    images (script Swift AVFoundation, pas de ffmpeg sur cette machine) — une capture simple est
+    plus lente que l'animation.
 
 ---
 
@@ -184,7 +191,7 @@ Les dégradés vont systématiquement **primaire → violet**.
 lib/
 ├── main.dart
 ├── app/                     # racine, thème, nav flottante, À propos, Réglages
-├── core/                    # database/ (schéma + migrations), widgets/ (transitions)
+├── core/                    # database/ (schéma + migrations), widgets/ (transitions, motion.dart)
 ├── shared/
 │   ├── models/              # Student, Skill, Project, ExperienceEntry
 │   ├── utils/               # linkedin, github, email : règles de saisie partagées
@@ -298,6 +305,7 @@ Aucune : l'application ne contacte que l'API GitHub publique, sans clé.
 | Lien photo | 20 nov. 2026 | « Ajouter une photo » lisible en thème sombre (contraste 2,8 → 9:1) via `AppColors.primaryText` (176 tests) |
 | Finitions | 20 nov. 2026 | Erreurs GitHub traduites (le service ne fabrique plus de texte) ; « Réessayer » qui plantait en debug corrigé ; boutons texte/contour lisibles en thème sombre via le thème (191 tests) |
 | Fin de CocoaPods | 20 nov. 2026 | `pod deintegrate`, `Podfile` supprimé : 100 % Swift Package Manager ; build sans locale UTF-8 vérifié, base + PDF testés sur simulateur |
+| Animations | 20 nov. 2026 | Cascade d'apparition (accueil, profil), chiffres qui comptent (complétion, tuiles), retour au toucher, transitions de l'aperçu GitHub et de l'icône thème ; « Réduire les animations » respecté partout (198 tests) |
 
 ---
 

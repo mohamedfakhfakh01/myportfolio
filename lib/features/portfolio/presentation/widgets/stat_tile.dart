@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/widgets/motion.dart';
 
 /// Petite tuile de statistique : une icône, un grand chiffre et un libellé.
 ///
@@ -16,7 +17,9 @@ class StatTile extends StatelessWidget {
   });
 
   final String label;
-  final String value;
+
+  /// Nombre affiché ; il compte de 0 jusqu'à cette valeur exacte.
+  final int value;
   final IconData icon;
 
   /// Mise en avant : fond indigo doux et sans bordure (style du design).
@@ -37,7 +40,7 @@ class StatTile extends StatelessWidget {
         children: [
           Icon(icon, color: AppColors.primary, size: 22),
           const SizedBox(height: 6),
-          Text(
+          CountUpText(
             value,
             style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w600),
           ),

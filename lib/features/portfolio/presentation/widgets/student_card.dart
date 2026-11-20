@@ -4,6 +4,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/student.dart';
 import 'student_avatar.dart';
+import '../../../../core/widgets/motion.dart';
 
 /// Carte réutilisable présentant un étudiant dans la liste d'accueil.
 ///
@@ -29,7 +30,9 @@ class StudentCard extends StatelessWidget {
     final TextTheme text = Theme.of(context).textTheme;
     final AppLocalizations l = AppLocalizations.of(context);
 
-    return Card(
+    // PressableScale : la carte s'enfonce légèrement sous le doigt.
+    return PressableScale(
+      child: Card(
       // InkWell ajoute l'effet visuel de « ondulation » au toucher.
       child: InkWell(
         onTap: onTap,
@@ -72,6 +75,7 @@ class StudentCard extends StatelessWidget {
             ],
           ),
         ),
+      ),
       ),
     );
   }

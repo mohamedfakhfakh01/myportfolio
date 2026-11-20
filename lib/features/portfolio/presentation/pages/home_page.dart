@@ -10,6 +10,7 @@ import '../../providers/portfolio_provider.dart';
 import '../widgets/student_card.dart';
 import '../widgets/student_edit_dialog.dart';
 import 'profile_page.dart';
+import '../../../../core/widgets/motion.dart';
 
 /// Écran d'**accueil** : liste les portfolios des deux étudiants du binôme.
 ///
@@ -66,7 +67,18 @@ class _HomePageState extends State<HomePage> {
     final AppLocalizations l = AppLocalizations.of(context);
     return [
       IconButton(
-        icon: Icon(isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined),
+        // Soleil ↔ lune : l'icône tourne en fondu au changement de thème.
+        icon: AnimatedSwitcher(
+          duration: motionDuration(context, const Duration(milliseconds: 300)),
+          transitionBuilder: (child, animation) => RotationTransition(
+            turns: Tween<double>(begin: 0.75, end: 1).animate(animation),
+            child: FadeTransition(opacity: animation, child: child),
+          ),
+          child: Icon(
+            isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
+            key: ValueKey<bool>(isDark),
+          ),
+        ),
         tooltip: isDark ? l.switchToLight : l.switchToDark,
         onPressed: () => context.read<ThemeController>().toggle(),
       ),
@@ -144,7 +156,7 @@ class _HomePageState extends State<HomePage> {
         ),
       // Apparition en fondu au chargement (de transparent à opaque).
       body: TweenAnimationBuilder<double>(
-        duration: const Duration(milliseconds: 400),
+        duration: motionDuration(context, const Duration(milliseconds: 400)),
         curve: Curves.easeOut,
         tween: Tween<double>(begin: 0, end: 1),
         builder: (context, value, child) =>
@@ -199,8 +211,12 @@ class _HomePageState extends State<HomePage> {
                     )
                   else
                     // Une carte par étudiant (filtré).
-                    for (final student in filtered) ...[
-                      StudentCard(
+                    for (final (i, student) in filtered.indexed) ...[
+                      // Les cartes arrivent l'une après l'autre (cascade).
+                      EntranceAnimation(
+                        key: ValueKey('entree-${student.id}'),
+                        index: i,
+                        child: StudentCard(
                         student: student,
                         onTap: () {
                           // Navigue vers l'écran profil en empilant une nouvelle
@@ -211,6 +227,7 @@ class _HomePageState extends State<HomePage> {
                           );
                         },
                         onDelete: () => _confirmDeletePortfolio(student),
+                        ),
                       ),
                       const SizedBox(height: 14),
                     ],
