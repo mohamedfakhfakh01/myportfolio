@@ -14,8 +14,10 @@ parcours) et de le montrer à un recruteur, hors ligne, depuis son téléphone.
 **Périmètre réel :** plusieurs portfolios, CRUD complet, tableau de bord avec score de complétion,
 export PDF, dépôts GitHub, thèmes clair/sombre, FR/EN. **Pas de sauvegarde** des données.
 **Stack :** Flutter 3.47 / Dart 3.13 · Material 3 · Provider · sqflite · API GitHub.
-**Cible testée :** **iOS** (simulateur + iPhone physique). Android : **compile** (APK release),
-mais jamais lancé sur appareil ni émulateur.
+**Cible :** **iPhone uniquement** (décision de l'utilisateur, 20 nov. 2026) — testé sur simulateur +
+iPhone physique. Le dossier `android/` est **gardé** (à sa demande, ne pas le supprimer) mais
+**non suivi** : il compile (APK signé clé debug), jamais lancé. Ne pas relancer de travail Android
+(émulateur, signature release, identifiant Play Store) sans demande explicite.
 
 ---
 
@@ -228,8 +230,10 @@ validation côté serveur ne s'appliquent pas ici.
 - ✅ Données persistées localement, migrations testées (aucune perte à la mise à jour).
 - ⚠️ **Aucune sauvegarde** : l'export/import JSON a été **retiré le 19 nov. 2026** à la demande
   de l'utilisateur. Les données ne vivent que sur l'appareil (récupérable via git : `638721f`).
-- ⚠️ **Android compilé mais jamais exécuté** ; APK signé avec la **clé de debug**
-  (`android/app/build.gradle.kts`), donc non publiable sur le Play Store.
+- ℹ️ **Android hors cible** (choix de l'utilisateur) : compilé mais jamais exécuté, APK signé avec la
+  **clé de debug**, identifiant `com.example.myportfolio` (refusé par le Play Store). Si un jour
+  Android redevient une cible : changer l'`applicationId` **avant** toute publication, puis signature
+  release (clé hors dépôt + `android/key.properties`, déjà ignorés par `android/.gitignore`).
 - ⚠️ Couverture de tests ≈ 78 % (des fichiers chargés par les tests) : logique, accueil (98 %),
   profil (82 %), PDF (97 %), détail projet (79 %), formulaires (75–95 %, création de CV 90 %).
   Restent hors tests : choix de photo (`image_picker`), ouverture de liens (`url_launcher`).
@@ -262,10 +266,9 @@ Aucune : l'application ne contacte que l'API GitHub publique, sans clé.
 
 ## 11. À faire
 
-- ~~Lancer l'APK sur un émulateur~~ : **écarté le 20 nov. 2026** (choix de l'utilisateur). État de la
-      machine : émulateur installé, mais dossiers `system-images/android-35` et `android-37.2` **vides**
-      (téléchargement inachevé) → il faudrait retélécharger une image (~1,5 Go) avant de créer un AVD.
-- [ ] Configurer une **signature release** Android avant toute publication.
+- ~~Émulateur Android~~ et ~~signature release Android~~ : **écartés le 20 nov. 2026** (app
+      iPhone uniquement). Pour mémoire : émulateur installé, mais `system-images/android-35` et
+      `android-37.2` **vides** (téléchargement inachevé, ~1,5 Go à refaire avant un AVD).
 - [ ] Migrer CocoaPods → Swift Package Manager.
 
 ---

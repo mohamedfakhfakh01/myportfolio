@@ -50,7 +50,8 @@ intégration de l'**API GitHub**.
 - **Flutter SDK** installé (`flutter --version`).
 - **Pour iOS** : Xcode, **CocoaPods** (`brew install cocoapods`), et soit un **simulateur iOS**,
   soit un **iPhone** en *Mode développeur* (signature configurée dans Xcode).
-- **Pour Android** : Android Studio et un **émulateur** (AVD).
+- **Android** : hors cible (l'app est faite pour l'iPhone) ; le dossier `android/` est conservé et
+  compile, mais n'est ni testé ni maintenu.
 
 > ⚠️ Le chemin du projet ne doit **pas contenir d'espaces** (Flutter échoue sinon sur les builds natifs).
 
@@ -136,8 +137,9 @@ lib/
 
 - **Aucune sauvegarde** : pas de synchronisation en ligne ni d'export des données. Elles vivent
   uniquement sur l'appareil ; supprimer l'app ou changer de téléphone les efface.
-- **Android** : l'APK release compile, mais n'a pas encore été testé sur un appareil ou un
-  émulateur. Il est signé avec la **clé de debug** (installable, mais refusé par le Play Store).
+- **Android hors cible** : l'app est conçue pour l'iPhone. L'APK release compile mais n'a jamais été
+  lancé ; il est signé avec la **clé de debug** et garde l'identifiant `com.example.myportfolio`
+  (tous deux refusés par le Play Store).
 - Couverture de tests ≈ 78 % : logique, écrans, export PDF et formulaires couverts ; le choix de
   photo et l'ouverture de liens (services du téléphone) ne sont pas testés automatiquement.
 - Export PDF : la police intégrée ne connaît que le Latin-1. La ponctuation typographique est
