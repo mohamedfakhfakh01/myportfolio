@@ -163,6 +163,10 @@ iPhone physique « iPhone de fakh » `00008120-000664510C70201E`.
     un seul contrôleur + `Interval`. Vérifier à l'écran : `simctl io recordVideo` puis extraire des
     images (script Swift AVFoundation, pas de ffmpeg sur cette machine) — une capture simple est
     plus lente que l'animation.
+31. **La CI est figée sur la version Flutter du Mac** (`flutter-version` dans `ci.yml`). Mettre à
+    jour Flutter sur le Mac ⇒ changer cette ligne dans le même commit, sinon local et CI divergent
+    (cas réel : CI rouge 5 jours, Flutter 3.50 en CI contre 3.47.4 en local). Vérifier la CI sans
+    `gh` : `curl https://api.github.com/repos/<dépôt>/actions/runs?head_sha=<sha>`.
 
 ---
 
@@ -277,11 +281,8 @@ Aucune : l'application ne contacte que l'API GitHub publique, sans clé.
       iPhone uniquement). Pour mémoire : émulateur installé, mais `system-images/android-35` et
       `android-37.2` **vides** (téléchargement inachevé, ~1,5 Go à refaire avant un AVD).
 - [x] ~~Migrer CocoaPods → Swift Package Manager~~ (20 nov. 2026).
-- [ ] **CI GitHub rouge depuis le 15 nov. 2026** (étape « Analyse statique ») : la CI installe la
-      *dernière* stable (Flutter **3.50**, Dart 3.14, sortie le 11 nov.) alors que le Mac est en
-      **3.47.4** — nouvelles règles d'analyse. En local, analyse et tests passent. Deux options :
-      figer la CI (`flutter-version: 3.47.4` dans `.github/workflows/ci.yml`, recommandé) ou passer
-      le Mac en 3.50 et corriger. Journaux de la CI : connexion GitHub requise (`gh` absent).
+- [x] ~~CI GitHub rouge~~ : **réparée le 20 nov. 2026** en figeant `flutter-version: 3.47.4` dans
+      `.github/workflows/ci.yml` (elle avait pris seule Flutter 3.50). Analyse + 210 tests verts.
 
 ---
 
@@ -312,7 +313,7 @@ Aucune : l'application ne contacte que l'API GitHub publique, sans clé.
 | Fin de CocoaPods | 20 nov. 2026 | `pod deintegrate`, `Podfile` supprimé : 100 % Swift Package Manager ; build sans locale UTF-8 vérifié, base + PDF testés sur simulateur |
 | Animations | 20 nov. 2026 | Cascade d'apparition (accueil, profil), chiffres qui comptent (complétion, tuiles), retour au toucher, transitions de l'aperçu GitHub et de l'icône thème ; « Réduire les animations » respecté partout (198 tests) |
 | Lisibilité & GitHub | 20 nov. 2026 | Plus aucun texte/icône indigo ou violet foncé en thème sombre (audit testé sur profil, À propos, Réglages) ; total GitHub exact (toutes les pages, « Plus de 500 » au-delà) (210 tests) |
-| Clôture | 20 nov. 2026 | Version 1.5.1 sur l'iPhone ; CI rouge découverte (Flutter 3.50 sur GitHub ≠ 3.47.4 en local), notée dans « À faire » |
+| Clôture | 20 nov. 2026 | Version 1.5.1 sur l'iPhone ; CI rouge (Flutter 3.50 sur GitHub ≠ 3.47.4 en local) réparée en figeant la version : verte |
 
 ---
 
