@@ -55,7 +55,7 @@ encore le garde jusqu'à ce que l'utilisateur le supprime (corbeille) ; il ne re
 export PATH="$HOME/flutter/bin:$PATH"      # Flutter n'est PAS dans le PATH
 
 flutter analyze                             # 0 erreur attendu
-flutter test                                # 210 tests
+flutter test                                # 220 tests
 flutter gen-l10n                            # APRÈS toute modif des .arb
 flutter run -d 87E626E0-E743-44A6-8A48-AA716FD7851B --debug   # simulateur iPhone 18 Pro Max
 flutter build ios --release                 # puis: flutter install -d <udid> --release
@@ -167,6 +167,10 @@ iPhone physique « iPhone de fakh » `00008120-000664510C70201E`.
     jour Flutter sur le Mac ⇒ changer cette ligne dans le même commit, sinon local et CI divergent
     (cas réel : CI rouge 5 jours, Flutter 3.50 en CI contre 3.47.4 en local). Vérifier la CI sans
     `gh` : `curl https://api.github.com/repos/<dépôt>/actions/runs?head_sha=<sha>`.
+32. **Toute nouvelle page passe par `app_routes.dart`** : y déclarer une constante + un `case` dans
+    `onGenerateRoute` (avec `when args is …` pour vérifier l'argument), puis
+    `Navigator.pushNamed`. Un test d'écran qui navigue doit fournir
+    `onGenerateRoute: AppRoutes.onGenerateRoute` à son `MaterialApp`, sinon la navigation échoue.
 
 ---
 
@@ -194,7 +198,7 @@ Les dégradés vont systématiquement **primaire → violet**.
 ```
 lib/
 ├── main.dart
-├── app/                     # racine, thème, nav flottante, À propos, Réglages
+├── app/                     # racine, app_routes.dart (routes nommées), thème, nav flottante, À propos, Réglages
 ├── core/                    # database/ (schéma + migrations), widgets/ (transitions, motion.dart)
 ├── shared/
 │   ├── models/              # Student, Skill, Project, ExperienceEntry
@@ -211,6 +215,12 @@ lib/
 ```
 
 **Décisions structurantes :**
+- **Routes nommées**, toutes déclarées dans `lib/app/app_routes.dart` (`/`, `/profil`, `/projet`,
+  `/portfolio/nouveau`, `/portfolio/modifier`) ; les pages naviguent par `Navigator.pushNamed` et
+  n'importent plus les autres pages. Argument manquant ou adresse inconnue → « Page introuvable ».
+- Formulaire de CV : `pages/student_form_page.dart` ; ses feuilles « brouillon » (rien en base tant
+  qu'on n'a pas créé) dans `widgets/*_draft_sheet.dart` ; les 4 listes du formulaire = un seul
+  widget `DraftListSection` ; l'aperçu GitHub dans `features/github/.../github_account_preview.dart`.
 - Architecture **feature-first** ; `domain/` contient la logique **pure et testable**
   (complétion du profil) séparée de l'interface.
 - Le `PortfolioProvider` **recharge depuis la base** après chaque écriture : l'UI ne devine jamais
@@ -314,6 +324,7 @@ Aucune : l'application ne contacte que l'API GitHub publique, sans clé.
 | Animations | 20 nov. 2026 | Cascade d'apparition (accueil, profil), chiffres qui comptent (complétion, tuiles), retour au toucher, transitions de l'aperçu GitHub et de l'icône thème ; « Réduire les animations » respecté partout (198 tests) |
 | Lisibilité & GitHub | 20 nov. 2026 | Plus aucun texte/icône indigo ou violet foncé en thème sombre (audit testé sur profil, À propos, Réglages) ; total GitHub exact (toutes les pages, « Plus de 500 » au-delà) (210 tests) |
 | Clôture | 20 nov. 2026 | Version 1.5.1 sur l'iPhone ; CI rouge (Flutter 3.50 sur GitHub ≠ 3.47.4 en local) réparée en figeant la version : verte |
+| Bilan DS | 23 nov. 2026 | Comparaison au barème de la prof : routes nommées (`app_routes.dart`), formulaire de 1 143 lignes découpé en 6 fichiers, 4 listes dupliquées → `DraftListSection` (220 tests) |
 
 ---
 

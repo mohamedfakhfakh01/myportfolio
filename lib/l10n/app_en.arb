@@ -7,6 +7,7 @@
   "add": "Add",
   "retry": "Retry",
   "loadError": "Could not load the data.",
+  "pageNotFound": "Page not found",
   "remove": "Remove",
 
   "navHome": "Home",

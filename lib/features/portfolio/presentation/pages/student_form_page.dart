@@ -1,15 +1,11 @@
 import 'dart:async';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
-
 import '../../../../app/theme/app_colors.dart';
-import '../../../../core/widgets/fade_slide_route.dart';
 import '../../../../core/widgets/motion.dart';
 import '../../../github/data/github_repo.dart';
 import '../../../github/data/github_service.dart';
@@ -22,18 +18,12 @@ import '../../../../shared/utils/email.dart';
 import '../../../../shared/utils/github.dart';
 import '../../../../shared/widgets/form_sheet.dart';
 import '../../providers/portfolio_provider.dart';
-import 'skill_category_label.dart';
-
-/// Ouvre l'**écran plein** d'édition (si [student] est fourni) ou de **création**
-/// d'un portfolio (si [student] est null).
-///
-/// Historiquement c'était une petite boîte de dialogue ; c'est maintenant une
-/// page complète, plus claire et plus lisible.
-Future<void> showStudentEditDialog(BuildContext context, {Student? student}) {
-  return Navigator.of(context).push(
-    fadeSlideRoute(StudentFormPage(student: student)),
-  );
-}
+import '../widgets/skill_category_label.dart';
+import '../../../github/presentation/widgets/github_account_preview.dart';
+import '../widgets/draft_list_section.dart';
+import '../widgets/experience_draft_sheet.dart';
+import '../widgets/project_draft_sheet.dart';
+import '../widgets/skill_draft_sheet.dart';
 
 /// Formulaire plein écran pour créer ou modifier un portfolio étudiant.
 class StudentFormPage extends StatefulWidget {
@@ -190,7 +180,7 @@ class _StudentFormPageState extends State<StudentFormPage> {
   Future<void> _addProject() async {
     final Project? project = await showFormSheet<Project>(
       context,
-      builder: (_) => const _ProjectInputDialog(),
+      builder: (_) => const ProjectDraftSheet(),
     );
     if (project != null) setState(() => _projects.add(project));
   }
@@ -200,7 +190,7 @@ class _StudentFormPageState extends State<StudentFormPage> {
   Future<void> _addSkill() async {
     final Skill? skill = await showFormSheet<Skill>(
       context,
-      builder: (_) => const _SkillInputDialog(),
+      builder: (_) => const SkillDraftSheet(),
     );
     if (skill != null) setState(() => _skills.add(skill));
   }
@@ -210,7 +200,7 @@ class _StudentFormPageState extends State<StudentFormPage> {
   Future<void> _addExperienceEntry(ExperienceKind kind) async {
     final ExperienceEntry? entry = await showFormSheet<ExperienceEntry>(
       context,
-      builder: (_) => _ExperienceInputDialog(kind: kind),
+      builder: (_) => ExperienceDraftSheet(kind: kind),
     );
     if (entry != null) setState(() => _experiences.add(entry));
   }
@@ -222,24 +212,6 @@ class _StudentFormPageState extends State<StudentFormPage> {
       if (e.period != null && e.period!.isNotEmpty) e.period!,
     ];
     return parts.isEmpty ? null : parts.join(' · ');
-  }
-
-  /// En-tête de section : titre à gauche, bouton « + » à droite.
-  Widget _sectionHeader(String title, String addTooltip, VoidCallback onAdd) {
-    final TextTheme text = Theme.of(context).textTheme;
-    return Row(
-      children: [
-        // Le titre prend la place restante et passe à la ligne si besoin
-        // (texte agrandi en accessibilité) au lieu de pousser le « + » hors
-        // de l'écran.
-        Expanded(child: Text(title, style: text.titleMedium)),
-        IconButton(
-          icon: Icon(Icons.add_circle, color: AppColors.primaryText),
-          tooltip: addTooltip,
-          onPressed: onAdd,
-        ),
-      ],
-    );
   }
 
   /// Appelé à chaque frappe dans le champ GitHub : efface l'ancien aperçu et
@@ -509,7 +481,7 @@ class _StudentFormPageState extends State<StudentFormPage> {
                   child: AnimatedSwitcher(
                     duration: motionDuration(
                         context, const Duration(milliseconds: 250)),
-                    child: _GithubPreview(
+                    child: GithubAccountPreview(
                       key: ValueKey<String>(
                         '$_previewUser|$_previewLoading|$_previewUnknown|'
                         '${_previewRepos?.length}',
@@ -569,129 +541,66 @@ class _StudentFormPageState extends State<StudentFormPage> {
                 ),
                 const SizedBox(height: 8),
 
-                // --- Compétences & projets (ajoutés dès la création) ---
+                // --- Contenu (ajouté dès la création) : 4 sections sur le
+                // même modèle, un seul widget réutilisable ---
                 if (_isCreating) ...[
-                  _sectionHeader(l.skillsOptional, l.addSkill, _addSkill),
-                  if (_skills.isEmpty)
-                    Text(
-                      l.noSkillAdded,
-                      style: text.bodyMedium
-                          ?.copyWith(color: AppColors.textSecondary),
-                    )
-                  else
-                    for (int i = 0; i < _skills.length; i++)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: Card(
-                          child: ListTile(
-                            title: Text(_skills[i].name),
-                            subtitle: Text(
-                              _skills[i].level != null
-                                  ? '${skillCategoryLabel(l, _skills[i].category)} · ${_skills[i].level}%'
-                                  : skillCategoryLabel(l, _skills[i].category),
-                            ),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.delete_outline),
-                              tooltip: l.remove,
-                              onPressed: () =>
-                                  setState(() => _skills.removeAt(i)),
-                            ),
-                          ),
+                  DraftListSection(
+                    title: l.skillsOptional,
+                    addTooltip: l.addSkill,
+                    onAdd: _addSkill,
+                    emptyMessage: l.noSkillAdded,
+                    items: [
+                      for (final Skill s in _skills)
+                        DraftListItem(
+                          title: s.name,
+                          subtitle: s.level != null
+                              ? '${skillCategoryLabel(l, s.category)} · ${s.level}%'
+                              : skillCategoryLabel(l, s.category),
+                          onRemove: () => setState(() => _skills.remove(s)),
                         ),
-                      ),
+                    ],
+                  ),
                   const SizedBox(height: 16),
-                  _sectionHeader(l.projectsOptional, l.addProject, _addProject),
-                  if (_projects.isEmpty)
-                    Text(
-                      l.noProjectAdded,
-                      style: text.bodyMedium
-                          ?.copyWith(color: AppColors.textSecondary),
-                    )
-                  else
-                    for (int i = 0; i < _projects.length; i++)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: Card(
-                          child: ListTile(
-                            title: Text(_projects[i].title),
-                            subtitle: Text(
-                              _projects[i].description,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.delete_outline),
-                              tooltip: l.remove,
-                              onPressed: () =>
-                                  setState(() => _projects.removeAt(i)),
-                            ),
-                          ),
+                  DraftListSection(
+                    title: l.projectsOptional,
+                    addTooltip: l.addProject,
+                    onAdd: _addProject,
+                    emptyMessage: l.noProjectAdded,
+                    items: [
+                      for (final Project p in _projects)
+                        DraftListItem(
+                          title: p.title,
+                          subtitle: p.description,
+                          subtitleMaxLines: 2,
+                          onRemove: () => setState(() => _projects.remove(p)),
                         ),
-                      ),
+                    ],
+                  ),
                   const SizedBox(height: 16),
-
-                  // --- Expérience ---
-                  _sectionHeader(l.experienceTitle, l.addExperience,
-                      () => _addExperienceEntry(ExperienceKind.experience)),
-                  if (!_experiences
-                      .any((e) => e.kind == ExperienceKind.experience))
-                    Text(
-                      l.experienceEmpty,
-                      style: text.bodyMedium
-                          ?.copyWith(color: AppColors.textSecondary),
-                    )
-                  else
-                    for (final e in _experiences
-                        .where((e) => e.kind == ExperienceKind.experience))
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: Card(
-                          child: ListTile(
-                            title: Text(e.title),
-                            subtitle: _experienceMeta(e) == null
-                                ? null
-                                : Text(_experienceMeta(e)!),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.delete_outline),
-                              tooltip: l.remove,
-                              onPressed: () =>
-                                  setState(() => _experiences.remove(e)),
-                            ),
+                  for (final (kind, title, addTooltip, empty) in [
+                    (ExperienceKind.experience, l.experienceTitle,
+                        l.addExperience, l.experienceEmpty),
+                    (ExperienceKind.education, l.educationTitle,
+                        l.addEducation, l.educationEmpty),
+                  ]) ...[
+                    DraftListSection(
+                      title: title,
+                      addTooltip: addTooltip,
+                      onAdd: () => _addExperienceEntry(kind),
+                      emptyMessage: empty,
+                      items: [
+                        for (final ExperienceEntry e
+                            in _experiences.where((e) => e.kind == kind))
+                          DraftListItem(
+                            title: e.title,
+                            subtitle: _experienceMeta(e),
+                            onRemove: () =>
+                                setState(() => _experiences.remove(e)),
                           ),
-                        ),
-                      ),
-                  const SizedBox(height: 16),
-
-                  // --- Formation ---
-                  _sectionHeader(l.educationTitle, l.addEducation,
-                      () => _addExperienceEntry(ExperienceKind.education)),
-                  if (!_experiences
-                      .any((e) => e.kind == ExperienceKind.education))
-                    Text(
-                      l.educationEmpty,
-                      style: text.bodyMedium
-                          ?.copyWith(color: AppColors.textSecondary),
-                    )
-                  else
-                    for (final e in _experiences
-                        .where((e) => e.kind == ExperienceKind.education))
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: Card(
-                          child: ListTile(
-                            title: Text(e.title),
-                            subtitle: _experienceMeta(e) == null
-                                ? null
-                                : Text(_experienceMeta(e)!),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.delete_outline),
-                              tooltip: l.remove,
-                              onPressed: () =>
-                                  setState(() => _experiences.remove(e)),
-                            ),
-                          ),
-                        ),
-                      ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                  ],
                 ],
                 const SizedBox(height: 28),
 
@@ -716,427 +625,6 @@ class _StudentFormPageState extends State<StudentFormPage> {
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-/// Petit formulaire pour saisir un projet (titre, description, lien) et le
-/// **renvoyer** via `Navigator.pop`, sans toucher à la base de données.
-class _ProjectInputDialog extends StatefulWidget {
-  const _ProjectInputDialog();
-
-  @override
-  State<_ProjectInputDialog> createState() => _ProjectInputDialogState();
-}
-
-class _ProjectInputDialogState extends State<_ProjectInputDialog> {
-  final _formKey = GlobalKey<FormState>();
-  final _titleController = TextEditingController();
-  final _descriptionController = TextEditingController();
-  final _linkController = TextEditingController();
-  final _tagsController = TextEditingController();
-
-  @override
-  void dispose() {
-    _titleController.dispose();
-    _descriptionController.dispose();
-    _linkController.dispose();
-    _tagsController.dispose();
-    super.dispose();
-  }
-
-  void _submit() {
-    if (!_formKey.currentState!.validate()) return;
-    final String link = _linkController.text.trim();
-    final List<String> tags = Project.parseTags(_tagsController.text);
-    Navigator.of(context).pop(
-      Project(
-        title: _titleController.text.trim(),
-        description: _descriptionController.text.trim(),
-        link: link.isEmpty ? null : link,
-        tags: tags,
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final AppLocalizations l = AppLocalizations.of(context);
-    return FormSheetBody(
-      title: l.projectAddTitle,
-      content: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextFormField(
-              controller: _titleController,
-              textCapitalization: TextCapitalization.sentences,
-              decoration: InputDecoration(labelText: l.titleLabel),
-              validator: (v) => (v == null || v.trim().isEmpty)
-                  ? l.titleRequired
-                  : null,
-            ),
-            const SizedBox(height: 12),
-            TextFormField(
-              controller: _descriptionController,
-              textCapitalization: TextCapitalization.sentences,
-              maxLines: 3,
-              decoration: InputDecoration(labelText: l.descriptionLabel),
-              validator: (v) => (v == null || v.trim().isEmpty)
-                  ? l.descriptionRequired
-                  : null,
-            ),
-            const SizedBox(height: 12),
-            TextFormField(
-              controller: _linkController,
-              keyboardType: TextInputType.url,
-              decoration: InputDecoration(labelText: l.linkLabel),
-            ),
-            const SizedBox(height: 12),
-            TextFormField(
-              controller: _tagsController,
-              textCapitalization: TextCapitalization.words,
-              decoration: InputDecoration(
-                labelText: l.technologiesLabel,
-                hintText: l.technologiesHint,
-              ),
-            ),
-          ],
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: Text(l.cancel),
-        ),
-        TextButton(
-          onPressed: _submit,
-          child: Text(l.add),
-        ),
-      ],
-    );
-  }
-}
-
-/// Petit formulaire pour saisir une compétence (nom, niveau, catégorie) et la
-/// **renvoyer** via `Navigator.pop`, sans toucher à la base de données.
-class _SkillInputDialog extends StatefulWidget {
-  const _SkillInputDialog();
-
-  @override
-  State<_SkillInputDialog> createState() => _SkillInputDialogState();
-}
-
-class _SkillInputDialogState extends State<_SkillInputDialog> {
-  final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _levelController = TextEditingController();
-  SkillCategory _category = SkillCategory.other;
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _levelController.dispose();
-    super.dispose();
-  }
-
-  void _submit() {
-    if (!_formKey.currentState!.validate()) return;
-    final String levelText = _levelController.text.trim();
-    Navigator.of(context).pop(
-      Skill(
-        name: _nameController.text.trim(),
-        level: levelText.isEmpty ? null : int.parse(levelText),
-        category: _category,
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final AppLocalizations l = AppLocalizations.of(context);
-    return FormSheetBody(
-      title: l.skillAddTitle,
-      content: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextFormField(
-              controller: _nameController,
-              textCapitalization: TextCapitalization.words,
-              decoration: InputDecoration(
-                labelText: l.nameLabel,
-                hintText: l.skillNameHint,
-              ),
-              validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? l.nameRequired : null,
-            ),
-            const SizedBox(height: 12),
-            TextFormField(
-              controller: _levelController,
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              decoration: InputDecoration(labelText: l.levelLabel),
-              validator: (v) {
-                if (v == null || v.trim().isEmpty) return null;
-                final int? n = int.tryParse(v.trim());
-                if (n == null) return l.enterNumber;
-                if (n < 0 || n > 100) return l.between0and100;
-                return null;
-              },
-            ),
-            const SizedBox(height: 12),
-            DropdownButtonFormField<SkillCategory>(
-              initialValue: _category,
-              decoration: InputDecoration(labelText: l.categoryLabel),
-              items: [
-                for (final c in SkillCategory.values)
-                  DropdownMenuItem(
-                    value: c,
-                    child: Text(skillCategoryLabel(l, c)),
-                  ),
-              ],
-              onChanged: (value) {
-                if (value != null) setState(() => _category = value);
-              },
-            ),
-          ],
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: Text(l.cancel),
-        ),
-        TextButton(
-          onPressed: _submit,
-          child: Text(l.add),
-        ),
-      ],
-    );
-  }
-}
-
-/// Petit formulaire pour saisir une entrée de parcours (intitulé, organisation,
-/// période, description) d'un [ExperienceKind] donné, et la **renvoyer** via
-/// `Navigator.pop`, sans toucher à la base de données.
-class _ExperienceInputDialog extends StatefulWidget {
-  const _ExperienceInputDialog({required this.kind});
-
-  final ExperienceKind kind;
-
-  @override
-  State<_ExperienceInputDialog> createState() => _ExperienceInputDialogState();
-}
-
-class _ExperienceInputDialogState extends State<_ExperienceInputDialog> {
-  final _formKey = GlobalKey<FormState>();
-  final _titleController = TextEditingController();
-  final _orgController = TextEditingController();
-  final _periodController = TextEditingController();
-  final _descController = TextEditingController();
-
-  @override
-  void dispose() {
-    _titleController.dispose();
-    _orgController.dispose();
-    _periodController.dispose();
-    _descController.dispose();
-    super.dispose();
-  }
-
-  String? _orNull(String s) => s.trim().isEmpty ? null : s.trim();
-
-  void _submit() {
-    if (!_formKey.currentState!.validate()) return;
-    Navigator.of(context).pop(
-      ExperienceEntry(
-        kind: widget.kind,
-        title: _titleController.text.trim(),
-        organization: _orNull(_orgController.text),
-        period: _orNull(_periodController.text),
-        description: _orNull(_descController.text),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final AppLocalizations l = AppLocalizations.of(context);
-    return FormSheetBody(
-      title: l.entryAddTitle,
-      content: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextFormField(
-              controller: _titleController,
-              textCapitalization: TextCapitalization.sentences,
-              decoration: InputDecoration(labelText: l.titleLabel),
-              validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? l.titleRequired : null,
-            ),
-            const SizedBox(height: 12),
-            TextFormField(
-              controller: _orgController,
-              textCapitalization: TextCapitalization.words,
-              decoration: InputDecoration(labelText: l.organizationLabel),
-            ),
-            const SizedBox(height: 12),
-            TextFormField(
-              controller: _periodController,
-              decoration: InputDecoration(
-                labelText: l.periodLabel,
-                hintText: l.periodHint,
-              ),
-            ),
-            const SizedBox(height: 12),
-            TextFormField(
-              controller: _descController,
-              textCapitalization: TextCapitalization.sentences,
-              maxLines: 3,
-              decoration: InputDecoration(labelText: l.entryDescLabel),
-            ),
-          ],
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: Text(l.cancel),
-        ),
-        TextButton(
-          onPressed: _submit,
-          child: Text(l.add),
-        ),
-      ],
-    );
-  }
-}
-
-/// Aperçu sous le champ GitHub : la preuve que c'est le bon compte, avec ses
-/// derniers dépôts publics (les plus récemment mis à jour d'abord).
-class _GithubPreview extends StatelessWidget {
-  const _GithubPreview({
-    super.key,
-    required this.loading,
-    required this.repos,
-    required this.unknown,
-  });
-
-  final bool loading;
-  final List<GithubRepo>? repos;
-  final bool unknown;
-
-  /// Nombre de dépôts listés ; les autres sont résumés en « + N autres ».
-  static const int _shown = 5;
-
-  /// Nombre maximal demandé à GitHub ; au-delà, on ne connaît pas le total.
-  static const int _fetched = 100;
-
-  @override
-  Widget build(BuildContext context) {
-    final AppLocalizations l = AppLocalizations.of(context);
-    final TextTheme text = Theme.of(context).textTheme;
-    final ColorScheme colors = Theme.of(context).colorScheme;
-
-    Widget line(Widget icon, String label, {Color? color}) => Padding(
-          padding: const EdgeInsets.only(top: 8, left: 12),
-          child: Row(
-            children: [
-              icon,
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(label,
-                    style: text.bodySmall?.copyWith(color: color)),
-              ),
-            ],
-          ),
-        );
-
-    if (loading) {
-      return line(
-        const SizedBox.square(
-          dimension: 14,
-          child: CircularProgressIndicator(strokeWidth: 2),
-        ),
-        l.githubPreviewLoading,
-      );
-    }
-    if (unknown) {
-      return line(
-        Icon(Icons.cloud_off_outlined, size: 16, color: colors.outline),
-        l.githubPreviewUnknown,
-        color: colors.outline,
-      );
-    }
-    final List<GithubRepo>? found = repos;
-    if (found == null) return const SizedBox.shrink();
-
-    final int more = found.length - _shown;
-    final Color accent = AppColors.primaryText; // lisible dans les 2 thèmes
-    return Container(
-      margin: const EdgeInsets.only(top: 10),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppColors.primarySoft,
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(Icons.check_circle, size: 18, color: accent),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(l.githubPreviewFound,
-                    style: text.labelLarge?.copyWith(color: accent)),
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          if (found.isEmpty)
-            Text(l.githubPreviewNoRepos, style: text.bodySmall)
-          else ...[
-            for (final GithubRepo repo in found.take(_shown))
-              Padding(
-                padding: const EdgeInsets.only(top: 4),
-                child: Row(
-                  children: [
-                    const Icon(Icons.book_outlined, size: 16),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: Text(
-                        repo.name,
-                        style: text.bodyMedium,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    if (repo.language != null) ...[
-                      const SizedBox(width: 8),
-                      Text(repo.language!, style: text.bodySmall),
-                    ],
-                  ],
-                ),
-              ),
-            if (more > 0)
-              Padding(
-                padding: const EdgeInsets.only(top: 6),
-                child: Text(
-                  // 100 dépôts reçus = la limite : le vrai total est inconnu.
-                  found.length >= _fetched
-                      ? l.githubPreviewManyMore
-                      : l.githubPreviewMore(more),
-                  style: text.bodySmall,
-                ),
-              ),
-          ],
-        ],
       ),
     );
   }

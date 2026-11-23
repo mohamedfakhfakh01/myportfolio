@@ -3,14 +3,12 @@ import 'package:provider/provider.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/theme_controller.dart';
-import '../../../../core/widgets/fade_slide_route.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/student.dart';
 import '../../providers/portfolio_provider.dart';
 import '../widgets/student_card.dart';
-import '../widgets/student_edit_dialog.dart';
-import 'profile_page.dart';
 import '../../../../core/widgets/motion.dart';
+import '../../../../app/app_routes.dart';
 
 /// Écran d'**accueil** : liste les portfolios des deux étudiants du binôme.
 ///
@@ -222,8 +220,9 @@ class _HomePageState extends State<HomePage> {
                           // Navigue vers l'écran profil en empilant une nouvelle
                           // page. `Navigator.push` ajoute ProfilePage au-dessus
                           // de l'accueil ; la flèche de retour la retire.
-                          Navigator.of(context).push(
-                            fadeSlideRoute(ProfilePage(studentId: student.id!)),
+                          Navigator.of(context).pushNamed(
+                            AppRoutes.profil,
+                            arguments: student.id!,
                           );
                         },
                         onDelete: () => _confirmDeletePortfolio(student),
@@ -238,7 +237,8 @@ class _HomePageState extends State<HomePage> {
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(bottom: 108),
         child: FloatingActionButton.extended(
-          onPressed: () => showStudentEditDialog(context),
+          onPressed: () =>
+              Navigator.of(context).pushNamed(AppRoutes.nouveauPortfolio),
           icon: const Icon(Icons.add),
           label: Text(l.addCv),
         ),

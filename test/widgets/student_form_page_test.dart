@@ -15,7 +15,7 @@ import 'package:myportfolio/app/theme/app_colors.dart';
 import 'package:myportfolio/app/theme/app_theme.dart';
 import 'package:myportfolio/features/github/data/github_service.dart';
 
-import 'package:myportfolio/features/portfolio/presentation/widgets/student_edit_dialog.dart';
+import 'package:myportfolio/features/portfolio/presentation/pages/student_form_page.dart';
 import 'package:myportfolio/features/portfolio/providers/portfolio_provider.dart';
 import 'package:myportfolio/l10n/app_localizations.dart';
 import 'package:myportfolio/shared/models/experience.dart';

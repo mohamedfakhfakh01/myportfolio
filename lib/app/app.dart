@@ -3,8 +3,8 @@ import 'package:provider/provider.dart';
 
 import '../features/portfolio/providers/portfolio_provider.dart';
 import '../l10n/app_localizations.dart';
+import 'app_routes.dart';
 import 'locale_controller.dart';
-import 'main_shell.dart';
 import 'theme/app_colors.dart';
 import 'theme/app_theme.dart';
 import 'theme/theme_controller.dart';
@@ -46,8 +46,12 @@ class MyPortfolioApp extends StatelessWidget {
             locale: localeController.locale,
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
-            // Écran de départ : la coquille à onglets (Accueil / À propos / Réglages).
-            home: const MainShell(),
+            // Navigation par ROUTES NOMMÉES, toutes déclarées dans
+            // app_routes.dart. Écran de départ : « / » = la coquille à onglets
+            // (Accueil / À propos / Réglages).
+            initialRoute: AppRoutes.accueil,
+            onGenerateRoute: AppRoutes.onGenerateRoute,
+            onUnknownRoute: AppRoutes.onUnknownRoute,
           );
         },
       ),

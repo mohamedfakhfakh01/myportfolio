@@ -6,8 +6,12 @@ import 'motion.dart';
 ///
 /// Remplace la transition par défaut (`MaterialPageRoute`) pour un rendu plus
 /// doux et moderne. Les animations `Hero` continuent de fonctionner par-dessus.
-Route<T> fadeSlideRoute<T>(Widget page) {
+///
+/// [settings] porte le **nom** de la route et ses arguments (routes nommées,
+/// voir `lib/app/app_routes.dart`).
+Route<T> fadeSlideRoute<T>(Widget page, {RouteSettings? settings}) {
   return PageRouteBuilder<T>(
+    settings: settings,
     transitionDuration: const Duration(milliseconds: 350),
     reverseTransitionDuration: const Duration(milliseconds: 300),
     pageBuilder: (context, animation, secondaryAnimation) => page,

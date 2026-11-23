@@ -134,6 +134,12 @@ abstract class AppLocalizations {
   /// **'Impossible de charger les données.'**
   String get loadError;
 
+  /// No description provided for @pageNotFound.
+  ///
+  /// In fr, this message translates to:
+  /// **'Page introuvable'**
+  String get pageNotFound;
+
   /// No description provided for @remove.
   ///
   /// In fr, this message translates to:

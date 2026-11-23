@@ -28,6 +28,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get loadError => 'Impossible de charger les données.';
 
   @override
+  String get pageNotFound => 'Page introuvable';
+
+  @override
   String get remove => 'Retirer';
 
   @override

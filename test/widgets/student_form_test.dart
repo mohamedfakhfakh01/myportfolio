@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 
 import 'package:myportfolio/features/portfolio/data/portfolio_repository.dart';
-import 'package:myportfolio/features/portfolio/presentation/widgets/student_edit_dialog.dart';
+import 'package:myportfolio/features/portfolio/presentation/pages/student_form_page.dart';
 import 'package:myportfolio/features/portfolio/providers/portfolio_provider.dart';
 import 'package:myportfolio/l10n/app_localizations.dart';
 import 'package:myportfolio/shared/models/student.dart';

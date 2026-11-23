@@ -3,7 +3,6 @@ import 'package:printing/printing.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../app/theme/app_colors.dart';
-import '../../../../core/widgets/fade_slide_route.dart';
 import '../../domain/profile_completion.dart';
 import '../../services/portfolio_pdf.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -19,15 +18,14 @@ import '../widgets/profile_completion_card.dart';
 import '../widgets/profile_completion_sheet.dart';
 import '../widgets/project_card.dart';
 import '../widgets/project_form_dialog.dart';
-import 'project_detail_page.dart';
 import '../widgets/quick_actions_row.dart';
 import '../widgets/skill_category_label.dart';
 import '../widgets/skill_level_tile.dart';
 import '../widgets/stat_tile.dart';
 import '../widgets/skill_form_dialog.dart';
 import '../widgets/student_avatar.dart';
-import '../widgets/student_edit_dialog.dart';
 import '../../../../core/widgets/motion.dart';
+import '../../../../app/app_routes.dart';
 
 /// Écran **profil** : affiche (et permet de modifier) le portfolio d'un étudiant.
 ///
@@ -127,7 +125,10 @@ class _ProfilePageState extends State<ProfilePage> {
           IconButton(
             icon: const Icon(Icons.edit_outlined),
             tooltip: l.editProfile,
-            onPressed: () => showStudentEditDialog(context, student: student),
+            onPressed: () => Navigator.of(context).pushNamed(
+              AppRoutes.modifierPortfolio,
+              arguments: student,
+            ),
           ),
         ],
       ),
@@ -448,12 +449,11 @@ class _ProfilePageState extends State<ProfilePage> {
                     for (final project in visibleProjects) ...[
                       ProjectCard(
                         project: project,
-                        onTap: () => Navigator.of(context).push(
-                          fadeSlideRoute(
-                            ProjectDetailPage(
-                              studentId: studentId,
-                              projectId: project.id!,
-                            ),
+                        onTap: () => Navigator.of(context).pushNamed(
+                          AppRoutes.projet,
+                          arguments: ProjectRouteArgs(
+                            studentId: studentId,
+                            projectId: project.id!,
                           ),
                         ),
                       ),

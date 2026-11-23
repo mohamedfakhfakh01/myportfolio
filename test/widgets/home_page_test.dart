@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 
+import 'package:myportfolio/app/app_routes.dart';
 import 'package:myportfolio/app/theme/theme_controller.dart';
 import 'package:myportfolio/features/portfolio/data/portfolio_repository.dart';
 import 'package:myportfolio/features/portfolio/presentation/pages/home_page.dart';
@@ -72,6 +73,8 @@ Future<PortfolioProvider> _pumpHome(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: const HomePage(),
+        // Comme dans l'app : la navigation passe par les routes nommées.
+        onGenerateRoute: AppRoutes.onGenerateRoute,
       ),
     ),
   );
