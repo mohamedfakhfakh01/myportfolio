@@ -324,7 +324,7 @@ Aucune : l'application ne contacte que l'API GitHub publique, sans clé.
 | Animations | 20 nov. 2026 | Cascade d'apparition (accueil, profil), chiffres qui comptent (complétion, tuiles), retour au toucher, transitions de l'aperçu GitHub et de l'icône thème ; « Réduire les animations » respecté partout (198 tests) |
 | Lisibilité & GitHub | 20 nov. 2026 | Plus aucun texte/icône indigo ou violet foncé en thème sombre (audit testé sur profil, À propos, Réglages) ; total GitHub exact (toutes les pages, « Plus de 500 » au-delà) (210 tests) |
 | Clôture | 20 nov. 2026 | Version 1.5.1 sur l'iPhone ; CI rouge (Flutter 3.50 sur GitHub ≠ 3.47.4 en local) réparée en figeant la version : verte |
-| Bilan DS | 23 nov. 2026 | Comparaison au barème de la prof : routes nommées (`app_routes.dart`), formulaire de 1 143 lignes découpé en 6 fichiers, 4 listes dupliquées → `DraftListSection` (220 tests) |
+| Bilan DS | 23 nov. 2026 | Comparaison au barème de la prof : routes nommées (`app_routes.dart`), formulaire de 1 143 lignes découpé en 6 fichiers, 4 listes dupliquées → `DraftListSection` (220 tests) ; fiche de révision `REVISION_DS.md` pour les questions individuelles (à tenir à jour si le code change) |
 
 ---
 
